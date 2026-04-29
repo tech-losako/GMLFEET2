@@ -17,83 +17,11 @@ const carsData = {
 };
 
 function openModal(carKey) {
-    const data = carsData[carKey];
-    if(!data) return;
-
-    // Set the data
-    document.getElementById('modalCarTitle').textContent = data.name;
-    document.getElementById('modalCarImg').src = data.img;
-    document.getElementById('selectedVehicle').value = data.name;
-    document.getElementById('modalValPrix').textContent = data.prix;
-    document.getElementById('modalValAcompte').textContent = data.acompte;
-    
-    // Hide general select if it was open
-    const generalSelectContainer = document.getElementById('generalVehicleSelectContainer');
-    if(generalSelectContainer) generalSelectContainer.classList.add('hidden');
-    const featuresContainer = document.getElementById('modalCarFeatures');
-    if(featuresContainer) featuresContainer.classList.remove('hidden');
-    
-    // Reset form states and visibility
-    appForm.reset();
-    appForm.classList.remove('hidden');
-    successMessage.classList.add('hidden');
-
-    // Make modal info full width initially, hide form
-    modalInfoPart.className = "w-full bg-gray-50 p-8 flex flex-col items-center justify-center border-r border-gray-100 transition-all duration-300";
-    modalFormPart.classList.add('hidden');
-    modalFormPart.classList.remove('w-full', 'md:w-7/12');
-    showFormBtn.classList.remove('hidden');
-    
-    // Show modal container
-    modal.classList.remove('hidden');
-    
-    // Trigger animations (slight delay to allow display:block to apply)
-    setTimeout(() => {
-        modalBackdrop.classList.remove('opacity-0');
-        modalBackdrop.classList.add('opacity-100');
-        
-        modalPanel.classList.remove('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
-        modalPanel.classList.add('opacity-100', 'translate-y-0', 'sm:scale-100');
-    }, 10);
-    
-    // Prevent background scrolling
-    document.body.style.overflow = 'hidden';
+    window.location.href = `detail-vehicule.html?car=${carKey}`;
 }
 
 function openGeneralModal() {
-    // Reset form states and visibility
-    appForm.reset();
-    appForm.classList.remove('hidden');
-    successMessage.classList.add('hidden');
-
-    // General state
-    document.getElementById('modalCarTitle').textContent = "Sélectionnez un véhicule";
-    document.getElementById('modalCarImg').src = "./img/fleet_white_bg.png"; 
-    document.getElementById('selectedVehicle').value = "";
-    
-    document.getElementById('generalVehicleSelectContainer').classList.remove('hidden');
-    document.getElementById('generalVehicleSelect').value = "";
-    
-    document.getElementById('modalCarFeatures').classList.add('hidden');
-    showFormBtn.classList.add('hidden');
-    
-    // Make modal info full width initially, hide form
-    modalInfoPart.className = "w-full bg-gray-50 p-8 flex flex-col items-center justify-center border-r border-gray-100 transition-all duration-300";
-    modalFormPart.classList.add('hidden');
-    modalFormPart.classList.remove('w-full', 'md:w-7/12');
-    
-    // Show modal container
-    modal.classList.remove('hidden');
-    
-    setTimeout(() => {
-        modalBackdrop.classList.remove('opacity-0');
-        modalBackdrop.classList.add('opacity-100');
-        
-        modalPanel.classList.remove('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
-        modalPanel.classList.add('opacity-100', 'translate-y-0', 'sm:scale-100');
-    }, 10);
-    
-    document.body.style.overflow = 'hidden';
+    window.location.href = `detail-vehicule.html`;
 }
 
 function handleGeneralVehicleSelect(val) {
@@ -117,33 +45,24 @@ function handleGeneralVehicleSelect(val) {
 }
 
 function showForm() {
-    // Adjust layout for side-by-side or stacked
-    modalInfoPart.className = "w-full md:w-5/12 bg-gray-50 p-4 md:p-8 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-gray-100 transition-all duration-300";
-    modalFormPart.classList.remove('hidden');
-    modalFormPart.classList.add('w-full', 'md:w-7/12');
-    showFormBtn.classList.add('hidden');
+    // Adjust layout for side-by-side or stacked in detail view
+    const appWrapper = document.getElementById('applicationWrapper');
+    const noCarWarn = document.getElementById('noCarSelectedWarning');
+    const actualForm = document.getElementById('applicationForm');
+
+    if (noCarWarn) noCarWarn.classList.add('hidden');
+    if (actualForm) actualForm.classList.remove('hidden');
 
     // On mobile, scroll to form
-    if(window.innerWidth < 768) {
+    if(window.innerWidth < 1024 && actualForm) {
         setTimeout(() => {
-            modalFormPart.scrollIntoView({ behavior: 'smooth' });
+            actualForm.scrollIntoView({ behavior: 'smooth' });
         }, 100);
     }
 }
 
 function closeModal() {
-    // Animate out
-    modalBackdrop.classList.remove('opacity-100');
-    modalBackdrop.classList.add('opacity-0');
-    
-    modalPanel.classList.remove('opacity-100', 'translate-y-0', 'sm:scale-100');
-    modalPanel.classList.add('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
-    
-    // Hide modal container after animation
-    setTimeout(() => {
-        modal.classList.add('hidden');
-        document.body.style.overflow = 'auto'; // Restore scroll
-    }, 300);
+    // Deprecated
 }
 
 function submitForm(e) {
@@ -153,8 +72,9 @@ function submitForm(e) {
     document.getElementById('successCarName').textContent = carName;
     
     // Hide form, show success
-    appForm.classList.add('hidden');
-    successMessage.classList.remove('hidden');
+    const actualForm = document.getElementById('applicationForm');
+    if (actualForm) actualForm.classList.add('hidden');
+    if (successMessage) successMessage.classList.remove('hidden');
     
     // Optional fake "save to local storage" for the admin panel to read
     const newApp = {
@@ -200,7 +120,18 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 window.addEventListener('DOMContentLoaded', () => {
-    if(window.location.search.includes('apply=true') && document.getElementById('vehicleModal')) {
-        openGeneralModal();
+    // Handle Detail Page Population
+    if (window.location.pathname.includes('detail-vehicule.html')) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const carKey = urlParams.get('car');
+        
+        if (carKey && carsData[carKey]) {
+            // Set the general select so the user sees it reflected
+            const selOptions = document.getElementById('generalVehicleSelect');
+            if(selOptions) selOptions.value = carKey;
+            
+            // Populate the specific data and auto-show the form
+            handleGeneralVehicleSelect(carKey);
+        }
     }
 });

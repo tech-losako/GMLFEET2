@@ -70,7 +70,7 @@
                         class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">Contact</a>
                 </div>
                 <div class="hidden md:flex items-center space-x-4">
-                    <a href="javascript:void(0)" onclick="openGeneralModal()"
+                    <a href="detail-vehicule.html"
                         class="bg-gmfRed hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-bold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">Devenir
                         Chauffeur</a>
                     <!-- <a href="admin.html"
@@ -95,7 +95,7 @@
                 <a href="apropos.html" class="block text-gray-800 font-bold hover:text-gmfRed transition">À Propos</a>
                 <a href="apropos.html#contact" class="block text-gray-800 font-bold hover:text-gmfRed transition">Contact</a>
                 <div class="pt-4 border-t border-gray-100 flex flex-col space-y-3">
-                    <a href="javascript:void(0)" onclick="openGeneralModal()" class="bg-gmfRed text-center text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md">Devenir Chauffeur</a>
+                    <a href="detail-vehicule.html" class="bg-gmfRed text-center text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md">Devenir Chauffeur</a>
                     <!-- <a href="admin.html" class="text-center text-gmfBlue font-bold underline-offset-4 hover:underline py-2">Espace Admin <i class="fas fa-lock ml-1 text-xs"></i></a> -->
                 </div>
             </div>
@@ -162,7 +162,7 @@
 
                 <!-- Vehicle Card: IST -->
                 <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
-                    onclick="openModal('IST')">
+                    onclick="window.location.href='detail-vehicule.html?car=IST'">
                     <div class="h-48 bg-gray-100 flex items-center justify-center relative overflow-hidden">
                         <div
                             class="absolute top-4 right-4 z-10 bg-white/80 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-gmfRed shadow-sm">
@@ -184,7 +184,7 @@
 
                 <!-- Vehicle Card: Blade -->
                 <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
-                    onclick="openModal('Blade')">
+                    onclick="window.location.href='detail-vehicule.html?car=Blade'">
                     <div class="h-48 bg-gray-100 flex items-center justify-center p-6">
                         <img src="https://www.toyota.bj/media/gamme/modeles/images/e24b1bcb758803114be811d3f2d02bd3.png"
                             alt="Toyota Blade"
@@ -203,7 +203,7 @@
 
                 <!-- Vehicle Card: Swift -->
                 <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
-                    onclick="openModal('Swift')">
+                    onclick="window.location.href='detail-vehicule.html?car=Swift'">
                     <div class="h-48 bg-gray-100 flex items-center justify-center relative overflow-hidden">
                         <img src="https://stimg.cardekho.com/images/carexteriorimages/630x420/Maruti/Swift/9226/1755777061785/front-left-side-47.jpg"
                             alt="Suzuki Swift"
@@ -222,7 +222,7 @@
 
                 <!-- Vehicle Card: Vitz -->
                 <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
-                    onclick="openModal('Vitz')">
+                    onclick="window.location.href='detail-vehicule.html?car=Vitz'">
                     <div
                         class="h-48 bg-gray-100 flex items-center justify-center relative p-6 bg-white border-b border-gray-100">
                         <div
@@ -348,7 +348,7 @@
                 </div>
             </div>
 
-            <a href="javascript:void(0)" onclick="openGeneralModal()"
+            <a href="detail-vehicule.html"
                 class="inline-block bg-gmfBlue hover:bg-blue-900 text-white font-bold py-4 px-10 rounded-full text-lg shadow-lg hover:shadow-xl transition-all">
                 Commencer maintenant
             </a>
@@ -415,33 +415,25 @@
         </div>
     </footer>
 
-    <!-- VEHICLE MODAL & FORM -->
+    <!-- VEHICLE MODAL & FORM (Commented out during migration) -->
+    <!--
     <div id="vehicleModal" class="fixed inset-0 z-[100] hidden">
-        <!-- Backdrop -->
         <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm transition-opacity opacity-0" id="modalBackdrop"
             onclick="closeModal()"></div>
-
-        <!-- Modal Content -->
         <div class="absolute inset-0 z-10 overflow-y-auto no-scrollbar pointer-events-none">
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                 <div id="modalPanel"
                     class="pointer-events-auto relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-4xl opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95 flex flex-col md:flex-row">
-
-                    <!-- Close button -->
                     <button type="button" onclick="closeModal()"
                         class="absolute top-4 right-4 z-20 bg-white/50 backdrop-blur rounded-full p-2 h-10 w-10 flex flex-col items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition focus:outline-none">
                         <i class="fas fa-times fa-lg"></i>
                     </button>
-
-                    <!-- Left: Vehicle Info -->
                     <div id="modalInfoPart"
                         class="w-full bg-gray-50 p-8 flex flex-col items-center justify-center border-r border-gray-100 transition-all duration-300">
                         <img id="modalCarImg" src="" alt="Vehicule"
                             class="w-full object-cover rounded-xl mb-8 max-h-64 drop-shadow-xl shadow-lg">
                         <h3 class="text-3xl font-black text-gmfBlue mb-2" id="modalCarTitle">Véhicule</h3>
                         <p class="text-gmfRed font-bold uppercase tracking-widest text-sm mb-6">Plan Car na ngai</p>
-
-                        <!-- Generic Vehicle Select Form -->
                         <div id="generalVehicleSelectContainer" class="hidden w-full mb-6">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Sélectionnez le véhicule souhaité :</label>
                             <select id="generalVehicleSelect" onchange="handleGeneralVehicleSelect(this.value)" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-white font-bold text-gmfBlue">
@@ -452,8 +444,6 @@
                                 <option value="Vitz">Toyota Vitz</option>
                             </select>
                         </div>
-
-                        <!-- Specific Car Features -->
                         <div id="modalCarFeatures" class="w-full space-y-4">
                             <div class="flex justify-between border-b border-gray-200 pb-2">
                                 <span class="text-gray-500">Prix du véhicule</span>
@@ -472,21 +462,16 @@
                                 <span class="font-bold text-gray-900">12, 15 ou 18 mois</span>
                             </div>
                         </div>
-
                         <button id="showFormBtn" onclick="showForm()"
                             class="w-full mt-8 bg-gmfRed hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all">
                             Postuler pour ce véhicule
                         </button>
                     </div>
-
-                    <!-- Right: Application Form -->
                     <div id="modalFormPart" class="hidden p-8 md:p-10 bg-white overflow-y-auto">
                         <h4 class="text-2xl font-bold text-gray-900 mb-6">Soumettre votre candidature</h4>
                         <p class="text-gray-500 mb-8 text-sm">Complétez ce formulaire avec les informations requises pour le plan de financement.</p>
-
                         <form id="applicationForm" class="space-y-5" onsubmit="submitForm(event)">
                             <input type="hidden" id="selectedVehicle" name="vehicle">
-
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-700 mb-1">Prénom & Nom (Client)</label>
@@ -500,9 +485,6 @@
                                         placeholder="+243 ...">
                                 </div>
                             </div>
-                            
-
-
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-700 mb-1">Numéro de Permis de Conduire</label>
@@ -520,7 +502,6 @@
                                     </select>
                                 </div>
                             </div>
-
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-700 mb-1">Prénom & Nom (Co-emprunteur)</label>
@@ -533,24 +514,20 @@
                                         class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-gray-50">
                                 </div>
                             </div>
-                            
                             <div class="bg-gray-50 p-4 border border-gray-200 rounded-xl mt-4">
                                 <h5 class="font-bold text-gmfRed text-sm mb-2"><i class="fas fa-exclamation-circle mr-1"></i> Documents obligatoires (à prévoir pour signature) :</h5>
                                 <ul class="list-disc list-inside text-xs text-gray-600 space-y-1">
-                                    <li>Pièces d'identité (Client, Co-emprunteur, Guarantor).</li>
+                                    <li>Pièces d'identité (Client, Co-emprunteur, Garant).</li>
                                     <li>Permis de conduire valide (Client).</li>
                                     <li>Preuve de résidence actuelle.</li>
-                                    <li>Justificatif de revenus du Guarantor.</li>
+                                    <li>Justificatif de revenus du Garant.</li>
                                 </ul>
                             </div>
-
                             <button type="submit"
                                 class="w-full bg-gmfRed hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all mt-4">
                                 <i class="fas fa-paper-plane mr-2"></i> Envoyer ma candidature
                             </button>
                         </form>
-
-                        <!-- Success Message (Hidden by default) -->
                         <div id="successMessage" class="hidden text-center py-10">
                             <div
                                 class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-500 mb-4">
@@ -568,6 +545,7 @@
             </div>
         </div>
     </div>
+    -->
 
     <!-- Scripts -->
     <script src="script.js"></script>
