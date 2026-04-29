@@ -309,7 +309,7 @@
                 <!-- Contact Form -->
                 <div class="lg:w-2/3 bg-gray-50 p-8 md:p-10 rounded-3xl border border-gray-100 shadow-sm">
                     <h3 class="text-2xl font-bold text-gray-900 mb-8">Envoyez-nous un message</h3>
-                    <form onsubmit="event.preventDefault(); alert('Votre message a été envoyé !'); this.reset();"
+                    <form onsubmit="event.preventDefault(); showContactSuccessModal(); this.reset();"
                         class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
@@ -344,6 +344,25 @@
             </div>
         </div>
     </section>
+
+    <!-- Success Modal Overlay (Contact) -->
+    <div id="contactSuccessModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm transition-opacity" onclick="closeContactModal()"></div>
+        <!-- Modal Content -->
+        <div class="relative bg-white rounded-3xl shadow-2xl p-8 md:p-10 max-w-lg w-full mx-4 transform transition-all text-center animate-fadeIn sm:scale-100">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 text-green-500 mb-6 shadow-inner">
+                <i class="fas fa-check fa-3x"></i>
+            </div>
+            <h4 class="text-3xl font-black text-gray-900 mb-3">Message Envoyé !</h4>
+            <p class="text-gray-600 mb-6 leading-relaxed">
+                Votre demande a bien été reçue. Notre équipe vous contactera très prochainement.
+            </p>
+            <button onclick="closeContactModal()" class="w-full inline-block bg-gmfBlue hover:bg-blue-900 text-white font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all">
+                <i class="fas fa-check-circle mr-2"></i> J'ai compris
+            </button>
+        </div>
+    </div>
 
     <!-- FOOTER -->
     <footer class="bg-gray-900 pt-16 pb-8 border-t-4 border-gmfRed">

@@ -61,8 +61,28 @@ function showForm() {
     }
 }
 
-function closeModal() {
-    // Deprecated
+function closeSuccessModal() {
+    const successModal = document.getElementById('successModalOverlay');
+    if (successModal) {
+        successModal.classList.add('hidden');
+        document.body.style.overflow = 'auto'; // Restore scroll
+    }
+}
+
+function showContactSuccessModal() {
+    const contactModal = document.getElementById('contactSuccessModal');
+    if (contactModal) {
+        contactModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeContactModal() {
+    const contactModal = document.getElementById('contactSuccessModal');
+    if (contactModal) {
+        contactModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
 }
 
 function submitForm(e) {
@@ -71,10 +91,19 @@ function submitForm(e) {
     const carName = document.getElementById('selectedVehicle').value;
     document.getElementById('successCarName').textContent = carName;
     
-    // Hide form, show success
+    // Show the modal overlay
+    const successModal = document.getElementById('successModalOverlay');
+    if (successModal) {
+        successModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+    }
+    
+    // Hide form inline
     const actualForm = document.getElementById('applicationForm');
-    if (actualForm) actualForm.classList.add('hidden');
-    if (successMessage) successMessage.classList.remove('hidden');
+    if (actualForm) {
+        // Reset the form so it is completely fresh
+        actualForm.reset();
+    }
     
     // Save new application data structure
     const newApp = {

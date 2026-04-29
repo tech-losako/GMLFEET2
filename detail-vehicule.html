@@ -254,23 +254,32 @@
                             <i class="fas fa-paper-plane mr-2"></i> Envoyer ma candidature
                         </button>
                     </form>
-
-                    <!-- Success Message (Hidden by default) -->
-                    <div id="successMessage" class="hidden text-center py-10">
-                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-500 mb-4">
-                            <i class="fas fa-check fa-2x"></i>
-                        </div>
-                        <h4 class="text-2xl font-bold text-gray-900 mb-2">Candidature Envoyée !</h4>
-                        <p class="text-gray-600">Notre équipe examinera votre profil pour le modèle <span
-                                id="successCarName" class="font-bold"></span> et vous contactera très prochainement.
-                        </p>
-                        <a href="vehicules.html"
-                            class="inline-block mt-8 text-gmfBlue font-bold hover:underline bg-blue-50 px-6 py-2 rounded-full"><i class="fas fa-arrow-left mr-2"></i> Retour aux véhicules</a>
-                    </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Success Modal Overlay -->
+    <div id="successModalOverlay" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm transition-opacity" onclick="closeSuccessModal()"></div>
+        <!-- Modal Content -->
+        <div class="relative bg-white rounded-3xl shadow-2xl p-8 md:p-10 max-w-lg w-full mx-4 transform transition-all text-center animate-fadeIn sm:scale-100">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 text-green-500 mb-6 shadow-inner">
+                <i class="fas fa-check fa-3x"></i>
+            </div>
+            <h4 class="text-3xl font-black text-gray-900 mb-3">Candidature Envoyée !</h4>
+            <p class="text-gray-600 mb-6 leading-relaxed">
+                Votre demande a bien été soumise. Notre équipe examinera votre profil pour le modèle 
+                <span id="successCarName" class="font-bold text-gmfBlue uppercase"></span> 
+                et vous contactera très prochainement.
+            </p>
+            <a href="index.html" class="w-full inline-block bg-gmfRed hover:bg-red-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all">
+                <i class="fas fa-check-circle mr-2"></i> J'ai compris
+            </a>
+            <button onclick="closeSuccessModal()" class="mt-6 text-gray-400 hover:text-gray-600 font-bold text-sm transition-colors uppercase tracking-wider">Fermer cette fenêtre</button>
+        </div>
+    </div>
 
     <!-- FOOTER -->
     <footer class="bg-gray-900 pt-16 pb-8 border-t-4 border-gmfRed">
