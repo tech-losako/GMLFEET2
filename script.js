@@ -76,10 +76,15 @@ function submitForm(e) {
     if (actualForm) actualForm.classList.add('hidden');
     if (successMessage) successMessage.classList.remove('hidden');
     
-    // Optional fake "save to local storage" for the admin panel to read
+    // Save new application data structure
     const newApp = {
         name: document.getElementById('clientName') ? document.getElementById('clientName').value : 'Client', 
-        phone: appForm.querySelectorAll('input[type="tel"]')[0]?.value || '',
+        phone: document.getElementById('clientPhone') ? document.getElementById('clientPhone').value : '',
+        address: document.getElementById('clientAddress') ? document.getElementById('clientAddress').value : '',
+        experience: document.getElementById('clientExperience') ? document.getElementById('clientExperience').value : '',
+        coBorrowerName: document.getElementById('coBorrowerName') ? document.getElementById('coBorrowerName').value : '',
+        coBorrowerPhone: document.getElementById('coBorrowerPhone') ? document.getElementById('coBorrowerPhone').value : '',
+        coBorrowerAddress: document.getElementById('coBorrowerAddress') ? document.getElementById('coBorrowerAddress').value : '',
         vehicle: carName,
         date: new Date().toLocaleDateString('fr-FR'),
         status: 'En attente'
