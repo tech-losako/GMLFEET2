@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GMFLEET - À Propos de Nous</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gmfRed: '#dc2626',
+                        gmfBlue: '#1e3a8a',
+                        gmfAccentBlue: '#2563eb',
+                        darkBg: '#0f172a',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50 text-gray-800 antialiased" id="accueil">
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-sm transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="index.html" class="text-3xl font-extrabold tracking-tighter">
+                        <span class="text-gmfBlue uppercase">GM</span><span class="text-gmfRed uppercase">FLEET</span>
+                    </a>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="index.html"
+                        class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">Accueil</a>
+                    <a href="vehicules.html"
+                        class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">Véhicules</a>
+                    <a href="apropos.html"
+                        class="text-gmfRed transition font-semibold text-sm uppercase tracking-wide">À Propos</a>
+                    <a href="#contact"
+                        class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">Contact</a>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="vehicules.html"
+                        class="bg-gmfRed hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-bold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">Devenir
+                        Chauffeur</a>
+                    <!-- <a href="admin.html"
+                        class="text-gmfBlue hover:text-gmfRed font-bold text-sm underline-offset-4 hover:underline">Admin
+                        <i class="fas fa-lock ml-1 text-xs"></i></a> -->
+                </div>
+
+                <!-- Hamburger Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobileMenuBtn" onclick="toggleMobileMenu()"
+                        class="text-gmfBlue hover:text-gmfRed focus:outline-none transition">
+                        <i class="fas fa-bars fa-2x"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MOBILE MENU -->
+        <div id="mobileMenu"
+            class="hidden md:hidden bg-white border-t border-gray-100 shadow-xl overflow-hidden transition-all">
+            <div class="px-4 pt-4 pb-6 space-y-4">
+                <a href="index.html" class="block text-gray-800 font-bold hover:text-gmfRed transition">Accueil</a>
+                <a href="vehicules.html"
+                    class="block text-gray-800 font-bold hover:text-gmfRed transition">Véhicules</a>
+                <a href="apropos.html" class="block text-gmfRed font-bold transition">À Propos</a>
+                <a href="apropos.html#contact"
+                    class="block text-gray-800 font-bold hover:text-gmfRed transition">Contact</a>
+                <div class="pt-4 border-t border-gray-100 flex flex-col space-y-3">
+                    <a href="vehicules.html?apply=true"
+                        class="bg-gmfRed text-center text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md">Devenir
+                        Chauffeur</a>
+                    <!-- <a href="admin.html"
+                        class="text-center text-gmfBlue font-bold underline-offset-4 hover:underline py-2">Espace Admin
+                        <i class="fas fa-lock ml-1 text-xs"></i></a> -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- NEW HERO SECTION FOR A PROPOS -->
+    <section class="relative pt-32 pb-20 lg:pt-40 lg:pb-24 overflow-hidden bg-gmfBlue">
+        <div class="absolute inset-0">
+            <div class="absolute inset-0 bg-gradient-to-br from-gmfBlue to-gray-900 opacity-90"></div>
+            <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=2000"
+                class="w-full h-full object-cover mix-blend-overlay opacity-30" alt="Notre équipe">
+        </div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 text-center">
+            <span class="text-gmfRed font-bold uppercase tracking-widest text-sm mb-4 block">Notre Identité</span>
+            <h1
+                class="text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-6 leading-tight max-w-4xl mx-auto">
+                Bien plus qu'une flotte, <br>
+                <span class="text-gmfRed">une famille.</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto font-light">
+                Derrière GMFLEET se cache une équipe passionnée qui travaille chaque jour pour révolutionner la mobilité
+                et l'indépendance financière de nos partenaires.
+            </p>
+        </div>
+
+        <!-- Decoration element -->
+        <div class="absolute bottom-0 left-0 w-full overflow-hidden rotate-180 transform" style="height: 50px;">
+            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"
+                preserveAspectRatio="none" class="w-full h-full text-white block" fill="currentColor">
+                <path
+                    d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z">
+                </path>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION (From Index) -->
+    <section id="apropos" class="relative py-24 md:py-32 bg-white overflow-hidden">
+        <!-- Background Image with Fade -->
+        <div class="absolute inset-0 z-0">
+            <img src="./img/gylain-omer-Sb54F2NNego-unsplash.jpg" alt="Chauffeur heureux"
+                class="w-full h-full object-cover object-left"
+                onerror="this.src='https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=2000'">
+            <div class="absolute inset-0 bg-gradient-to-b md:bg-gradient-to-r from-transparent via-white/80 to-white">
+            </div>
+            <div
+                class="absolute right-0 top-0 bottom-0 w-full md:w-2/3 bg-gradient-to-l from-white via-white/95 to-transparent">
+            </div>
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-end">
+                <div class="md:w-1/2 xl:w-5/12">
+                    <h2 class="text-sm font-bold text-gmfRed uppercase tracking-widest mb-2 drop-shadow-sm">À propos de
+                        GMFLEET</h2>
+                    <h3 class="text-4xl font-extrabold text-gray-900 mb-6 drop-shadow-sm">Autonomiser les chauffeurs
+                        pour un avenir
+                        <span class="text-gmfBlue">meilleur</span>.
+                    </h3>
+                    <p
+                        class="text-lg text-gray-800 mb-8 leading-relaxed font-medium bg-white/40 md:bg-transparent backdrop-blur-sm md:backdrop-blur-none p-4 md:p-0 rounded-2xl">
+                        Chez GMFLEET, nous croyons que le travail acharné doit mener à la
+                        propriété. Notre modèle unique de financement de véhicules "Car na ngai" (Conduisez et devenez
+                        propriétaire) est conçu sur mesure pour le marché congolais.</p>
+                    <div
+                        class="space-y-6 mb-8 bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-white shadow-sm">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-red-100 p-3 rounded-full text-gmfRed shadow-inner">
+                                <i class="fas fa-car-side fa-lg"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-xl font-bold text-gray-900">Véhicules de qualité</h4>
+                                <p class="text-gray-700">Des voitures robustes et vérifiées, prêtes à générer des
+                                    revenus immédiatement.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-blue-100 p-3 rounded-full text-gmfBlue shadow-inner">
+                                <i class="fas fa-file-contract fa-lg"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-xl font-bold text-gray-900">Sans dépôt bloquant</h4>
+                                <p class="text-gray-700">Un système de crédit accessible qui vous permet de payer en
+                                    travaillant.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-green-100 p-3 rounded-full text-green-600 shadow-inner">
+                                <i class="fas fa-handshake fa-lg"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-xl font-bold text-gray-900">Devenez Propriétaire</h4>
+                                <p class="text-gray-700">À la fin du terme de paiement, la voiture vous appartient
+                                    légalement.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- EVENTS GALLERY SECTION -->
+    <section id="galerie" class="py-20 bg-gray-50 border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-extrabold text-gmfBlue mb-4">Nos <span class="text-gmfRed">Événements</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Vivez de l'intérieur les temps forts, remises de clés
+                    et formations organisées par GMFLEET pour sa communauté.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Gallery Item 1 -->
+                <div
+                    class="group relative rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300">
+                    <img src="https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&q=80&w=800"
+                        alt="Réunion des chauffeurs"
+                        class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-80">
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-6">
+                        <h4 class="text-white font-bold text-lg">Cérémonie de remise des clés</h4>
+                        <p class="text-gray-300 text-sm">Célébration des nouveaux propriétaires</p>
+                    </div>
+                </div>
+
+                <!-- Gallery Item 2 -->
+                <div
+                    class="group relative rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300">
+                    <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=800"
+                        alt="Formation"
+                        class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-80">
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-6">
+                        <h4 class="text-white font-bold text-lg">Atelier de Formation</h4>
+                        <p class="text-gray-300 text-sm">Gestion des revenus et maintenance</p>
+                    </div>
+                </div>
+
+                <!-- Gallery Item 3 -->
+                <div
+                    class="group relative rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300">
+                    <img src="https://images.unsplash.com/photo-1531973576160-7125cd663d86?auto=format&fit=crop&q=80&w=800"
+                        alt="Rencontre"
+                        class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-80">
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-6">
+                        <h4 class="text-white font-bold text-lg">Communauté GMFLEET</h4>
+                        <p class="text-gray-300 text-sm">Moment de partage et de convivialité</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section id="contact" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row gap-16">
+                <!-- Contact Info -->
+                <div class="lg:w-1/3">
+                    <h2 class="text-4xl font-extrabold text-gmfBlue mb-6">Contactez-<span
+                            class="text-gmfRed">nous</span></h2>
+                    <p class="text-gray-600 mb-10 text-lg">Vous avez des questions sur notre programme Car na ngai ou
+                        souhaitez devenir partenaire ? Notre équipe est prête à vous répondre.</p>
+
+                    <div class="space-y-6">
+                        <div class="flex items-center p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                            <div
+                                class="w-12 h-12 bg-red-100 text-gmfRed rounded-full flex items-center justify-center text-xl shrink-0">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="font-bold text-gray-900">Notre Adresse</h4>
+                                <p class="text-gray-600">Boulevard du 30 Juin, Kinshasa, RDC</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                            <div
+                                class="w-12 h-12 bg-blue-100 text-gmfBlue rounded-full flex items-center justify-center text-xl shrink-0">
+                                <i class="fas fa-phone-alt"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="font-bold text-gray-900">Téléphone</h4>
+                                <p class="text-gray-600">+243 81 000 0000</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                            <div
+                                class="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xl shrink-0">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="font-bold text-gray-900">E-mail</h4>
+                                <p class="text-gray-600">contact@gmfleet.cd</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="lg:w-2/3 bg-gray-50 p-8 md:p-10 rounded-3xl border border-gray-100 shadow-sm">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-8">Envoyez-nous un message</h3>
+                    <form onsubmit="event.preventDefault(); alert('Votre message a été envoyé !'); this.reset();"
+                        class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Nom complet</label>
+                                <input type="text" required
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Numéro de
+                                    téléphone</label>
+                                <input type="tel" required
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-white"
+                                    placeholder="+243 ...">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Sujet</label>
+                            <input type="text" required
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Message</label>
+                            <textarea required rows="4"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-white"></textarea>
+                        </div>
+                        <button type="submit"
+                            class="w-full md:w-auto px-10 bg-gmfBlue hover:bg-blue-900 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all">
+                            <i class="fas fa-paper-plane mr-2"></i> Envoyer le message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 pt-16 pb-8 border-t-4 border-gmfRed">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="md:col-span-2">
+                    <a href="index.html" class="text-3xl font-extrabold tracking-tighter block mb-4">
+                        <span class="text-white uppercase">GM</span><span class="text-gmfRed uppercase">FLEET</span>
+                    </a>
+                    <p class="text-gray-400 max-w-sm mb-6">
+                        Une initiative de George Michael Logistics. Nous finançons l'avenir de la mobilité en donnant
+                        aux chauffeurs l'accès à la propriété de véhicules.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gmfBlue hover:text-white transition-colors"><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gmfBlue hover:text-white transition-colors"><i
+                                class="fab fa-twitter"></i></a>
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gmfBlue hover:text-white transition-colors"><i
+                                class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">Liens Utiles</h4>
+                    <ul class="space-y-3">
+                        <li><a href="index.html" class="text-gray-400 hover:text-gmfRed transition-colors">Accueil</a>
+                        </li>
+                        <li><a href="vehicules.html" class="text-gray-400 hover:text-gmfRed transition-colors">Nos
+                                Véhicules</a></li>
+                        <li><a href="apropos.html" class="text-gray-400 hover:text-gmfRed transition-colors">À
+                                propos</a>
+                        </li>
+                        <!-- <li><a href="admin.html" class="text-gray-400 hover:text-gmfRed transition-colors">Espace
+                                Admin</a></li> -->
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">Contact</h4>
+                    <ul class="space-y-3 text-gray-400">
+                        <li class="flex items-center"><i class="fas fa-envelope mr-3 text-gmfRed"></i>
+                            contact@gmfleet.cd</li>
+                        <li class="flex items-center"><i class="fas fa-phone-alt mr-3 text-gmfRed"></i> +243 00 000 0000
+                        </li>
+                        <li class="flex items-start"><i class="fas fa-map-marker-alt mr-3 mt-1 text-gmfRed"></i>
+                            Kinshasa, RDC</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-sm">© 2026 GMFLEET (George Michael Logistics). Tous droits réservés.</p>
+                <div class="flex space-x-4 mt-4 md:mt-0 text-sm">
+                    <a href="#" class="text-gray-500 hover:text-white">Termes & Conditions</a>
+                    <a href="#" class="text-gray-500 hover:text-white">Confidentialité</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

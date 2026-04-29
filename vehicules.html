@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GMFLEET - Nos Véhicules</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Hide scrollbar for clean modal */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+    </style>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Couleurs de George Michael Logistics
+                        gmfRed: '#dc2626', // Rouge vif (Tailwind red-600)
+                        gmfBlue: '#1e3a8a', // Bleu sombre / corporate (Tailwind blue-900)
+                        gmfAccentBlue: '#2563eb', // Bleu accent (blue-600)
+                        darkBg: '#0f172a',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50 text-gray-800 antialiased" id="accueil">
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-sm transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="index.html" class="text-3xl font-extrabold tracking-tighter">
+                        <span class="text-gmfBlue uppercase">GM</span><span class="text-gmfRed uppercase">FLEET</span>
+                    </a>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="index.html"
+                        class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">Accueil</a>
+                    <a href="vehicules.html"
+                        class="text-gmfRed transition font-semibold text-sm uppercase tracking-wide">Véhicules</a>
+                    <a href="apropos.html"
+                        class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">À
+                        Propos</a>
+                    <a href="apropos.html#contact"
+                        class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">Contact</a>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="javascript:void(0)" onclick="openGeneralModal()"
+                        class="bg-gmfRed hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-bold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">Devenir
+                        Chauffeur</a>
+                    <!-- <a href="admin.html"
+                        class="text-gmfBlue hover:text-gmfRed font-bold text-sm underline-offset-4 hover:underline">Admin
+                        <i class="fas fa-lock ml-1 text-xs"></i></a> -->
+                </div>
+                
+                <!-- Hamburger Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobileMenuBtn" onclick="toggleMobileMenu()" class="text-gmfBlue hover:text-gmfRed focus:outline-none transition">
+                        <i class="fas fa-bars fa-2x"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MOBILE MENU -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-gray-100 shadow-xl overflow-hidden transition-all">
+            <div class="px-4 pt-4 pb-6 space-y-4">
+                <a href="index.html" class="block text-gray-800 font-bold hover:text-gmfRed transition">Accueil</a>
+                <a href="vehicules.html" class="block text-gmfRed font-bold transition">Véhicules</a>
+                <a href="apropos.html" class="block text-gray-800 font-bold hover:text-gmfRed transition">À Propos</a>
+                <a href="apropos.html#contact" class="block text-gray-800 font-bold hover:text-gmfRed transition">Contact</a>
+                <div class="pt-4 border-t border-gray-100 flex flex-col space-y-3">
+                    <a href="javascript:void(0)" onclick="openGeneralModal()" class="bg-gmfRed text-center text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md">Devenir Chauffeur</a>
+                    <!-- <a href="admin.html" class="text-center text-gmfBlue font-bold underline-offset-4 hover:underline py-2">Espace Admin <i class="fas fa-lock ml-1 text-xs"></i></a> -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- NEW HERO SECTION FOR VEHICLES -->
+    <section class="relative pt-32 pb-20 lg:pt-40 lg:pb-24 overflow-hidden bg-gmfBlue">
+        <div class="absolute inset-0">
+            <div class="absolute inset-0 bg-gradient-to-br from-gray-900 to-gmfBlue opacity-90"></div>
+            <img src="./img/ko-towson-p0_BOHuwRLY-unsplash.jpg"
+                class="w-full h-full object-cover mix-blend-overlay opacity-40" alt="Background Fleet">
+        </div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 text-center">
+            <span class="text-gmfRed font-bold uppercase tracking-widest text-sm mb-4 block">Notre Flotte</span>
+            <h1
+                class="text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-6 leading-tight max-w-4xl mx-auto">
+                Le bon véhicule pour <br>
+                <span class="text-gmfRed">votre réussite.</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto font-light">
+                Explorez notre gamme de véhicules économiques et performants. Conçus pour maximiser vos revenus tout au
+                long de votre parcours Car na ngai.
+            </p>
+        </div>
+
+        <!-- Decoration element -->
+        <div class="absolute bottom-0 left-0 w-full overflow-hidden rotate-180 transform" style="height: 50px;">
+            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"
+                preserveAspectRatio="none" class="w-full h-full text-white block" fill="currentColor">
+                <path
+                    d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z">
+                </path>
+            </svg>
+        </div>
+    </section>
+
+    <!-- CONDUIRE AVEC NOUS SECTION -->
+    <section id="conduire-avec-nous" class="py-16 bg-white text-center">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-extrabold text-gmfBlue mb-6">Conduire avec nous</h2>
+            <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                Rejoignez la communauté GMFLEET et prenez le volant de votre avenir. Nous vous offrons non seulement un
+                véhicule performant et bien entretenu, mais aussi un plan structuré pour en devenir l'unique
+                propriétaire. Votre succès sur la route est notre priorité. Mettez le contact, nous nous chargeons du
+                reste !
+            </p>
+        </div>
+    </section>
+
+    <!-- VEHICLES SECTION -->
+    <section id="vehicules" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-extrabold text-gmfBlue mb-4">Choisissez votre <span
+                        class="text-gmfRed">véhicule</span></h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Découvrez notre sélection de véhicules fiables et
+                    économiques, prêts pour optimiser vos revenus.</p>
+            </div>
+
+            <!-- CARS GRID -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+                <!-- Vehicle Card: IST -->
+                <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
+                    onclick="openModal('IST')">
+                    <div class="h-48 bg-gray-100 flex items-center justify-center relative overflow-hidden">
+                        <div
+                            class="absolute top-4 right-4 z-10 bg-white/80 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-gmfRed shadow-sm">
+                            Populaire</div>
+                        <img src="./img/ist.jpeg"
+                            alt="Toyota IST"
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="p-6">
+                        <div class="text-sm text-gray-500 font-semibold mb-1 uppercase tracking-wide">Toyota</div>
+                        <h3 class="text-2xl font-extrabold text-gray-900 mb-2">IST</h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">Compacte, robuste et idéale pour la ville.
+                            Très faible consommation.</p>
+                        <button
+                            class="w-full bg-gmfBlue hover:bg-blue-900 text-white py-3 rounded-xl font-bold transition-colors">Voir
+                            les détails</button>
+                    </div>
+                </div>
+
+                <!-- Vehicle Card: Blade -->
+                <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
+                    onclick="openModal('Blade')">
+                    <div class="h-48 bg-gray-100 flex items-center justify-center p-6">
+                        <img src="https://www.toyota.bj/media/gamme/modeles/images/e24b1bcb758803114be811d3f2d02bd3.png"
+                            alt="Toyota Blade"
+                            class="max-h-full object-contain group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="p-6">
+                        <div class="text-sm text-gray-500 font-semibold mb-1 uppercase tracking-wide">Toyota</div>
+                        <h3 class="text-2xl font-extrabold text-gray-900 mb-2">Blade</h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">Le confort supérieur allié à une performance
+                            routière exceptionnelle.</p>
+                        <button
+                            class="w-full bg-gmfBlue hover:bg-blue-900 text-white py-3 rounded-xl font-bold transition-colors">Voir
+                            les détails</button>
+                    </div>
+                </div>
+
+                <!-- Vehicle Card: Swift -->
+                <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
+                    onclick="openModal('Swift')">
+                    <div class="h-48 bg-gray-100 flex items-center justify-center relative overflow-hidden">
+                        <img src="https://stimg.cardekho.com/images/carexteriorimages/630x420/Maruti/Swift/9226/1755777061785/front-left-side-47.jpg"
+                            alt="Suzuki Swift"
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="p-6">
+                        <div class="text-sm text-gray-500 font-semibold mb-1 uppercase tracking-wide">Suzuki</div>
+                        <h3 class="text-2xl font-extrabold text-gray-900 mb-2">Swift</h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">Agile et dynamique. Parfaite pour se faufiler
+                            dans le trafic urbain.</p>
+                        <button
+                            class="w-full bg-gmfBlue hover:bg-blue-900 text-white py-3 rounded-xl font-bold transition-colors">Voir
+                            les détails</button>
+                    </div>
+                </div>
+
+                <!-- Vehicle Card: Vitz -->
+                <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
+                    onclick="openModal('Vitz')">
+                    <div
+                        class="h-48 bg-gray-100 flex items-center justify-center relative p-6 bg-white border-b border-gray-100">
+                        <div
+                            class="absolute top-4 right-4 z-10 bg-green-100 px-3 py-1 rounded-full text-xs font-bold text-green-700 shadow-sm">
+                            Économique</div>
+                        <img src="./img/vitz.jpeg"
+                            alt="Toyota Vitz"
+                            class="max-h-full object-contain group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="p-6">
+                        <div class="text-sm text-gray-500 font-semibold mb-1 uppercase tracking-wide">Toyota</div>
+                        <h3 class="text-2xl font-extrabold text-gray-900 mb-2">Vitz</h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">La reine de l'économie de carburant et de
+                            l'entretien minimal.</p>
+                        <button
+                            class="w-full bg-gmfBlue hover:bg-blue-900 text-white py-3 rounded-xl font-bold transition-colors">Voir
+                            les détails</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIAlS SECTION -->
+    <section id="temoignages" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-extrabold text-gmfBlue mb-4">Ce que disent nos <span
+                        class="text-gmfRed">chauffeurs</span></h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Découvrez comment GMFLEET transforme la vie de nos
+                    partenaires au quotidien.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-gray-50 p-8 rounded-3xl relative shadow-sm border border-gray-100">
+                    <i class="fas fa-quote-left text-4xl text-gray-200 absolute top-6 left-6"></i>
+                    <p class="text-gray-600 relative z-10 italic mb-6">"Grâce à GMFLEET, j'ai pu avoir ma propre voiture
+                        sans devoir avancer des sommes énormes. Le processus était clair et je suis aujourd'hui
+                        propriétaire de mon véhicule !"</p>
+                    <div class="flex items-center">
+                        <div
+                            class="w-12 h-12 bg-gmfBlue rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
+                            P</div>
+                        <div>
+                            <h4 class="font-bold text-gray-900">Patrick M.</h4>
+                            <span class="text-sm text-gray-500">Chauffeur Toyota IST</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Testimonial 2 -->
+                <div class="bg-gray-50 p-8 rounded-3xl relative shadow-sm border border-gray-100">
+                    <i class="fas fa-quote-left text-4xl text-gray-200 absolute top-6 left-6"></i>
+                    <p class="text-gray-600 relative z-10 italic mb-6">"Je recommande fortement. L'entretien inclus et
+                        l'assurance m'ont permis de rouler sereinement tout en remboursant doucement."</p>
+                    <div class="flex items-center">
+                        <div
+                            class="w-12 h-12 bg-gmfRed rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
+                            S</div>
+                        <div>
+                            <h4 class="font-bold text-gray-900">Serge K.</h4>
+                            <span class="text-sm text-gray-500">Chauffeur Suzuki Swift</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Testimonial 3 -->
+                <div class="bg-gray-50 p-8 rounded-3xl relative shadow-sm border border-gray-100">
+                    <i class="fas fa-quote-left text-4xl text-gray-200 absolute top-6 left-6"></i>
+                    <p class="text-gray-600 relative z-10 italic mb-6">"Le respect des termes contratuels est réel.
+                        Chaque paiement me rapprochait de mon but. L'équipe est à l'écoute et très pro."</p>
+                    <div class="flex items-center">
+                        <div
+                            class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
+                            L</div>
+                        <div>
+                            <h4 class="font-bold text-gray-900">Lucie T.</h4>
+                            <span class="text-sm text-gray-500">Chauffeuse Toyota Vitz</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STEPS SECTION -->
+    <section id="etapes" class="py-20 bg-gray-50 border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl font-extrabold text-gmfBlue mb-4">Vos 3 étapes pour devenir <span
+                    class="text-gmfRed">propriétaire</span></h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-16">Le chemin le plus simple vers l'indépendance
+                financière.</p>
+
+            <div class="flex flex-col md:flex-row justify-center items-center gap-8 mb-12">
+                <!-- Step 1 -->
+                <div class="bg-white p-8 rounded-2xl shadow-md border border-gray-100 w-full md:w-1/3 relative">
+                    <div
+                        class="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gmfRed text-white rounded-full flex items-center justify-center font-bold text-2xl border-4 border-gray-50 shadow-sm">
+                        1</div>
+                    <i class="fas fa-user-check text-4xl text-gmfBlue mb-4 mt-2"></i>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Postulez & Vérification</h3>
+                    <p class="text-gray-600">Soumettez votre demande en ligne pour le modèle souhaité. Notre équipe
+                        vérifie rapidement votre profil.</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="bg-white p-8 rounded-2xl shadow-md border border-gray-100 w-full md:w-1/3 relative">
+                    <div
+                        class="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gmfRed text-white rounded-full flex items-center justify-center font-bold text-2xl border-4 border-gray-50 shadow-sm">
+                        2</div>
+                    <i class="fas fa-key text-4xl text-gmfBlue mb-4 mt-2"></i>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Prenez le volant</h3>
+                    <p class="text-gray-600">On vous remet les clés. Vous commencez immédiatement à rouler et à générer
+                        des revenus de votre côté.</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="bg-white p-8 rounded-2xl shadow-md border border-gray-100 w-full md:w-1/3 relative">
+                    <div
+                        class="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gmfRed text-white rounded-full flex items-center justify-center font-bold text-2xl border-4 border-gray-50 shadow-sm">
+                        3</div>
+                    <i class="fas fa-hand-holding-usd text-4xl text-gmfBlue mb-4 mt-2"></i>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Devenez Propriétaire</h3>
+                    <p class="text-gray-600">Effectuez vos versements réguliers. À la fin de la période, le véhicule
+                        vous appartient à 100%.</p>
+                </div>
+            </div>
+
+            <a href="javascript:void(0)" onclick="openGeneralModal()"
+                class="inline-block bg-gmfBlue hover:bg-blue-900 text-white font-bold py-4 px-10 rounded-full text-lg shadow-lg hover:shadow-xl transition-all">
+                Commencer maintenant
+            </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 pt-16 pb-8 border-t-4 border-gmfRed">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="md:col-span-2">
+                    <a href="index.html" class="text-3xl font-extrabold tracking-tighter block mb-4">
+                        <span class="text-white uppercase">GM</span><span class="text-gmfRed uppercase">FLEET</span>
+                    </a>
+                    <p class="text-gray-400 max-w-sm mb-6">
+                        Une initiative de George Michael Logistics. Nous finançons l'avenir de la mobilité en donnant
+                        aux chauffeurs l'accès à la propriété de véhicules.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gmfBlue hover:text-white transition-colors"><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gmfBlue hover:text-white transition-colors"><i
+                                class="fab fa-twitter"></i></a>
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gmfBlue hover:text-white transition-colors"><i
+                                class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">Liens Utiles</h4>
+                    <ul class="space-y-3">
+                        <li><a href="index.html" class="text-gray-400 hover:text-gmfRed transition-colors">Accueil</a>
+                        </li>
+                        <li><a href="vehicules.html" class="text-gray-400 hover:text-gmfRed transition-colors">Nos
+                                Véhicules</a></li>
+                        <li><a href="apropos.html" class="text-gray-400 hover:text-gmfRed transition-colors">À
+                                propos</a>
+                        </li>
+                        <!-- <li><a href="admin.html" class="text-gray-400 hover:text-gmfRed transition-colors">Espace
+                                Admin</a></li> -->
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">Contact</h4>
+                    <ul class="space-y-3 text-gray-400">
+                        <li class="flex items-center"><i class="fas fa-envelope mr-3 text-gmfRed"></i>
+                            contact@gmfleet.cd</li>
+                        <li class="flex items-center"><i class="fas fa-phone-alt mr-3 text-gmfRed"></i> +243 00 000 0000
+                        </li>
+                        <li class="flex items-start"><i class="fas fa-map-marker-alt mr-3 mt-1 text-gmfRed"></i>
+                            Kinshasa, RDC</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-sm">© 2026 GMFLEET (George Michael Logistics). Tous droits réservés.</p>
+                <div class="flex space-x-4 mt-4 md:mt-0 text-sm">
+                    <a href="#" class="text-gray-500 hover:text-white">Termes & Conditions</a>
+                    <a href="#" class="text-gray-500 hover:text-white">Confidentialité</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- VEHICLE MODAL & FORM -->
+    <div id="vehicleModal" class="fixed inset-0 z-[100] hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm transition-opacity opacity-0" id="modalBackdrop"
+            onclick="closeModal()"></div>
+
+        <!-- Modal Content -->
+        <div class="absolute inset-0 z-10 overflow-y-auto no-scrollbar pointer-events-none">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div id="modalPanel"
+                    class="pointer-events-auto relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-4xl opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95 flex flex-col md:flex-row">
+
+                    <!-- Close button -->
+                    <button type="button" onclick="closeModal()"
+                        class="absolute top-4 right-4 z-20 bg-white/50 backdrop-blur rounded-full p-2 h-10 w-10 flex flex-col items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition focus:outline-none">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+
+                    <!-- Left: Vehicle Info -->
+                    <div id="modalInfoPart"
+                        class="w-full bg-gray-50 p-8 flex flex-col items-center justify-center border-r border-gray-100 transition-all duration-300">
+                        <img id="modalCarImg" src="" alt="Vehicule"
+                            class="w-full object-cover rounded-xl mb-8 max-h-64 drop-shadow-xl shadow-lg">
+                        <h3 class="text-3xl font-black text-gmfBlue mb-2" id="modalCarTitle">Véhicule</h3>
+                        <p class="text-gmfRed font-bold uppercase tracking-widest text-sm mb-6">Plan Car na ngai</p>
+
+                        <!-- Generic Vehicle Select Form -->
+                        <div id="generalVehicleSelectContainer" class="hidden w-full mb-6">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Sélectionnez le véhicule souhaité :</label>
+                            <select id="generalVehicleSelect" onchange="handleGeneralVehicleSelect(this.value)" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-white font-bold text-gmfBlue">
+                                <option value="">-- Choisir un modèle --</option>
+                                <option value="IST">Toyota IST</option>
+                                <option value="Blade">Toyota Blade</option>
+                                <option value="Swift">Suzuki Swift</option>
+                                <option value="Vitz">Toyota Vitz</option>
+                            </select>
+                        </div>
+
+                        <!-- Specific Car Features -->
+                        <div id="modalCarFeatures" class="w-full space-y-4">
+                            <div class="flex justify-between border-b border-gray-200 pb-2">
+                                <span class="text-gray-500">Prix du véhicule</span>
+                                <span id="modalValPrix" class="font-bold text-gray-900">-</span>
+                            </div>
+                            <div class="flex justify-between border-b border-gray-200 pb-2">
+                                <span class="text-gray-500">Acompte (20%)</span>
+                                <span id="modalValAcompte" class="font-bold text-gmfRed">-</span>
+                            </div>
+                            <div class="flex justify-between border-b border-gray-200 pb-2">
+                                <span class="text-gray-500">Jours ouvrables</span>
+                                <span class="font-bold text-gray-900">6 Jours</span>
+                            </div>
+                            <div class="flex justify-between pb-2 border-b border-gray-200">
+                                <span class="text-gray-500">Durées disponibles</span>
+                                <span class="font-bold text-gray-900">12, 15 ou 18 mois</span>
+                            </div>
+                        </div>
+
+                        <button id="showFormBtn" onclick="showForm()"
+                            class="w-full mt-8 bg-gmfRed hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all">
+                            Postuler pour ce véhicule
+                        </button>
+                    </div>
+
+                    <!-- Right: Application Form -->
+                    <div id="modalFormPart" class="hidden p-8 md:p-10 bg-white overflow-y-auto">
+                        <h4 class="text-2xl font-bold text-gray-900 mb-6">Soumettre votre candidature</h4>
+                        <p class="text-gray-500 mb-8 text-sm">Complétez ce formulaire avec les informations requises pour le plan de financement.</p>
+
+                        <form id="applicationForm" class="space-y-5" onsubmit="submitForm(event)">
+                            <input type="hidden" id="selectedVehicle" name="vehicle">
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Prénom & Nom (Client)</label>
+                                    <input type="text" id="clientName" required
+                                        class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-gray-50">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Téléphone</label>
+                                    <input type="tel" required
+                                        class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-gray-50"
+                                        placeholder="+243 ...">
+                                </div>
+                            </div>
+                            
+
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Numéro de Permis de Conduire</label>
+                                    <input type="text" required
+                                        class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-gray-50">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Expérience de conduite</label>
+                                    <select required
+                                        class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-gray-50">
+                                        <option value="">Sélectionnez...</option>
+                                        <option value="1-3">1 à 3 ans</option>
+                                        <option value="3-5">3 à 5 ans</option>
+                                        <option value="5+">Plus de 5 ans</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Prénom & Nom (Co-emprunteur)</label>
+                                    <input type="text" required
+                                        class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-gray-50">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Prénom & Nom (Garant)</label>
+                                    <input type="text" required
+                                        class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-gray-50">
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-50 p-4 border border-gray-200 rounded-xl mt-4">
+                                <h5 class="font-bold text-gmfRed text-sm mb-2"><i class="fas fa-exclamation-circle mr-1"></i> Documents obligatoires (à prévoir pour signature) :</h5>
+                                <ul class="list-disc list-inside text-xs text-gray-600 space-y-1">
+                                    <li>Pièces d'identité (Client, Co-emprunteur, Guarantor).</li>
+                                    <li>Permis de conduire valide (Client).</li>
+                                    <li>Preuve de résidence actuelle.</li>
+                                    <li>Justificatif de revenus du Guarantor.</li>
+                                </ul>
+                            </div>
+
+                            <button type="submit"
+                                class="w-full bg-gmfRed hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all mt-4">
+                                <i class="fas fa-paper-plane mr-2"></i> Envoyer ma candidature
+                            </button>
+                        </form>
+
+                        <!-- Success Message (Hidden by default) -->
+                        <div id="successMessage" class="hidden text-center py-10">
+                            <div
+                                class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-500 mb-4">
+                                <i class="fas fa-check fa-2x"></i>
+                            </div>
+                            <h4 class="text-2xl font-bold text-gray-900 mb-2">Candidature Envoyée !</h4>
+                            <p class="text-gray-600">Notre équipe examinera votre profil pour le modèle <span
+                                    id="successCarName" class="font-bold"></span> et vous contactera très prochainement.
+                            </p>
+                            <button onclick="closeModal()"
+                                class="mt-8 text-gmfBlue font-bold hover:underline">Fermer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+
+</html>

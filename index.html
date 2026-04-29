@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GMFLEET - Conduisez. Devenez Propriétaire.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Hide scrollbar for clean modal */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+    </style>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Couleurs de George Michael Logistics
+                        gmfRed: '#dc2626', // Rouge vif (Tailwind red-600)
+                        gmfBlue: '#1e3a8a', // Bleu sombre / corporate (Tailwind blue-900)
+                        gmfAccentBlue: '#2563eb', // Bleu accent (blue-600)
+                        darkBg: '#0f172a',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50 text-gray-800 antialiased" id="accueil">
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-sm transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="#accueil" class="text-3xl font-extrabold tracking-tighter">
+                        <span class="text-gmfBlue uppercase">GM</span><span class="text-gmfRed uppercase">FLEET</span>
+                    </a>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="index.html"
+                        class="text-gmfRed transition font-semibold text-sm uppercase tracking-wide">Accueil</a>
+                    <a href="vehicules.html"
+                        class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">Véhicules</a>
+                    <a href="apropos.html"
+                        class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">À
+                        Propos</a>
+                    <a href="apropos.html#contact"
+                        class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">Contact</a>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="vehicules.html?apply=true"
+                        class="bg-gmfRed hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-bold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">Devenir
+                        Chauffeur</a>
+                    <!-- <a href="admin.html"
+                        class="text-gmfBlue hover:text-gmfRed font-bold text-sm underline-offset-4 hover:underline">Admin
+                        <i class="fas fa-lock ml-1 text-xs"></i></a> -->
+                </div>
+
+                <!-- Hamburger Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobileMenuBtn" onclick="toggleMobileMenu()"
+                        class="text-gmfBlue hover:text-gmfRed focus:outline-none transition">
+                        <i class="fas fa-bars fa-2x"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MOBILE MENU -->
+        <div id="mobileMenu"
+            class="hidden md:hidden bg-white border-t border-gray-100 shadow-xl overflow-hidden transition-all">
+            <div class="px-4 pt-4 pb-6 space-y-4">
+                <a href="index.html" class="block text-gmfRed font-bold transition">Accueil</a>
+                <a href="vehicules.html"
+                    class="block text-gray-800 font-bold hover:text-gmfRed transition">Véhicules</a>
+                <a href="apropos.html" class="block text-gray-800 font-bold hover:text-gmfRed transition">À Propos</a>
+                <a href="apropos.html#contact"
+                    class="block text-gray-800 font-bold hover:text-gmfRed transition">Contact</a>
+                <div class="pt-4 border-t border-gray-100 flex flex-col space-y-3">
+                    <a href="vehicules.html?apply=true"
+                        class="bg-gmfRed text-center text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md">Devenir
+                        Chauffeur</a>
+                    <!-- <a href="admin.html"
+                        class="text-center text-gmfBlue font-bold underline-offset-4 hover:underline py-2">Espace Admin
+                        <i class="fas fa-lock ml-1 text-xs"></i></a> -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-gmfBlue">
+        <div class="absolute inset-0">
+            <!-- Decorative background gradient mimicking moove.io premium feel -->
+            <div class="absolute inset-0 bg-gradient-to-r from-gmfBlue to-gmfAccentBlue opacity-90"></div>
+            <!-- Utilisation d'une image de background avec overlay -->
+            <img src="./img/fortune-vieyra-o4yi2U-qcf0-unsplash.jpg"
+                class="w-full h-full object-cover mix-blend-overlay opacity-30" alt="Background Driver">
+        </div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
+            <div class="text-center md:text-left md:w-2/3">
+                <h1 class="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-6 leading-tight">
+                    Conduisez-le. <br>
+                    <span class="text-gmfRed">Possédez-le.</span>
+                </h1>
+                <p class="text-lg md:text-2xl text-gray-200 mb-10 max-w-3xl font-light">
+                    Transformez votre parcours professionnel. GMFLEET vous donne la possibilité de louer pour posséder
+                    votre véhicule. Commencez à gagner de l'argent et devenez propriétaire.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                    <a href="#etapes"
+                        class="bg-gmfRed hover:bg-red-700 text-white font-bold py-4 px-8 rounded-full text-lg transition-all shadow-xl hover:shadow-2xl flex justify-center items-center gap-2 group">
+                        En savoir plus
+                        <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                    <a href="#etapes"
+                        class="bg-white/10 hover:bg-white/20 backdrop-blur text-white font-bold py-4 px-8 rounded-full text-lg transition-all border border-white/30 text-center">
+                        Comment ça marche
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Decoration element -->
+        <div class="absolute bottom-0 left-0 w-full overflow-hidden rotate-180 transform" style="height: 50px;">
+            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"
+                preserveAspectRatio="none" class="w-full h-full text-gray-50 block" fill="currentColor">
+                <path
+                    d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z">
+                </path>
+            </svg>
+        </div>
+    </section>
+
+
+
+    <!-- STEPS SECTION -->
+    <section id="etapes" class="py-20 bg-gray-50 border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl font-extrabold text-gmfBlue mb-4">Vos 3 étapes pour devenir <span
+                    class="text-gmfRed">propriétaire</span></h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-16">Le chemin le plus simple vers l'indépendance
+                financière.</p>
+
+            <div class="flex flex-col md:flex-row justify-center items-center gap-8 mb-12">
+                <!-- Step 1 -->
+                <div class="bg-white p-8 rounded-2xl shadow-md border border-gray-100 w-full md:w-1/3 relative">
+                    <div
+                        class="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gmfRed text-white rounded-full flex items-center justify-center font-bold text-2xl border-4 border-gray-50 shadow-sm">
+                        1</div>
+                    <i class="fas fa-user-check text-4xl text-gmfBlue mb-4 mt-2"></i>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Postulez & Vérification</h3>
+                    <p class="text-gray-600">Soumettez votre demande en ligne pour le modèle souhaité. Notre équipe
+                        vérifie rapidement votre profil.</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="bg-white p-8 rounded-2xl shadow-md border border-gray-100 w-full md:w-1/3 relative">
+                    <div
+                        class="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gmfRed text-white rounded-full flex items-center justify-center font-bold text-2xl border-4 border-gray-50 shadow-sm">
+                        2</div>
+                    <i class="fas fa-key text-4xl text-gmfBlue mb-4 mt-2"></i>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Prenez le volant</h3>
+                    <p class="text-gray-600">On vous remet les clés. Vous commencez immédiatement à rouler et à générer
+                        des revenus de votre côté.</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="bg-white p-8 rounded-2xl shadow-md border border-gray-100 w-full md:w-1/3 relative">
+                    <div
+                        class="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gmfRed text-white rounded-full flex items-center justify-center font-bold text-2xl border-4 border-gray-50 shadow-sm">
+                        3</div>
+                    <i class="fas fa-hand-holding-usd text-4xl text-gmfBlue mb-4 mt-2"></i>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Devenez Propriétaire</h3>
+                    <p class="text-gray-600">Effectuez vos versements réguliers. À la fin de la période, le véhicule
+                        vous appartient à 100%.</p>
+                </div>
+            </div>
+
+            <a href="vehicules.html?apply=true"
+                class="inline-block bg-gmfBlue hover:bg-blue-900 text-white font-bold py-4 px-10 rounded-full text-lg shadow-lg hover:shadow-xl transition-all">
+                Commencer maintenant
+            </a>
+        </div>
+    </section>
+
+    <!-- VEHICLES PROMO SECTION -->
+    <section id="vehicules-promo" class="relative py-24 md:py-32 bg-white overflow-hidden">
+        <!-- Background Image with Fade -->
+        <div class="absolute inset-0 z-0">
+            <img src="./img/fleet_white_bg.png" alt="Flotte de voitures"
+                class="w-full h-full object-contain object-right md:object-right-bottom p-8">
+            <!-- Mobile: fade bottom to top. Desktop: fade right to left (image is on the right) -->
+            <div
+                class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-white/90 md:from-white via-white/80 md:via-white/70 to-transparent md:to-transparent bg-opacity-50">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-transparent w-full md:w-3/4"></div>
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="md:w-1/2 md:pr-12">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-gmfBlue mb-6 drop-shadow-sm">Choisissez votre <span
+                        class="text-gmfRed">véhicule</span></h2>
+                <p
+                    class="text-xl text-gray-800 mb-8 leading-relaxed font-medium bg-white/30 md:bg-transparent backdrop-blur-sm md:backdrop-blur-none p-4 md:p-0 rounded-2xl">
+                    Découvrez notre flotte exceptionnelle de véhicules fiables et économiques, prêts pour optimiser vos
+                    revenus. Nous mettons à votre disposition les meilleurs modèles du marché pour assurer votre
+                    sécurité et votre rentabilité.</p>
+                <a href="vehicules.html"
+                    class="inline-block bg-gmfBlue hover:bg-blue-900 text-white font-bold py-4 px-8 rounded-full text-lg transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                    Voir notre flotte complète <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section id="apropos" class="relative py-24 md:py-32 bg-white overflow-hidden">
+        <!-- Background Image with Fade -->
+        <div class="absolute inset-0 z-0">
+            <!-- Ensure image looks good on the left -->
+            <img src="./img/gylain-omer-Sb54F2NNego-unsplash.jpg" alt="Chauffeur heureux"
+                class="w-full h-full object-cover object-left"
+                onerror="this.src='https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=2000'">
+            <!-- Mobile: fade top to bottom (image top). Desktop: fade left to right (image left) -->
+            <div class="absolute inset-0 bg-gradient-to-b md:bg-gradient-to-r from-transparent via-white/80 to-white">
+            </div>
+            <!-- Extra layer for strong readability on the right -->
+            <div
+                class="absolute right-0 top-0 bottom-0 w-full md:w-2/3 bg-gradient-to-l from-white via-white/95 to-transparent">
+            </div>
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-end">
+                <div class="md:w-1/2 xl:w-5/12">
+                    <h2 class="text-sm font-bold text-gmfRed uppercase tracking-widest mb-2 drop-shadow-sm">À propos de
+                        GMFLEET</h2>
+                    <h3 class="text-4xl font-extrabold text-gray-900 mb-6 drop-shadow-sm">Autonomiser les chauffeurs
+                        pour un avenir
+                        <span class="text-gmfBlue">meilleur</span>.
+                    </h3>
+                    <p
+                        class="text-lg text-gray-800 mb-8 leading-relaxed font-medium bg-white/40 md:bg-transparent backdrop-blur-sm md:backdrop-blur-none p-4 md:p-0 rounded-2xl">
+                        Chez GMFLEET, nous croyons que le travail acharné doit mener à la
+                        propriété. Notre modèle unique de financement de véhicules "Car na ngai" (Conduisez et devenez
+                        propriétaire) est conçu sur mesure pour le marché congolais.</p>
+                    </p>
+                    <div
+                        class="space-y-6 mb-8 bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-white shadow-sm">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-red-100 p-3 rounded-full text-gmfRed shadow-inner">
+                                <i class="fas fa-car-side fa-lg"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-xl font-bold text-gray-900">Véhicules de qualité</h4>
+                                <p class="text-gray-700">Des voitures robustes et vérifiées, prêtes à générer des
+                                    revenus immédiatement.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-blue-100 p-3 rounded-full text-gmfBlue shadow-inner">
+                                <i class="fas fa-file-contract fa-lg"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-xl font-bold text-gray-900">Sans dépôt bloquant</h4>
+                                <p class="text-gray-700">Un système de crédit accessible qui vous permet de payer en
+                                    travaillant.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-green-100 p-3 rounded-full text-green-600 shadow-inner">
+                                <i class="fas fa-handshake fa-lg"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-xl font-bold text-gray-900">Devenez Propriétaire</h4>
+                                <p class="text-gray-700">À la fin du terme de paiement, la voiture vous appartient
+                                    légalement.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="apropos.html"
+                        class="inline-block bg-gmfBlue hover:bg-blue-900 text-white font-bold py-4 px-8 rounded-full text-lg transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                        Découvrir notre histoire <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VISION SECTION -->
+    <section id="vision" class="py-20 bg-gmfBlue text-white text-center">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl md:text-4xl font-extrabold mb-6">Notre <span class="text-gmfRed">Vision</span></h2>
+            <p class="text-xl md:text-2xl font-light leading-relaxed mb-8">
+                "Redéfinir la mobilité en Afrique en transformant chaque chauffeur en un entrepreneur indépendant et
+                propriétaire de son outil de travail."
+            </p>
+            <div class="w-24 h-1 bg-gmfRed mx-auto rounded-full"></div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 pt-16 pb-8 border-t-4 border-gmfRed">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="md:col-span-2">
+                    <a href="#" class="text-3xl font-extrabold tracking-tighter block mb-4">
+                        <span class="text-white uppercase">GM</span><span class="text-gmfRed uppercase">FLEET</span>
+                    </a>
+                    <p class="text-gray-400 max-w-sm mb-6">
+                        Une initiative de George Michael Logistics. Nous finançons l'avenir de la mobilité en donnant
+                        aux chauffeurs l'accès à la propriété de véhicules.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gmfBlue hover:text-white transition-colors"><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gmfBlue hover:text-white transition-colors"><i
+                                class="fab fa-twitter"></i></a>
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gmfBlue hover:text-white transition-colors"><i
+                                class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">Liens Utiles</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#accueil" class="text-gray-400 hover:text-gmfRed transition-colors">Accueil</a>
+                        </li>
+                        <li><a href="vehicules.html" class="text-gray-400 hover:text-gmfRed transition-colors">Nos
+                                Véhicules</a></li>
+                        <li><a href="apropos.html" class="text-gray-400 hover:text-gmfRed transition-colors">À
+                                propos</a>
+                        </li>
+                        <!-- <li><a href="admin.html" class="text-gray-400 hover:text-gmfRed transition-colors">Espace
+                                Admin</a></li> -->
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">Contact</h4>
+                    <ul class="space-y-3 text-gray-400">
+                        <li class="flex items-center"><i class="fas fa-envelope mr-3 text-gmfRed"></i>
+                            contact@gmfleet.cd</li>
+                        <li class="flex items-center"><i class="fas fa-phone-alt mr-3 text-gmfRed"></i> +243 00 000 0000
+                        </li>
+                        <li class="flex items-start"><i class="fas fa-map-marker-alt mr-3 mt-1 text-gmfRed"></i>
+                            Kinshasa, RDC</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-sm">© 2026 GMFLEET (George Michael Logistics). Tous droits réservés.</p>
+                <div class="flex space-x-4 mt-4 md:mt-0 text-sm">
+                    <a href="#" class="text-gray-500 hover:text-white">Termes & Conditions</a>
+                    <a href="#" class="text-gray-500 hover:text-white">Confidentialité</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+
+</html>

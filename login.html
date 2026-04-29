@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Admin - GMFLEET</title>
+    <meta name="description" content="Espace de connexion administrateur GMFLEET - George Michael Logistics">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gmfRed: '#dc2626',
+                        gmfBlue: '#1e3a8a',
+                        darkBg: '#0f172a',
+                        darkCard: '#1e293b',
+                        darkBorder: '#334155'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .login-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%);
+        }
+
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(220, 38, 38, 0.15);
+            animation: float 6s ease-in-out infinite;
+        }
+        .particle:nth-child(2) { animation-delay: -2s; animation-duration: 8s; background: rgba(30, 58, 138, 0.2); }
+        .particle:nth-child(3) { animation-delay: -4s; animation-duration: 10s; }
+        .particle:nth-child(4) { animation-delay: -1s; animation-duration: 7s; background: rgba(37, 99, 235, 0.15); }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.6; }
+            50% { transform: translateY(-30px) rotate(180deg); opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up { animation: slideUp 0.6s ease-out forwards; }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.9); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .input-glow:focus {
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2), 0 0 20px rgba(220, 38, 38, 0.1);
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+    </style>
+</head>
+<body class="login-bg min-h-screen flex items-center justify-center relative overflow-hidden">
+
+    <!-- Decorative particles -->
+    <div class="particle" style="width: 120px; height: 120px; top: 10%; left: 15%;"></div>
+    <div class="particle" style="width: 80px; height: 80px; top: 60%; left: 75%;"></div>
+    <div class="particle" style="width: 150px; height: 150px; top: 80%; left: 20%;"></div>
+    <div class="particle" style="width: 60px; height: 60px; top: 20%; left: 80%;"></div>
+
+    <!-- Grid pattern overlay -->
+    <div class="absolute inset-0 opacity-5" style="background-image: radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px); background-size: 40px 40px;"></div>
+
+    <!-- Login Card -->
+    <div class="glass-card rounded-3xl p-8 md:p-12 w-full max-w-md mx-4 relative z-10 animate-slide-up" id="loginCard">
+
+        <!-- Logo -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gmfRed/20 mb-5">
+                <i class="fas fa-car-side text-gmfRed text-2xl"></i>
+            </div>
+            <h1 class="text-3xl font-black tracking-tighter">
+                <span class="text-white">GM</span><span class="text-gmfRed">FLEET</span>
+            </h1>
+            <p class="text-gray-400 text-sm mt-2 font-medium">Espace Administrateur</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="loginError" class="hidden bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl mb-6 flex items-center">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span id="loginErrorText">Identifiants incorrects</span>
+        </div>
+
+        <!-- Form -->
+        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5">
+            <div>
+                <label class="block text-gray-300 text-sm font-semibold mb-2">Adresse e-mail</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i class="fas fa-envelope text-gray-500"></i>
+                    </div>
+                    <input type="email" id="loginEmail" required
+                        class="input-glow w-full pl-11 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-gmfRed outline-none transition-all duration-300"
+                        placeholder="admin@gmfleet.cd">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-gray-300 text-sm font-semibold mb-2">Mot de passe</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-gray-500"></i>
+                    </div>
+                    <input type="password" id="loginPassword" required
+                        class="input-glow w-full pl-11 pr-12 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-gmfRed outline-none transition-all duration-300"
+                        placeholder="••••••••">
+                    <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-300 transition">
+                        <i class="fas fa-eye" id="togglePwdIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" id="rememberMe" class="w-4 h-4 rounded border-gray-600 bg-white/5 text-gmfRed focus:ring-gmfRed focus:ring-offset-0">
+                    <span class="ml-2 text-gray-400 text-sm">Se souvenir de moi</span>
+                </label>
+            </div>
+
+            <button type="submit" id="loginBtn"
+                class="w-full bg-gmfRed hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-red-900/30 hover:shadow-xl hover:shadow-red-900/40 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                <span>Se connecter</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </form>
+
+        <!-- Footer -->
+        <div class="mt-8 pt-6 border-t border-white/5 text-center">
+            <a href="index.html" class="text-gray-500 hover:text-gray-300 text-sm transition-colors">
+                <i class="fas fa-arrow-left mr-1"></i> Retour au site GMFLEET
+            </a>
+        </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="absolute bottom-6 text-center w-full text-gray-600 text-xs">
+        © 2026 GMFLEET — George Michael Logistics
+    </div>
+
+    <script>
+        // Check if already logged in
+        if (localStorage.getItem('gmfleet_admin_logged') === 'true') {
+            window.location.href = 'admin.html';
+        }
+
+        function togglePassword() {
+            const input = document.getElementById('loginPassword');
+            const icon = document.getElementById('togglePwdIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+            const card = document.getElementById('loginCard');
+            const btn = document.getElementById('loginBtn');
+
+            // Loading state
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Connexion en cours...';
+            btn.disabled = true;
+
+            // Simulate network delay
+            setTimeout(() => {
+                // Demo credentials
+                if (email === 'admin@gmfleet.cd' && password === 'admin123') {
+                    localStorage.setItem('gmfleet_admin_logged', 'true');
+                    localStorage.setItem('gmfleet_admin_name', 'Admin GMFLEET');
+
+                    // Success animation
+                    btn.innerHTML = '<i class="fas fa-check mr-2"></i> Connecté !';
+                    btn.classList.remove('bg-gmfRed', 'hover:bg-red-700');
+                    btn.classList.add('bg-green-600');
+
+                    setTimeout(() => {
+                        window.location.href = 'admin.html';
+                    }, 800);
+                } else {
+                    errorEl.classList.remove('hidden');
+                    card.classList.add('shake');
+                    setTimeout(() => card.classList.remove('shake'), 500);
+
+                    btn.innerHTML = '<span>Se connecter</span><i class="fas fa-arrow-right ml-2"></i>';
+                    btn.disabled = false;
+                }
+            }, 1200);
+        }
+    </script>
+</body>
+</html>

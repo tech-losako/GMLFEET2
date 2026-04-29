@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - GMFLEET</title>
+    <meta name="description" content="Panneau d'administration GMFLEET - Gestion de la flotte et des candidatures">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gmfRed: '#dc2626',
+                        gmfBlue: '#1e3a8a',
+                        gmfSide: '#f8fafc',
+                        gmfCard: '#ffffff',
+                        gmfBorder: '#e2e8f0'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* ===== THEME VARIABLES ===== */
+        :root {
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-input: #f9fafb;
+            --bg-hover: #f8fafc;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-lift: 0 8px 25px rgba(0, 0, 0, 0.08);
+            --scrollbar-track: #f1f5f9;
+            --scrollbar-thumb: #cbd5e1;
+            --modal-bg: rgba(15, 23, 42, 0.4);
+        }
+
+        .dark {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #0f172a;
+            --bg-hover: rgba(255, 255, 255, 0.03);
+            --border: #334155;
+            --border-light: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow-lift: 0 8px 25px rgba(0, 0, 0, 0.3);
+            --scrollbar-track: #0f172a;
+            --scrollbar-thumb: #334155;
+            --modal-bg: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Apply theme vars */
+        .theme-bg-main {
+            background-color: var(--bg-main);
+        }
+
+        .theme-bg-card {
+            background-color: var(--bg-card);
+        }
+
+        .theme-bg-input {
+            background-color: var(--bg-input);
+        }
+
+        .theme-border {
+            border-color: var(--border);
+        }
+
+        .theme-border-light {
+            border-color: var(--border-light);
+        }
+
+        .theme-text {
+            color: var(--text-primary);
+        }
+
+        .theme-text-secondary {
+            color: var(--text-secondary);
+        }
+
+        .theme-text-muted {
+            color: var(--text-muted);
+        }
+
+        /* Dark mode badge overrides */
+        .dark .badge-attente {
+            background: rgba(234, 179, 8, 0.15);
+            color: #eab308;
+            border-color: rgba(234, 179, 8, 0.3);
+        }
+
+        .dark .badge-valide {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .dark .badge-refuse {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .dark .badge-dispo {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .dark .badge-location {
+            background: rgba(234, 179, 8, 0.15);
+            color: #eab308;
+            border-color: rgba(234, 179, 8, 0.3);
+        }
+
+        .dark .badge-maint {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Sidebar */
+        .sidebar-gradient {
+            background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 40%, #1d4ed8 100%);
+        }
+
+        /* Sidebar active link */
+        .nav-link {
+            transition: all 0.2s ease;
+        }
+
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(4px);
+        }
+
+        .nav-link:not(.active):hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Section fade */
+        .section-panel {
+            display: none;
+        }
+
+        .section-panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* KPI counter animation */
+        @keyframes countUp {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .kpi-value {
+            animation: countUp 0.5s ease-out forwards;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--modal-bg);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+            animation: fadeIn 0.2s ease;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Status badge */
+        .badge-attente {
+            background: #fef9c3;
+            color: #a16207;
+            border: 1px solid #fde047;
+        }
+
+        .badge-valide {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #86efac;
+        }
+
+        .badge-refuse {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+        }
+
+        .badge-dispo {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #86efac;
+        }
+
+        .badge-location {
+            background: #fef9c3;
+            color: #a16207;
+            border: 1px solid #fde047;
+        }
+
+        .badge-maint {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+        }
+
+        /* Notification dot */
+        .notif-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: #dc2626;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.7;
+                transform: scale(1.3);
+            }
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+
+        /* Tooltip */
+        .tooltip-trigger:hover .tooltip-text {
+            display: block;
+        }
+
+        .tooltip-text {
+            display: none;
+        }
+
+        /* Chart bars */
+        .chart-bar {
+            transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Sidebar toggle for mobile */
+        #sidebar {
+            transition: transform 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                z-index: 50;
+                height: 100vh;
+                transform: translateX(-100%);
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+        }
+
+        /* Table row hover */
+        .table-row:hover {
+            background: var(--bg-hover);
+        }
+
+        /* Input focus */
+        .light-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        /* Card hover lift */
+        .card-lift {
+            transition: all 0.2s ease;
+        }
+
+        .card-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lift);
+        }
+
+        /* Dark mode toggle */
+        .theme-toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .dark .theme-toggle {
+            background: #475569;
+        }
+
+        .theme-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .dark .theme-toggle::after {
+            transform: translateX(20px);
+        }
+
+        /* Transition for theme switching */
+        .theme-transition {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Print styles */
+        @media print {
+
+            #sidebar,
+            header,
+            .flex.wrap.gap-3,
+            button,
+            .no-print {
+                display: none !important;
+            }
+
+            main,
+            .overflow-y-auto {
+                overflow: visible !important;
+                height: auto !important;
+                display: block !important;
+            }
+
+            .section-panel {
+                display: none !important;
+            }
+
+            .section-panel.active {
+                display: block !important;
+                padding: 0 !important;
+            }
+
+            body {
+                background: white !important;
+                color: black !important;
+            }
+
+            .bg-white,
+            .theme-bg-card,
+            .theme-bg-main {
+                background: white !important;
+            }
+
+            .border,
+            .theme-border {
+                border-color: #eee !important;
+            }
+
+            .shadow-sm,
+            .shadow-xl,
+            .card-lift {
+                box-shadow: none !important;
+                transform: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 flex h-screen overflow-hidden theme-transition" id="appBody">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside id="sidebar" class="w-64 sidebar-gradient flex flex-col shrink-0 shadow-xl">
+
+        <!-- Logo -->
+        <div class="h-16 flex items-center px-6 border-b border-white/15">
+            <span class="text-xl font-black tracking-tighter">
+                <span class="text-white">GM</span><span class="text-red-400">FLEET</span>
+            </span>
+            <span
+                class="ml-2 text-xs font-semibold text-white/90 bg-white/15 px-2 py-0.5 rounded-full border border-white/20">Admin</span>
+        </div>
+
+        <!-- Admin info -->
+        <div class="px-4 py-4 border-b border-white/15">
+            <div class="flex items-center space-x-3">
+                <div
+                    class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center font-bold text-sm text-white shrink-0">
+                    A
+                </div>
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold text-white truncate" id="adminName">Admin GMFLEET</p>
+                    <p class="text-xs text-blue-200/70">Administrateur</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+            <p class="text-xs text-blue-200/50 uppercase font-semibold px-3 mb-3 tracking-wider">Menu principal</p>
+
+            <a href="#" class="nav-link active flex items-center px-4 py-3 rounded-xl text-sm font-medium text-white"
+                data-section="dashboard" onclick="navigate('dashboard', this)">
+                <i class="fas fa-chart-pie w-5 mr-3 text-base"></i>
+                <span>Tableau de bord</span>
+            </a>
+            <a href="#" class="nav-link flex items-center px-4 py-3 rounded-xl text-sm font-medium text-blue-100/70"
+                data-section="candidatures" onclick="navigate('candidatures', this)">
+                <i class="fas fa-users w-5 mr-3 text-base"></i>
+                <span>Candidatures</span>
+                <span id="navBadge"
+                    class="ml-auto bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded-full hidden">0</span>
+            </a>
+            <a href="#" class="nav-link flex items-center px-4 py-3 rounded-xl text-sm font-medium text-blue-100/70"
+                data-section="flotte" onclick="navigate('flotte', this)">
+                <i class="fas fa-car w-5 mr-3 text-base"></i>
+                <span>Flotte</span>
+            </a>
+            <a href="#" class="nav-link flex items-center px-4 py-3 rounded-xl text-sm font-medium text-blue-100/70"
+                data-section="finances" onclick="navigate('finances', this)">
+                <i class="fas fa-wallet w-5 mr-3 text-base"></i>
+                <span>Finances</span>
+            </a>
+            <a href="#" class="nav-link flex items-center px-4 py-3 rounded-xl text-sm font-medium text-blue-100/70"
+                data-section="rapports" onclick="navigate('rapports', this)">
+                <i class="fas fa-chart-bar w-5 mr-3 text-base"></i>
+                <span>Rapports</span>
+            </a>
+
+            <p class="text-xs text-blue-200/50 uppercase font-semibold px-3 mt-6 mb-3 tracking-wider">Compte</p>
+            <a href="#" class="nav-link flex items-center px-4 py-3 rounded-xl text-sm font-medium text-blue-100/70"
+                data-section="parametres" onclick="navigate('parametres', this)">
+                <i class="fas fa-cog w-5 mr-3 text-base"></i>
+                <span>Paramètres</span>
+            </a>
+        </nav>
+
+        <!-- Bottom actions -->
+        <div class="px-3 py-4 border-t border-white/15 space-y-1">
+            <a href="index.html"
+                class="flex items-center px-4 py-2.5 rounded-xl text-sm text-blue-100/60 hover:text-white hover:bg-white/10 transition">
+                <i class="fas fa-globe w-5 mr-3"></i> Voir le site
+            </a>
+            <button onclick="logout()"
+                class="w-full flex items-center px-4 py-2.5 rounded-xl text-sm text-red-300/80 hover:text-red-200 hover:bg-red-500/15 transition">
+                <i class="fas fa-sign-out-alt w-5 mr-3"></i> Déconnexion
+            </button>
+        </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden">
+
+        <!-- Top Header -->
+        <header class="h-16 border-b flex items-center justify-between px-6 shrink-0 z-10 theme-transition"
+            style="background-color:var(--bg-card);border-color:var(--border);box-shadow:var(--shadow-card)">
+            <!-- Mobile menu toggle -->
+            <button onclick="toggleSidebar()" class="md:hidden text-gray-500 hover:text-gray-800 mr-4">
+                <i class="fas fa-bars text-lg"></i>
+            </button>
+
+            <div>
+                <h1 class="text-base font-bold" style="color:var(--text-primary)" id="pageTitle">Tableau de bord</h1>
+                <p class="text-xs" style="color:var(--text-muted)" id="pageDate"></p>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <!-- Dark/Light Toggle -->
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-sun text-sm theme-text-muted" style="color:var(--text-muted)"></i>
+                    <div class="theme-toggle" onclick="toggleTheme()" id="themeToggle" title="Mode sombre / clair">
+                    </div>
+                    <i class="fas fa-moon text-sm theme-text-muted" style="color:var(--text-muted)"></i>
+                </div>
+                <!-- Notifications -->
+                <button class="relative theme-text-muted hover:text-gmfBlue transition" style="color:var(--text-muted)"
+                    onclick="navigate('candidatures', document.querySelector('[data-section=candidatures]'))">
+                    <i class="fas fa-bell text-lg"></i>
+                    <span id="notifDot" class="notif-dot hidden"></span>
+                </button>
+                <!-- Avatar -->
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-gmfBlue to-blue-700 flex items-center justify-center font-bold text-sm text-white cursor-pointer"
+                    onclick="navigate('parametres', document.querySelector('[data-section=parametres]'))">
+                    A
+                </div>
+            </div>
+        </header>
+
+        <!-- Scrollable Content Area -->
+        <div class="flex-1 overflow-y-auto theme-transition" style="background-color:var(--bg-main)">
+
+            <!-- ==================== DASHBOARD ==================== -->
+            <section id="section-dashboard" class="section-panel active p-6">
+
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm card-lift">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                                <i class="fas fa-file-alt text-blue-600"></i>
+                            </div>
+                            <span class="text-xs text-green-700 bg-green-50 px-2 py-1 rounded-full font-semibold">
+                                <i class="fas fa-arrow-up mr-1"></i>+12%
+                            </span>
+                        </div>
+                        <p class="text-2xl font-black text-gray-900 kpi-value" id="kpiTotal">0</p>
+                        <p class="text-xs text-gray-400 mt-1 font-medium">Total Candidatures</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm card-lift">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+                                <i class="fas fa-hourglass-half text-amber-500"></i>
+                            </div>
+                            <span class="text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded-full font-semibold">
+                                <i class="fas fa-clock mr-1"></i>En cours
+                            </span>
+                        </div>
+                        <p class="text-2xl font-black text-gray-900 kpi-value" id="kpiAttente">0</p>
+                        <p class="text-xs text-gray-400 mt-1 font-medium">En attente</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm card-lift">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                                <i class="fas fa-check-circle text-emerald-500"></i>
+                            </div>
+                            <span class="text-xs text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full font-semibold">
+                                <i class="fas fa-arrow-up mr-1"></i>+5%
+                            </span>
+                        </div>
+                        <p class="text-2xl font-black text-gray-900 kpi-value" id="kpiValide">0</p>
+                        <p class="text-xs text-gray-400 mt-1 font-medium">Validées</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm card-lift">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
+                                <i class="fas fa-car text-purple-500"></i>
+                            </div>
+                            <span class="text-xs text-purple-700 bg-purple-50 px-2 py-1 rounded-full font-semibold">
+                                <i class="fas fa-car mr-1"></i>Flotte
+                            </span>
+                        </div>
+                        <p class="text-2xl font-black text-gray-900 kpi-value" id="kpiFlotte">0</p>
+                        <p class="text-xs text-gray-400 mt-1 font-medium">Véhicules actifs</p>
+                    </div>
+                </div>
+
+                <!-- Charts + Recent -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+
+                    <!-- Bar Chart -->
+                    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm lg:col-span-2">
+                        <div class="flex items-center justify-between mb-5">
+                            <div>
+                                <h3 class="font-bold text-gray-900 text-sm">Candidatures par semaine</h3>
+                                <p class="text-xs text-gray-400">Évolution sur 6 semaines</p>
+                            </div>
+                            <div class="flex space-x-1">
+                                <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-gmfRed"></div>
+                            </div>
+                        </div>
+                        <!-- Chart -->
+                        <div class="flex items-end justify-between h-32 gap-2" id="barChart">
+                            <!-- Generated by JS -->
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-400 mt-2" id="barLabels"></div>
+                    </div>
+
+                    <!-- Doughnut-like -->
+                    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                        <h3 class="font-bold text-gray-900 text-sm mb-4">Répartition statuts</h3>
+                        <div class="space-y-4" id="chartDonut">
+                            <!-- Generated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent candidatures -->
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+                        <h3 class="font-bold text-gray-900 text-sm">Candidatures récentes</h3>
+                        <button
+                            onclick="navigate('candidatures', document.querySelector('[data-section=candidatures]'))"
+                            class="text-xs text-blue-600 hover:text-blue-800 transition font-medium">
+                            Voir tout <i class="fas fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-100 bg-gray-50/50">
+                                    <th
+                                        class="px-5 py-3 text-left text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                                        Candidat</th>
+                                    <th
+                                        class="px-5 py-3 text-left text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                                        Véhicule</th>
+                                    <th
+                                        class="px-5 py-3 text-left text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                                        Date</th>
+                                    <th
+                                        class="px-5 py-3 text-left text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                                        Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboardTable" class="divide-y divide-gray-100">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== CANDIDATURES ==================== -->
+            <section id="section-candidatures" class="section-panel p-6">
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-3 mb-5">
+                    <input type="text" id="searchInput" placeholder="Rechercher un candidat…" oninput="filterTable()"
+                        class="light-input bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 flex-1 min-w-48 transition shadow-sm">
+                    <select id="filterStatus" onchange="filterTable()"
+                        class="light-input bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-600 transition shadow-sm">
+                        <option value="">Tous les statuts</option>
+                        <option value="En attente">En attente</option>
+                        <option value="Validé">Validé</option>
+                        <option value="Refusé">Refusé</option>
+                    </select>
+                    <button onclick="openAddModal()"
+                        class="bg-gmfRed hover:bg-red-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition flex items-center space-x-2 shadow-sm">
+                        <i class="fas fa-plus"></i><span>Ajouter</span>
+                    </button>
+                    <button onclick="loadData()"
+                        class="bg-white border border-gray-200 text-gray-500 hover:text-gray-800 text-sm px-4 py-2.5 rounded-xl transition shadow-sm">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+
+                <!-- Table -->
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-100 bg-gray-50/50">
+                                    <th
+                                        class="px-5 py-4 text-left text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                                        Candidat</th>
+                                    <th
+                                        class="px-5 py-4 text-left text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                                        Véhicule</th>
+                                    <th
+                                        class="px-5 py-4 text-left text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                                        Contact</th>
+                                    <th
+                                        class="px-5 py-4 text-left text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                                        Date</th>
+                                    <th
+                                        class="px-5 py-4 text-left text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                                        Statut</th>
+                                    <th
+                                        class="px-5 py-4 text-right text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                                        Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="candidaturesBody" class="divide-y divide-gray-100">
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Empty state -->
+                    <div id="emptyState" class="hidden py-16 text-center">
+                        <i class="fas fa-search text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500 font-medium">Aucune candidature trouvée</p>
+                        <p class="text-xs text-gray-400 mt-1">Essayez de modifier vos filtres</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== FLOTTE ==================== -->
+            <section id="section-flotte" class="section-panel p-6">
+                <div class="flex justify-between items-center mb-5">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900">Gestion de la Flotte</h2>
+                        <p class="text-xs text-gray-400 mt-1">Suivi en temps réel des véhicules</p>
+                    </div>
+                    <button onclick="openAddVehicleModal()"
+                        class="bg-gmfRed hover:bg-red-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition flex items-center space-x-2 shadow-sm">
+                        <i class="fas fa-plus"></i><span>Ajouter</span>
+                    </button>
+                </div>
+
+                <!-- Fleet stats -->
+                <div class="grid grid-cols-3 gap-4 mb-5">
+                    <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center card-lift">
+                        <p class="text-2xl font-black text-emerald-500" id="flotteDisponible">0</p>
+                        <p class="text-xs text-gray-400 mt-1">Disponibles</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center card-lift">
+                        <p class="text-2xl font-black text-amber-500" id="flotteEnLocation">0</p>
+                        <p class="text-xs text-gray-400 mt-1">En location</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center card-lift">
+                        <p class="text-2xl font-black text-red-500" id="flotteMaintenance">0</p>
+                        <p class="text-xs text-gray-400 mt-1">Maintenance</p>
+                    </div>
+                </div>
+
+                <!-- Vehicle grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" id="vehicleGrid">
+                </div>
+            </section>
+
+            <!-- ==================== RAPPORTS ==================== -->
+            <section id="section-rapports" class="section-panel p-6">
+                <div class="flex justify-between items-center mb-5">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900">Rapports & Statistiques</h2>
+                        <p class="text-xs text-gray-400 mt-1">Résumé de l'activité de la plateforme</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="window.print()"
+                            class="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-semibold px-5 py-2.5 rounded-xl transition flex items-center space-x-2 shadow-sm no-print">
+                            <i class="fas fa-print"></i><span>Imprimer</span>
+                        </button>
+                        <button onclick="exportExcel()"
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition flex items-center space-x-2 shadow-sm no-print">
+                            <i class="fas fa-file-excel"></i><span>Exporter Excel</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Summary cards -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm card-lift">
+                        <i class="fas fa-users text-blue-500 mb-3"></i>
+                        <p class="text-xl font-black text-gray-900" id="rptTotal">0</p>
+                        <p class="text-xs text-gray-400 mt-1">Total dossiers</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm card-lift">
+                        <i class="fas fa-percentage text-emerald-500 mb-3"></i>
+                        <p class="text-xl font-black text-gray-900" id="rptTaux">0%</p>
+                        <p class="text-xs text-gray-400 mt-1">Taux approbation</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm card-lift">
+                        <i class="fas fa-car text-purple-500 mb-3"></i>
+                        <p class="text-xl font-black text-gray-900" id="rptFlotte">0</p>
+                        <p class="text-xs text-gray-400 mt-1">Véhicules flotte</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm card-lift">
+                        <i class="fas fa-calendar text-orange-500 mb-3"></i>
+                        <p class="text-xl font-black text-gray-900" id="rptMois">Avr. 2026</p>
+                        <p class="text-xs text-gray-400 mt-1">Période active</p>
+                    </div>
+                </div>
+
+                <!-- Report table -->
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div class="px-5 py-4 border-b border-gray-100">
+                        <h3 class="font-bold text-gray-900 text-sm">Rapport détaillé des candidatures</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-100 bg-gray-50/50">
+                                    <th class="px-5 py-3 text-left text-xs text-gray-500 font-semibold uppercase">#</th>
+                                    <th class="px-5 py-3 text-left text-xs text-gray-500 font-semibold uppercase">
+                                        Candidat</th>
+                                    <th class="px-5 py-3 text-left text-xs text-gray-500 font-semibold uppercase">
+                                        Véhicule souhaité</th>
+                                    <th class="px-5 py-3 text-left text-xs text-gray-500 font-semibold uppercase">
+                                        Contact</th>
+                                    <th class="px-5 py-3 text-left text-xs text-gray-500 font-semibold uppercase">Date
+                                    </th>
+                                    <th class="px-5 py-3 text-left text-xs text-gray-500 font-semibold uppercase">Statut
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportTable" class="divide-y divide-gray-100">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== FINANCES ==================== -->
+            <section id="section-finances" class="section-panel p-6">
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900 theme-text">Gestion Financière</h2>
+                        <p class="text-xs text-gray-400 theme-text-muted mt-1">Suivi des paiements "Drive-to-Own" & Location</p>
+                    </div>
+                    <button onclick="openPaymentModal()"
+                        class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition flex items-center space-x-2 shadow-sm">
+                        <i class="fas fa-plus"></i><span>Enregistrer un Paiement</span>
+                    </button>
+                </div>
+
+                <!-- Finance KPIs -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white theme-bg-card rounded-2xl p-6 border theme-border shadow-sm card-lift">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center">
+                                <i class="fas fa-hand-holding-usd text-emerald-600 text-xl"></i>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">Total Collecté</span>
+                        </div>
+                        <p class="text-3xl font-black text-gray-900 theme-text" id="finTotal">0 $</p>
+                        <p class="text-xs text-gray-400 theme-text-muted mt-1">Paiements cumulés</p>
+                    </div>
+
+                    <div class="bg-white theme-bg-card rounded-2xl p-6 border theme-border shadow-sm card-lift">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
+                                <i class="fas fa-calendar-check text-blue-600 text-xl"></i>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-1 rounded-md">Cette Semaine</span>
+                        </div>
+                        <p class="text-3xl font-black text-gray-900 theme-text" id="finWeek">0 $</p>
+                        <p class="text-xs text-gray-400 theme-text-muted mt-1">Objectif : <span id="finTarget">0 $</span></p>
+                    </div>
+
+                    <div class="bg-white theme-bg-card rounded-2xl p-6 border theme-border shadow-sm card-lift">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center">
+                                <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-red-600 bg-red-50 px-2 py-1 rounded-md">Impayés</span>
+                        </div>
+                        <p class="text-3xl font-black text-gray-900 theme-text" id="finLate">0 $</p>
+                        <p class="text-xs text-gray-400 theme-text-muted mt-1">Paiements en retard</p>
+                    </div>
+                </div>
+
+                <!-- Payments Table -->
+                <div class="bg-white theme-bg-card rounded-2xl border theme-border shadow-sm overflow-hidden mb-8">
+                    <div class="px-5 py-4 border-b theme-border flex items-center justify-between">
+                        <h3 class="font-bold text-gray-900 theme-text text-sm">Suivi des Chauffeurs</h3>
+                        <div class="flex space-x-2">
+                            <span class="flex items-center text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Légende :</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">À jour</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700">En retard</span>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="bg-gray-50/50 theme-border-light border-b">
+                                    <th class="px-5 py-4 text-left text-xs text-gray-500 theme-text-muted font-bold uppercase tracking-wider">Conducteur</th>
+                                    <th class="px-5 py-4 text-left text-xs text-gray-500 theme-text-muted font-bold uppercase tracking-wider">Véhicule</th>
+                                    <th class="px-5 py-4 text-left text-xs text-gray-500 theme-text-muted font-bold uppercase tracking-wider">Mensualité</th>
+                                    <th class="px-5 py-4 text-left text-xs text-gray-500 theme-text-muted font-bold uppercase tracking-wider">Progression</th>
+                                    <th class="px-5 py-4 text-left text-xs text-gray-500 theme-text-muted font-bold uppercase tracking-wider">Dernier Paiement</th>
+                                    <th class="px-5 py-4 text-left text-xs text-gray-500 theme-text-muted font-bold uppercase tracking-wider">Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody id="financeTable" class="divide-y theme-border-light">
+                                <!-- Generated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="bg-white theme-bg-card rounded-2xl border theme-border shadow-sm overflow-hidden">
+                    <div class="px-5 py-4 border-b theme-border">
+                        <h3 class="font-bold text-gray-900 theme-text text-sm">Dernières Transactions</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="bg-gray-50/50 theme-border-light border-b">
+                                    <th class="px-5 py-3 text-left text-xs text-gray-400 font-bold uppercase">Date</th>
+                                    <th class="px-5 py-3 text-left text-xs text-gray-400 font-bold uppercase">Chauffeur</th>
+                                    <th class="px-5 py-3 text-left text-xs text-gray-400 font-bold uppercase">Méthode</th>
+                                    <th class="px-5 py-3 text-left text-xs text-gray-400 font-bold uppercase">Référence</th>
+                                    <th class="px-5 py-3 text-right text-xs text-gray-400 font-bold uppercase">Montant</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentPayments" class="divide-y theme-border-light text-xs text-gray-500 theme-text-secondary">
+                                <!-- Generated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== PARAMETRES ==================== -->
+            <section id="section-parametres" class="section-panel p-6 max-w-2xl">
+                <h2 class="text-lg font-bold text-gray-900 mb-6">Paramètres du compte</h2>
+
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
+                    <h3 class="text-sm font-bold text-gray-900 mb-5 flex items-center">
+                        <i class="fas fa-user-circle text-blue-500 mr-2"></i>
+                        Informations administrateur
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs text-gray-500 font-semibold uppercase mb-2">Nom complet</label>
+                            <input type="text" id="settingName" value="Admin GMFLEET"
+                                class="light-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 font-semibold uppercase mb-2">Adresse
+                                e-mail</label>
+                            <input type="email" id="settingEmail" value="admin@gmfleet.cd"
+                                class="light-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 transition">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
+                    <h3 class="text-sm font-bold text-gray-900 mb-5 flex items-center">
+                        <i class="fas fa-lock text-amber-500 mr-2"></i>
+                        Changer le mot de passe
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs text-gray-500 font-semibold uppercase mb-2">Mot de passe
+                                actuel</label>
+                            <input type="password" id="settingOldPwd" placeholder="••••••••"
+                                class="light-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 font-semibold uppercase mb-2">Nouveau mot de
+                                passe</label>
+                            <input type="password" id="settingNewPwd" placeholder="••••••••"
+                                class="light-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 transition">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <button onclick="saveSettings()"
+                        class="bg-gmfBlue hover:bg-blue-800 text-white font-semibold px-6 py-3 rounded-xl transition text-sm shadow-sm">
+                        <i class="fas fa-save mr-2"></i>Sauvegarder
+                    </button>
+                    <button onclick="logout()"
+                        class="bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 font-semibold px-6 py-3 rounded-xl transition text-sm">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Déconnexion
+                    </button>
+                </div>
+
+                <div id="settingMsg"
+                    class="hidden mt-4 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm px-4 py-3 rounded-xl">
+                    <i class="fas fa-check-circle mr-2"></i>Paramètres sauvegardés avec succès !
+                </div>
+            </section>
+
+        </div><!-- end scrollable -->
+    </main>
+
+    <!-- ==================== MODAL: Détail Candidature ==================== -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="font-bold text-gray-900">Détail de la candidature</h3>
+                <button onclick="closeModal('detailModal')"
+                    class="text-gray-400 hover:text-gray-700 transition text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6" id="detailContent">
+            </div>
+            <div class="px-6 py-4 border-t border-gray-100 flex justify-end space-x-3">
+                <button id="modalRefuse" onclick=""
+                    class="flex items-center space-x-2 bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 px-4 py-2.5 rounded-xl text-sm font-semibold transition">
+                    <i class="fas fa-times"></i><span>Refuser</span>
+                </button>
+                <button id="modalValide" onclick=""
+                    class="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition shadow-sm">
+                    <i class="fas fa-check"></i><span>Valider</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: Ajouter Candidature ==================== -->
+    <div class="modal-overlay" id="addModal">
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-2xl w-full max-w-md mx-4">
+            <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="font-bold text-gray-900">Nouvelle candidature</h3>
+                <button onclick="closeModal('addModal')" class="text-gray-400 hover:text-gray-700 transition text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-500 font-semibold uppercase mb-2">Nom complet *</label>
+                    <input type="text" id="addName" placeholder="Ex: Jean Kabasele"
+                        class="light-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 transition">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 font-semibold uppercase mb-2">Véhicule souhaité *</label>
+                    <select id="addVehicle"
+                        class="light-input w-full theme-bg-input theme-border theme-text rounded-xl px-4 py-3 text-sm transition"
+                        style="background-color:var(--bg-input);border-color:var(--border);color:var(--text-primary)">
+                        <option value="">-- Sélectionner --</option>
+                        <!-- Populated dynamically from fleet -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 font-semibold uppercase mb-2">Téléphone *</label>
+                    <input type="tel" id="addPhone" placeholder="+243 XXX XXX XXX"
+                        class="light-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 transition">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 font-semibold uppercase mb-2">Message / Notes</label>
+                    <textarea id="addNote" rows="3" placeholder="Notes supplémentaires…"
+                        class="light-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 transition resize-none"></textarea>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-100 flex justify-end space-x-3">
+                <button onclick="closeModal('addModal')"
+                    class="text-gray-500 hover:text-gray-800 px-4 py-2.5 text-sm transition">Annuler</button>
+                <button onclick="addCandidate()"
+                    class="bg-gmfRed hover:bg-red-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition shadow-sm">
+                    <i class="fas fa-plus mr-2"></i>Ajouter
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: Ajouter Véhicule ==================== -->
+    <div class="modal-overlay" id="addVehicleModal">
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-2xl w-full max-w-md mx-4">
+            <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="font-bold text-gray-900">Ajouter un véhicule</h3>
+                <button onclick="closeModal('addVehicleModal')"
+                    class="text-gray-400 hover:text-gray-700 transition text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-500 font-semibold uppercase mb-2">Modèle *</label>
+                    <input type="text" id="vehModel" placeholder="Ex: Toyota Vitz"
+                        class="light-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 transition">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 font-semibold uppercase mb-2">Plaque d'immatriculation
+                        *</label>
+                    <input type="text" id="vehPlate" placeholder="Ex: KN 123 AB"
+                        class="light-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 transition">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 font-semibold uppercase mb-2">Statut *</label>
+                    <select id="vehStatus"
+                        class="light-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-600 transition">
+                        <option value="Disponible">🟢 Disponible</option>
+                        <option value="En location">🟡 En location</option>
+                        <option value="Maintenance">🔴 Maintenance</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 font-semibold uppercase mb-2">Conducteur assigné</label>
+                    <input type="text" id="vehDriver" placeholder="Nom du conducteur"
+                        class="light-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 transition">
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-100 flex justify-end space-x-3">
+                <button onclick="closeModal('addVehicleModal')"
+                    class="text-gray-500 hover:text-gray-800 px-4 py-2.5 text-sm transition">Annuler</button>
+                <button onclick="addVehicle()"
+                    class="bg-gmfRed hover:bg-red-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition shadow-sm">
+                    <i class="fas fa-plus mr-2"></i>Ajouter
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: Enregistrer Paiement ==================== -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="bg-white theme-bg-card rounded-2xl border theme-border shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+            <div class="px-6 py-5 border-b theme-border flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-gray-900 theme-text">Enregistrer un Paiement</h3>
+                    <p class="text-xs text-gray-400 theme-text-muted">Créditer le compte d'un chauffeur</p>
+                </div>
+                <button onclick="closeModal('paymentModal')" class="text-gray-400 hover:text-gray-700 transition text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-[10px] text-gray-500 theme-text-muted font-bold uppercase mb-2 tracking-wider">Chauffeur *</label>
+                    <select id="payDriver" class="light-input w-full theme-bg-input theme-border theme-text rounded-xl px-4 py-3 text-sm transition">
+                        <option value="">-- Sélectionner un chauffeur --</option>
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] text-gray-500 theme-text-muted font-bold uppercase mb-2 tracking-wider">Montant (USD) *</label>
+                        <input type="number" id="payAmount" placeholder="Ex: 150" class="light-input w-full theme-bg-input theme-border theme-text rounded-xl px-4 py-3 text-sm transition font-bold text-emerald-600">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-gray-500 theme-text-muted font-bold uppercase mb-2 tracking-wider">Méthode *</label>
+                        <select id="payMethod" class="light-input w-full theme-bg-input theme-border theme-text rounded-xl px-4 py-3 text-sm transition">
+                            <option value="Mobile Money">Mobile Money</option>
+                            <option value="Espèces">Espèces</option>
+                            <option value="Virement">Virement</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] text-gray-500 theme-text-muted font-bold uppercase mb-2 tracking-wider">Date du Paiement *</label>
+                    <input type="date" id="payDate" class="light-input w-full theme-bg-input theme-border theme-text rounded-xl px-4 py-3 text-sm transition">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-gray-500 theme-text-muted font-bold uppercase mb-2 tracking-wider">Référence / Transaction ID</label>
+                    <input type="text" id="payRef" placeholder="Ex: TXN-987654321" class="light-input w-full theme-bg-input theme-border theme-text rounded-xl px-4 py-3 text-sm transition font-mono">
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t theme-border flex justify-end space-x-3 bg-gray-50/50 theme-bg-input">
+                <button onclick="closeModal('paymentModal')" class="text-gray-500 theme-text-secondary hover:text-gray-800 px-4 py-2.5 text-sm transition font-medium">Annuler</button>
+                <button onclick="recordPayment()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition shadow-lg shadow-emerald-500/20">
+                    Confirmer le Paiement
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TOAST ==================== -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 hidden transition-all duration-300">
+        <div
+            class="bg-white border border-gray-200 rounded-2xl px-5 py-4 flex items-center space-x-3 shadow-2xl min-w-64">
+            <div id="toastIcon" class="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0"></div>
+            <p id="toastMsg" class="text-sm font-medium text-gray-900"></p>
+        </div>
+    </div>
+
+    <script>
+            // ==================== AUTH GUARD ====================
+            (function () {
+                if (localStorage.getItem('gmfleet_admin_logged') !== 'true') {
+                    window.location.href = 'login.html';
+                }
+            })();
+
+        // ==================== DATA ====================
+        let applications = [];
+        let vehicles = [];
+        let payments = [];
+
+        const MOCK_APPS = [
+            { id: 1, name: 'Jean Kabasele', vehicle: 'Toyota IST', phone: '+243990123456', date: '14/04/2026', status: 'En attente', note: 'Chauffeur expérimenté, 5 ans d\'expérience.' },
+            { id: 2, name: 'Marie Mutombo', vehicle: 'Suzuki Swift', phone: '+243810987654', date: '13/04/2026', status: 'Validé', note: 'Profil vérifié, documents complets.' },
+            { id: 3, name: 'Patrick Ngoy', vehicle: 'Toyota Vitz', phone: '+243998765432', date: '12/04/2026', status: 'Refusé', note: 'Dossier incomplet, documents manquants.' },
+            { id: 4, name: 'Grace Kabila', vehicle: 'Hyundai i10', phone: '+243893456789', date: '11/04/2026', status: 'En attente', note: 'Nouveau profil à examiner.' },
+            { id: 5, name: 'Christian Lukaku', vehicle: 'Toyota RAV4', phone: '+243994321098', date: '10/04/2026', status: 'Validé', note: 'Conducteur exemplaire, recommandé.' },
+        ];
+
+        const MOCK_VEHICLES = [
+            { id: 1, model: 'Toyota IST', plate: 'KN 4521 A', status: 'En location', driver: 'Marie Mutombo' },
+            { id: 2, model: 'Suzuki Swift', plate: 'KN 7832 B', status: 'Disponible', driver: '—' },
+            { id: 3, model: 'Toyota Vitz', plate: 'KN 1100 C', status: 'Maintenance', driver: '—' },
+            { id: 4, model: 'Hyundai i10', plate: 'KN 5560 D', status: 'Disponible', driver: '—' },
+            { id: 5, model: 'Toyota RAV4', plate: 'KN 3307 E', status: 'En location', driver: 'Christian Lukaku' },
+            { id: 6, model: 'Mitsubishi Pajero', plate: 'KN 9921 F', status: 'Disponible', driver: '—' },
+        ];
+
+        const CHART_DATA = [
+            { label: 'S1', val: 3 }, { label: 'S2', val: 7 }, { label: 'S3', val: 5 },
+            { label: 'S4', val: 9 }, { label: 'S5', val: 6 }, { label: 'S6', val: 12 }
+        ];
+
+        const MOCK_PAYMENTS = [
+            { id: 101, driverId: 5, driverName: 'Christian Lukaku', amount: 150, date: '2026-04-14', method: 'Mobile Money', ref: 'MP-882193' },
+            { id: 102, driverId: 1, driverName: 'Marie Mutombo', amount: 150, date: '2026-04-13', method: 'Espèces', ref: 'CASH-0021' },
+            { id: 103, driverId: 5, driverName: 'Christian Lukaku', amount: 150, date: '2026-04-07', method: 'Mobile Money', ref: 'MP-771022' }
+        ];
+
+        function loadData() {
+            applications = JSON.parse(localStorage.getItem('gmfleet_apps') || 'null') || MOCK_APPS;
+            vehicles = JSON.parse(localStorage.getItem('gmfleet_vehicles') || 'null') || MOCK_VEHICLES;
+            payments = JSON.parse(localStorage.getItem('gmfleet_payments') || 'null') || MOCK_PAYMENTS;
+            
+            // Fix: assign unique IDs to any candidatures that don't have one
+            applications.forEach((app, i) => {
+                if (!app.id) app.id = Date.now() + i + Math.floor(Math.random() * 10000);
+            });
+            saveAll();
+            refreshUI();
+            populateVehicleSelect();
+        }
+
+        // Populate the add-candidature vehicle dropdown from the fleet
+        function populateVehicleSelect() {
+            const select = document.getElementById('addVehicle');
+            if (!select) return;
+            // Keep only the placeholder
+            select.innerHTML = '<option value="">-- Sélectionner --</option>';
+            // Get unique models from the vehicles fleet
+            const models = [...new Set(vehicles.map(v => v.model))];
+            models.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m;
+                opt.textContent = m;
+                select.appendChild(opt);
+            });
+        }
+
+        function saveAll() {
+            localStorage.setItem('gmfleet_apps', JSON.stringify(applications));
+            localStorage.setItem('gmfleet_vehicles', JSON.stringify(vehicles));
+            localStorage.setItem('gmfleet_payments', JSON.stringify(payments));
+        }
+
+        // ==================== NAVIGATION ====================
+        const TITLES = {
+            dashboard: 'Tableau de bord',
+            candidatures: 'Gestion des candidatures',
+            flotte: 'Gestion de la flotte',
+            finances: 'Gestion Financière',
+            rapports: 'Rapports & Statistiques',
+            parametres: 'Paramètres'
+        };
+
+        function navigate(section, el) {
+            // Prevent default
+            event && event.preventDefault();
+
+            // Update sections
+            document.querySelectorAll('.section-panel').forEach(s => s.classList.remove('active'));
+            document.getElementById('section-' + section).classList.add('active');
+
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(l => {
+                l.classList.remove('active', 'text-white');
+                l.classList.add('text-blue-100/70');
+            });
+            if (el) {
+                el.classList.add('active');
+                el.classList.remove('text-blue-100/70');
+            }
+
+            // Update header
+            document.getElementById('pageTitle').textContent = TITLES[section] || section;
+
+            // Close mobile sidebar
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // ==================== REFRESH UI ====================
+        function refreshUI() {
+            updateKPIs();
+            renderDashboardTable();
+            renderBarChart();
+            renderDonut();
+            renderCandidatures();
+            renderFlotte();
+            renderRapport();
+            renderFinances();
+            updateNavBadge();
+            document.getElementById('adminName').textContent = localStorage.getItem('gmfleet_admin_name') || 'Admin GMFLEET';
+        }
+
+        // ==================== KPIs ====================
+        function updateKPIs() {
+            const total = applications.length;
+            const attente = applications.filter(a => a.status === 'En attente').length;
+            const valide = applications.filter(a => a.status === 'Validé').length;
+
+            animateCount('kpiTotal', total);
+            animateCount('kpiAttente', attente);
+            animateCount('kpiValide', valide);
+            animateCount('kpiFlotte', vehicles.length);
+
+            // Reports KPIs
+            document.getElementById('rptTotal').textContent = total;
+            document.getElementById('rptTaux').textContent = total ? Math.round(valide / total * 100) + '%' : '0%';
+            document.getElementById('rptFlotte').textContent = vehicles.length;
+
+            // Notif dot
+            const notifDot = document.getElementById('notifDot');
+            attente > 0 ? notifDot.classList.remove('hidden') : notifDot.classList.add('hidden');
+        }
+
+        function animateCount(id, target, suffix = '') {
+            const el = document.getElementById(id);
+            if (!el) return;
+            let start = 0;
+            const step = Math.ceil(target / 20) || 1;
+            const interval = setInterval(() => {
+                start = Math.min(start + step, target);
+                el.textContent = start + suffix;
+                if (start >= target) {
+                    el.textContent = target + suffix;
+                    clearInterval(interval);
+                }
+            }, 30);
+        }
+
+        function updateNavBadge() {
+            const attente = applications.filter(a => a.status === 'En attente').length;
+            const badge = document.getElementById('navBadge');
+            if (attente > 0) {
+                badge.textContent = attente;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // ==================== BAR CHART ====================
+        function renderBarChart() {
+            const max = Math.max(...CHART_DATA.map(d => d.val));
+            const chart = document.getElementById('barChart');
+            const labels = document.getElementById('barLabels');
+            chart.innerHTML = '';
+            labels.innerHTML = '';
+            CHART_DATA.forEach((d, i) => {
+                const pct = Math.round((d.val / max) * 100);
+                const isLast = i === CHART_DATA.length - 1;
+                chart.innerHTML += `
+                <div class="flex-1 flex flex-col items-center justify-end">
+                    <span class="text-xs text-gray-500 mb-1"></span>
+                    <div class="w-full rounded-t-lg chart-bar ${isLast ? 'bg-gmfRed' : 'bg-blue-500'}" style="height:${pct}%"></div>
+                </div>`;
+                labels.innerHTML += `<span class="flex-1 text-center">${d.label}</span>`;
+            });
+        }
+
+        // ==================== DONUT CHART (custom) ====================
+        function renderDonut() {
+            const total = applications.length || 1;
+            const attente = applications.filter(a => a.status === 'En attente').length;
+            const valide = applications.filter(a => a.status === 'Validé').length;
+            const refuse = applications.filter(a => a.status === 'Refusé').length;
+
+            const data = [
+                { label: 'En attente', count: attente, color: 'bg-yellow-400', pct: Math.round(attente / total * 100) },
+                { label: 'Validées', count: valide, color: 'bg-green-400', pct: Math.round(valide / total * 100) },
+                { label: 'Refusées', count: refuse, color: 'bg-red-400', pct: Math.round(refuse / total * 100) },
+            ];
+
+            document.getElementById('chartDonut').innerHTML = data.map(d => `
+            <div>
+                <div class="flex justify-between text-xs mb-1">
+                    <span style="color:var(--text-secondary)" class="flex items-center">
+                        <span class="w-2 h-2 rounded-full ${d.color} mr-2 inline-block"></span>
+                        ${d.label}
+                    </span>
+                    <span style="color:var(--text-primary)" class="font-bold">${d.count}</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill ${d.color}" style="width:${d.pct}%"></div>
+                </div>
+            </div>
+        `).join('');
+        }
+
+        // ==================== DASHBOARD TABLE ====================
+        function renderDashboardTable() {
+            const recent = [...applications].slice(-4).reverse();
+            const body = document.getElementById('dashboardTable');
+            body.innerHTML = recent.map(app => `
+            <tr class="table-row" style="border-color:var(--border-light)">
+                <td class="px-5 py-3.5 font-medium text-sm" style="color:var(--text-primary)">${app.name}</td>
+                <td class="px-5 py-3.5 text-sm" style="color:var(--text-secondary)">${app.vehicle}</td>
+                <td class="px-5 py-3.5 text-xs" style="color:var(--text-muted)">${app.date}</td>
+                <td class="px-5 py-3.5"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeClass(app.status)}">${app.status}</span></td>
+            </tr>
+        `).join('');
+        }
+
+        // ==================== CANDIDATURES TABLE ====================
+        function renderCandidatures(filter = '') {
+            const search = document.getElementById('searchInput')?.value?.toLowerCase() || '';
+            const statusFilter = document.getElementById('filterStatus')?.value || '';
+
+            let data = [...applications];
+            if (search) data = data.filter(a => a.name.toLowerCase().includes(search));
+            if (statusFilter) data = data.filter(a => a.status === statusFilter);
+
+            const body = document.getElementById('candidaturesBody');
+            const emptyState = document.getElementById('emptyState');
+
+            if (data.length === 0) {
+                body.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+            body.innerHTML = data.map(app => `
+            <tr class="table-row">
+                <td class="px-5 py-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-xs font-bold text-white shrink-0">
+                            ${app.name.charAt(0)}
+                        </div>
+                        <span class="font-semibold text-sm" style="color:var(--text-primary)">${app.name}</span>
+                    </div>
+                </td>
+                <td class="px-5 py-4">
+                    <span class="px-3 py-1 rounded-lg text-xs font-semibold" style="background:var(--bg-hover);color:var(--text-secondary)">${app.vehicle}</span>
+                </td>
+                <td class="px-5 py-4 text-sm" style="color:var(--text-secondary)">${app.phone}</td>
+                <td class="px-5 py-4 text-sm" style="color:var(--text-muted)">${app.date}</td>
+                <td class="px-5 py-4">
+                    <span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeClass(app.status)}">${app.status}</span>
+                </td>
+                <td class="px-5 py-4 text-right space-x-2">
+                    <button onclick="openDetail(${app.id})" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition inline-flex items-center justify-center">
+                        <i class="fas fa-eye text-xs"></i>
+                    </button>
+                    <button onclick="changeStatus(${app.id}, 'Validé')" class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition inline-flex items-center justify-center">
+                        <i class="fas fa-check text-xs"></i>
+                    </button>
+                    <button onclick="changeStatus(${app.id}, 'Refusé')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition inline-flex items-center justify-center">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+        }
+
+        function filterTable() { renderCandidatures(); }
+
+        // ==================== FLOTTE ====================
+        function renderFlotte() {
+            const dispo = vehicles.filter(v => v.status === 'Disponible').length;
+            const loc = vehicles.filter(v => v.status === 'En location').length;
+            const maint = vehicles.filter(v => v.status === 'Maintenance').length;
+
+            document.getElementById('flotteDisponible').textContent = dispo;
+            document.getElementById('flotteEnLocation').textContent = loc;
+            document.getElementById('flotteMaintenance').textContent = maint;
+
+            const iconMap = {
+                'Toyota IST': 'fa-car', 'Suzuki Swift': 'fa-car-side',
+                'Toyota Vitz': 'fa-car', 'Hyundai i10': 'fa-car-side',
+                'Toyota RAV4': 'fa-truck-pickup', 'Mitsubishi Pajero': 'fa-truck-pickup'
+            };
+
+            document.getElementById('vehicleGrid').innerHTML = vehicles.map(v => {
+                const icon = iconMap[v.model] || 'fa-car';
+                const statusBadge = v.status === 'Disponible' ? 'badge-dispo' :
+                    v.status === 'En location' ? 'badge-location' : 'badge-maint';
+                const dot = v.status === 'Disponible' ? 'bg-green-400' :
+                    v.status === 'En location' ? 'bg-yellow-400' : 'bg-red-400';
+
+                return `
+            <div class="rounded-2xl border p-5 transition group card-lift theme-transition" style="background-color:var(--bg-card);border-color:var(--border);box-shadow:var(--shadow-card)">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center transition" style="background:var(--bg-hover)">
+                        <i class="fas ${icon} text-lg transition" style="color:var(--text-muted)"></i>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 rounded-full ${dot} animate-pulse"></div>
+                        <span class="text-xs font-bold ${statusBadge} px-2.5 py-1 rounded-full border">${v.status}</span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-sm mb-1" style="color:var(--text-primary)">${v.model}</h4>
+                <p class="text-xs mb-3 font-mono" style="color:var(--text-muted)">${v.plate}</p>
+                <div class="flex items-center text-xs" style="color:var(--text-muted)">
+                    <i class="fas fa-user mr-2"></i>
+                    <span>${v.driver || '—'}</span>
+                </div>
+                <div class="mt-4 flex space-x-2">
+                    <select onchange="changeVehicleStatus(${v.id}, this.value)" class="flex-1 rounded-lg px-3 py-2 text-xs transition light-input" style="background-color:var(--bg-input);border:1px solid var(--border);color:var(--text-secondary)">
+                        <option ${v.status === 'Disponible' ? 'selected' : ''}>Disponible</option>
+                        <option ${v.status === 'En location' ? 'selected' : ''}>En location</option>
+                        <option ${v.status === 'Maintenance' ? 'selected' : ''}>Maintenance</option>
+                    </select>
+                    <button onclick="deleteVehicle(${v.id})" class="w-9 h-9 bg-red-50 rounded-lg text-red-500 hover:bg-red-100 transition flex items-center justify-center">
+                        <i class="fas fa-trash-alt text-xs"></i>
+                    </button>
+                </div>
+            </div>`;
+            }).join('');
+        }
+
+        // ==================== FINANCES ====================
+        function renderFinances() {
+            // KPIs
+            const totalCollected = payments.reduce((sum, p) => sum + p.amount, 0);
+            
+            // Calculate week collection (approx for demo: last 7 days)
+            const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+            const weekCollected = payments
+                .filter(p => new Date(p.date) >= weekAgo)
+                .reduce((sum, p) => sum + p.amount, 0);
+
+            // Active leases (drivers currently renting)
+            const activeLeases = vehicles.filter(v => v.status === 'En location');
+            const targetWeek = activeLeases.length * 150; // assuming $150/week target
+            const lateAmount = Math.max(0, targetWeek - weekCollected);
+
+            animateCount('finTotal', totalCollected, ' $');
+            animateCount('finWeek', weekCollected, ' $');
+            document.getElementById('finTarget').textContent = targetWeek + ' $';
+            animateCount('finLate', lateAmount, ' $');
+
+            // Finance Tracking Table
+            const financeBody = document.getElementById('financeTable');
+            financeBody.innerHTML = activeLeases.map(v => {
+                const driverPays = payments.filter(p => p.driverName === v.driver);
+                const lastPay = driverPays.length ? driverPays.sort((a,b) => new Date(b.date) - new Date(a.date))[0] : null;
+                const totalPaid = driverPays.reduce((s,p) => s+p.amount, 0);
+                const progress = Math.min(100, Math.round((totalPaid / 15000) * 100)); // Target $15k to own
+                
+                // Status logic: if no payment in last 8 days -> late
+                const isLate = !lastPay || (new Date() - new Date(lastPay.date)) > (8 * 24 * 60 * 60 * 1000);
+
+                return `
+                <tr class="table-row">
+                    <td class="px-5 py-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500">
+                                ${v.driver.charAt(0)}
+                            </div>
+                            <span class="font-semibold text-sm theme-text">${v.driver}</span>
+                        </div>
+                    </td>
+                    <td class="px-5 py-4 text-xs theme-text-secondary">${v.model} (${v.plate})</td>
+                    <td class="px-5 py-4 font-bold text-sm theme-text">150 $</td>
+                    <td class="px-5 py-4">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-24 progress-bar">
+                                <div class="progress-fill bg-blue-500" style="width:${progress}%"></div>
+                            </div>
+                            <span class="text-[10px] theme-text-muted">${progress}%</span>
+                        </div>
+                    </td>
+                    <td class="px-5 py-4 text-xs theme-text-secondary">${lastPay ? lastPay.date : '—'}</td>
+                    <td class="px-5 py-4">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${isLate ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}">
+                            ${isLate ? 'En retard' : 'À jour'}
+                        </span>
+                    </td>
+                </tr>`;
+            }).join('');
+
+            // Recent Transactions
+            const transBody = document.getElementById('recentPayments');
+            const recent = [...payments].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+            transBody.innerHTML = recent.length ? recent.map(p => `
+                <tr class="table-row">
+                    <td class="px-5 py-3">${p.date}</td>
+                    <td class="px-5 py-3 font-medium theme-text">${p.driverName}</td>
+                    <td class="px-5 py-3">${p.method}</td>
+                    <td class="px-5 py-3 font-mono">${p.ref || '—'}</td>
+                    <td class="px-5 py-3 text-right font-bold text-emerald-600">+ ${p.amount} $</td>
+                </tr>
+            `).join('') : '<tr><td colspan="5" class="py-10 text-center theme-text-muted">Aucune transaction récente</td></tr>';
+        }
+
+        function openPaymentModal() {
+            const select = document.getElementById('payDriver');
+            select.innerHTML = '<option value="">-- Sélectionner un chauffeur --</option>';
+            // Only active drivers
+            const activeDrivers = vehicles.filter(v => v.status === 'En location');
+            activeDrivers.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.driver;
+                opt.textContent = v.driver + ' (' + v.model + ')';
+                select.appendChild(opt);
+            });
+            // Default date to today
+            document.getElementById('payDate').valueAsDate = new Date();
+            openModal('paymentModal');
+        }
+
+        function recordPayment() {
+            const name = document.getElementById('payDriver').value;
+            const amount = parseFloat(document.getElementById('payAmount').value);
+            const method = document.getElementById('payMethod').value;
+            const date = document.getElementById('payDate').value;
+            const ref = document.getElementById('payRef').value.trim();
+
+            if (!name || isNaN(amount) || !date) {
+                showToast('error', 'Veuillez remplir les champs obligatoires.');
+                return;
+            }
+
+            const id = Date.now();
+            payments.unshift({ id, driverName: name, amount, date, method, ref });
+            saveAll();
+            refreshUI();
+            closeModal('paymentModal');
+            showToast('success', `Paiement de ${amount}$ enregistré pour ${name}`);
+            
+            // Clear fields for next time
+            document.getElementById('payAmount').value = '';
+            document.getElementById('payRef').value = '';
+        }
+
+        // ==================== RAPPORT ====================
+        function renderRapport() {
+            document.getElementById('reportTable').innerHTML = applications.map((app, i) => `
+            <tr class="table-row">
+                <td class="px-5 py-3.5 text-xs" style="color:var(--text-muted)">${i + 1}</td>
+                <td class="px-5 py-3.5 font-medium text-sm" style="color:var(--text-primary)">${app.name}</td>
+                <td class="px-5 py-3.5 text-sm" style="color:var(--text-secondary)">${app.vehicle}</td>
+                <td class="px-5 py-3.5 text-sm" style="color:var(--text-secondary)">${app.phone}</td>
+                <td class="px-5 py-3.5 text-xs" style="color:var(--text-muted)">${app.date}</td>
+                <td class="px-5 py-3.5"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeClass(app.status)}">${app.status}</span></td>
+            </tr>
+        `).join('');
+        }
+
+        // ==================== BADGE HELPER ====================
+        function badgeClass(status) {
+            if (status === 'En attente') return 'badge-attente';
+            if (status === 'Validé') return 'badge-valide';
+            if (status === 'Refusé') return 'badge-refuse';
+            return 'badge-attente';
+        }
+
+        // ==================== ACTIONS ====================
+        function openDetail(id) {
+            const app = applications.find(a => a.id === id);
+            if (!app) return;
+            document.getElementById('detailContent').innerHTML = `
+            <div class="space-y-4">
+                <div class="flex items-center space-x-4 mb-5">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-xl font-black text-white">
+                        ${app.name.charAt(0)}
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-black" style="color:var(--text-primary)">${app.name}</h4>
+                        <span class="text-xs font-bold ${badgeClass(app.status)} px-2.5 py-1 rounded-full border">${app.status}</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="rounded-xl p-3" style="background:var(--bg-hover)">
+                        <p class="text-xs mb-1" style="color:var(--text-muted)">Véhicule souhaité</p>
+                        <p class="text-sm font-semibold" style="color:var(--text-primary)">${app.vehicle}</p>
+                    </div>
+                    <div class="rounded-xl p-3" style="background:var(--bg-hover)">
+                        <p class="text-xs mb-1" style="color:var(--text-muted)">Téléphone</p>
+                        <p class="text-sm font-semibold" style="color:var(--text-primary)">${app.phone}</p>
+                    </div>
+                    <div class="rounded-xl p-3" style="background:var(--bg-hover)">
+                        <p class="text-xs mb-1" style="color:var(--text-muted)">Date de dépôt</p>
+                        <p class="text-sm font-semibold" style="color:var(--text-primary)">${app.date}</p>
+                    </div>
+                    <div class="rounded-xl p-3" style="background:var(--bg-hover)">
+                        <p class="text-xs mb-1" style="color:var(--text-muted)">Référence</p>
+                        <p class="text-sm font-semibold" style="color:var(--text-primary)">#GMF-${String(app.id).padStart(4, '0')}</p>
+                    </div>
+                </div>
+                ${app.note ? `<div class="rounded-xl p-3" style="background:var(--bg-hover)">
+                    <p class="text-xs mb-1" style="color:var(--text-muted)">Notes</p>
+                    <p class="text-sm" style="color:var(--text-secondary)">${app.note}</p>
+                </div>` : ''}
+            </div>
+        `;
+            document.getElementById('modalValide').onclick = () => { changeStatus(id, 'Validé'); closeModal('detailModal'); };
+            document.getElementById('modalRefuse').onclick = () => { changeStatus(id, 'Refusé'); closeModal('detailModal'); };
+            openModal('detailModal');
+        }
+
+        function changeStatus(id, newStatus) {
+            const app = applications.find(a => a.id === id);
+            if (!app) return;
+            app.status = newStatus;
+            saveAll();
+            refreshUI();
+            showToast(newStatus === 'Validé' ? 'success' : 'error', `Candidature de ${app.name} ${newStatus === 'Validé' ? 'validée' : 'refusée'} !`);
+        }
+
+        function changeVehicleStatus(id, newStatus) {
+            const v = vehicles.find(v => v.id === id);
+            if (v) { v.status = newStatus; saveAll(); renderFlotte(); showToast('info', `Statut mis à jour : ${newStatus}`); }
+        }
+
+        function deleteVehicle(id) {
+            vehicles = vehicles.filter(v => v.id !== id);
+            saveAll();
+            renderFlotte();
+            showToast('error', 'Véhicule supprimé.');
+        }
+
+        function openAddModal() { openModal('addModal'); }
+        function openAddVehicleModal() { openModal('addVehicleModal'); }
+
+        function addCandidate() {
+            const name = document.getElementById('addName').value.trim();
+            const vehicle = document.getElementById('addVehicle').value;
+            const phone = document.getElementById('addPhone').value.trim();
+            const note = document.getElementById('addNote').value.trim();
+            if (!name || !vehicle || !phone) { showToast('error', 'Veuillez remplir tous les champs obligatoires.'); return; }
+            const id = Date.now();
+            const date = new Date().toLocaleDateString('fr-FR');
+            applications.unshift({ id, name, vehicle, phone, date, status: 'En attente', note });
+            saveAll();
+            refreshUI();
+            closeModal('addModal');
+            document.getElementById('addName').value = '';
+            document.getElementById('addPhone').value = '';
+            document.getElementById('addNote').value = '';
+            showToast('success', `Candidature de ${name} ajoutée !`);
+        }
+
+        function addVehicle() {
+            const model = document.getElementById('vehModel').value.trim();
+            const plate = document.getElementById('vehPlate').value.trim();
+            const status = document.getElementById('vehStatus').value;
+            const driver = document.getElementById('vehDriver').value.trim();
+            if (!model || !plate) { showToast('error', 'Modèle et plaque requis.'); return; }
+            const id = Date.now();
+            vehicles.unshift({ id, model, plate, status, driver: driver || '—' });
+            saveAll();
+            renderFlotte();
+            closeModal('addVehicleModal');
+            document.getElementById('vehModel').value = '';
+            document.getElementById('vehPlate').value = '';
+            document.getElementById('vehDriver').value = '';
+            showToast('success', `Véhicule ${model} ajouté !`);
+        }
+
+        // ==================== EXPORT EXCEL ====================
+        function exportExcel() {
+            const data = [
+                ['ID', 'Nom', 'Véhicule', 'Téléphone', 'Date', 'Statut'],
+                ...applications.map((a, i) => [i + 1, a.name, a.vehicle, a.phone, a.date, a.status])
+            ];
+            const worksheet = XLSX.utils.aoa_to_sheet(data);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Candidatures");
+
+            // Format column widths for better readability
+            worksheet['!cols'] = [
+                { wch: 10 }, // ID
+                { wch: 25 }, // Nom
+                { wch: 20 }, // Véhicule
+                { wch: 20 }, // Téléphone
+                { wch: 15 }, // Date
+                { wch: 15 }  // Statut
+            ];
+
+            XLSX.writeFile(workbook, "gmfleet_rapport.xlsx");
+            showToast('success', 'Rapport Excel exporté !');
+        }
+
+        // ==================== SETTINGS ====================
+        function saveSettings() {
+            const name = document.getElementById('settingName').value.trim();
+            const email = document.getElementById('settingEmail').value.trim();
+            if (name) { localStorage.setItem('gmfleet_admin_name', name); document.getElementById('adminName').textContent = name; }
+            const msg = document.getElementById('settingMsg');
+            msg.classList.remove('hidden');
+            setTimeout(() => msg.classList.add('hidden'), 3000);
+        }
+
+        // ==================== MODALS ====================
+        function openModal(id) {
+            document.getElementById(id).classList.add('open');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('open');
+        }
+        // Close on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(m => {
+            m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('open'); });
+        });
+
+        // ==================== TOAST ====================
+        function showToast(type, msg) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const msgEl = document.getElementById('toastMsg');
+
+            const isDark = document.documentElement.classList.contains('dark');
+            const cfg = isDark ? {
+                success: { bg: 'bg-green-500/20 text-green-400', icon: 'fa-check' },
+                error: { bg: 'bg-red-500/20 text-red-400', icon: 'fa-times' },
+                info: { bg: 'bg-blue-500/20 text-blue-400', icon: 'fa-info' }
+            } : {
+                success: { bg: 'bg-emerald-50 text-emerald-600', icon: 'fa-check' },
+                error: { bg: 'bg-red-50 text-red-600', icon: 'fa-times' },
+                info: { bg: 'bg-blue-50 text-blue-600', icon: 'fa-info' }
+            };
+            const c = cfg[type] || cfg.info;
+            icon.className = `w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0 ${c.bg}`;
+            icon.innerHTML = `<i class="fas ${c.icon}"></i>`;
+            msgEl.textContent = msg;
+
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3500);
+        }
+
+        // ==================== LOGOUT ====================
+        function logout() {
+            localStorage.removeItem('gmfleet_admin_logged');
+            window.location.href = 'login.html';
+        }
+
+        // ==================== DATE ====================
+        function setDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('pageDate').textContent = new Date().toLocaleDateString('fr-FR', options);
+        }
+
+        // ==================== THEME TOGGLE ====================
+        function toggleTheme() {
+            const html = document.documentElement;
+            const body = document.getElementById('appBody');
+            const isNowDark = html.classList.toggle('dark');
+            localStorage.setItem('gmfleet_theme', isNowDark ? 'dark' : 'light');
+            applyThemeClasses(isNowDark);
+        }
+
+        function applyThemeClasses(isDark) {
+            const body = document.getElementById('appBody');
+            if (isDark) {
+                body.classList.remove('bg-gray-50', 'text-gray-800');
+                body.classList.add('bg-[#0f172a]', 'text-gray-100');
+            } else {
+                body.classList.remove('bg-[#0f172a]', 'text-gray-100');
+                body.classList.add('bg-gray-50', 'text-gray-800');
+            }
+            // Update all themed components
+            document.querySelectorAll('[data-theme-card]').forEach(el => {
+                el.style.backgroundColor = 'var(--bg-card)';
+                el.style.borderColor = 'var(--border)';
+                el.style.boxShadow = 'var(--shadow-card)';
+            });
+        }
+
+        function initTheme() {
+            const saved = localStorage.getItem('gmfleet_theme');
+            if (saved === 'dark') {
+                document.documentElement.classList.add('dark');
+                applyThemeClasses(true);
+            }
+        }
+
+        // ==================== INIT ====================
+        initTheme();
+        window.addEventListener('DOMContentLoaded', () => {
+            setDate();
+            loadData();
+        });
+    </script>
+
+</body>
+
+</html>
