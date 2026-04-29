@@ -10,10 +10,42 @@ const modalFormPart = document.getElementById('modalFormPart');
 const showFormBtn = document.getElementById('showFormBtn');
 
 const carsData = {
-    'IST': { name: 'Toyota IST', img: './img/ist.jpeg', prix: '6 500 $', acompte: '1 300 $' },
-    'Blade': { name: 'Toyota Blade', img: 'https://www.toyota.bj/media/gamme/modeles/images/e24b1bcb758803114be811d3f2d02bd3.png', prix: '7 000 $', acompte: '1 400 $' },
-    'Swift': { name: 'Suzuki Swift', img: 'https://stimg.cardekho.com/images/carexteriorimages/630x420/Maruti/Swift/9226/1755777061785/front-left-side-47.jpg', prix: '5 500 $', acompte: '1 100 $' },
-    'Vitz': { name: 'Toyota Vitz', img: './img/vitz.jpeg', prix: '5 500 $', acompte: '1 100 $' }
+    'IST': {
+        name: 'Toyota IST',
+        img: './img/ist.jpeg',
+        pricing: {
+            "12": { total: "10 536 $", avance: "1 300 $", week: "203 $" },
+            "15": { total: "11 784 $", avance: "1 300 $", week: "181 $" },
+            "18": { total: "12 560 $", avance: "1 300 $", week: "161 $" }
+        }
+    },
+    'Blade': {
+        name: 'Toyota Blade',
+        img: 'https://www.toyota.bj/media/gamme/modeles/images/e24b1bcb758803114be811d3f2d02bd3.png',
+        pricing: {
+            "12": { total: "11 160 $", avance: "1 400 $", week: "215 $" },
+            "15": { total: "12 174 $", avance: "1 400 $", week: "187 $" },
+            "18": { total: "13 500 $", avance: "1 400 $", week: "173 $" }
+        }
+    },
+    'Swift': {
+        name: 'Suzuki Swift',
+        img: 'https://stimg.cardekho.com/images/carexteriorimages/630x420/Maruti/Swift/9226/1755777061785/front-left-side-47.jpg',
+        pricing: {
+            "12": { total: "9 288 $", avance: "1 100 $", week: "179 $" },
+            "15": { total: "10 224 $", avance: "1 100 $", week: "157 $" },
+            "18": { total: "11 160 $", avance: "1 100 $", week: "143 $" }
+        }
+    },
+    'Vitz': {
+        name: 'Toyota Vitz',
+        img: './img/vitz.jpeg',
+        pricing: {
+            "12": { total: "9 288 $", avance: "1 100 $", week: "179 $" },
+            "15": { total: "10 224 $", avance: "1 100 $", week: "157 $" },
+            "18": { total: "11 160 $", avance: "1 100 $", week: "143 $" }
+        }
+    }
 };
 
 function openModal(carKey) {
@@ -36,12 +68,33 @@ function handleGeneralVehicleSelect(val) {
     document.getElementById('modalCarTitle').textContent = data.name;
     document.getElementById('modalCarImg').src = data.img;
     document.getElementById('selectedVehicle').value = data.name;
-    document.getElementById('modalValPrix').textContent = data.prix;
-    document.getElementById('modalValAcompte').textContent = data.acompte;
+    
+    updatePricingDisplay();
+    
     document.getElementById('modalCarFeatures').classList.remove('hidden');
     
     // Auto show form
     showForm();
+}
+
+function updatePricingDisplay() {
+    const val = document.getElementById('generalVehicleSelect') ? document.getElementById('generalVehicleSelect').value : null;
+    if(!val) return;
+    
+    const data = carsData[val];
+    
+    // Default to 12 if no duration specifically selected yet
+    const durContainer = document.getElementById('planDuration');
+    const selectedDuration = durContainer && durContainer.value ? durContainer.value : "12";
+    
+    const pricing = data.pricing[selectedDuration];
+    if(pricing) {
+        document.getElementById('modalValPrix').textContent = pricing.total;
+        document.getElementById('modalValAcompte').textContent = pricing.avance;
+        
+        const semaineEl = document.getElementById('modalValSemaine');
+        if(semaineEl) semaineEl.textContent = pricing.week;
+    }
 }
 
 function showForm() {
