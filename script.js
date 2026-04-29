@@ -85,6 +85,7 @@ function submitForm(e) {
         coBorrowerName: document.getElementById('coBorrowerName') ? document.getElementById('coBorrowerName').value : '',
         coBorrowerPhone: document.getElementById('coBorrowerPhone') ? document.getElementById('coBorrowerPhone').value : '',
         coBorrowerAddress: document.getElementById('coBorrowerAddress') ? document.getElementById('coBorrowerAddress').value : '',
+        duration: document.getElementById('planDuration') ? document.getElementById('planDuration').value : '',
         vehicle: carName,
         date: new Date().toLocaleDateString('fr-FR'),
         status: 'En attente'
