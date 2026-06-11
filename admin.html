@@ -1212,13 +1212,27 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabaseClient.js"></script>
     <script>
-            // ==================== AUTH GUARD ====================
-            (function () {
+        // ==================== AUTH GUARD ====================
+        async function ensureAdminSession() {
+            if (!window.GMFleetBackend?.isConfigured()) {
                 if (localStorage.getItem('gmfleet_admin_logged') !== 'true') {
                     window.location.href = 'login.html';
+                    return false;
                 }
-            })();
+                return true;
+            }
+
+            const { data, error } = await window.GMFleetBackend.getSession();
+            if (error || !data.session) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            return true;
+        }
 
         // ==================== DATA ====================
         let applications = [];
@@ -1253,16 +1267,35 @@
             { id: 103, driverId: 5, driverName: 'Christian Lukaku', amount: 150, date: '2026-04-07', method: 'Mobile Money', ref: 'MP-771022' }
         ];
 
-        function loadData() {
-            applications = JSON.parse(localStorage.getItem('gmfleet_apps') || 'null') || MOCK_APPS;
-            vehicles = JSON.parse(localStorage.getItem('gmfleet_vehicles') || 'null') || MOCK_VEHICLES;
-            payments = JSON.parse(localStorage.getItem('gmfleet_payments') || 'null') || MOCK_PAYMENTS;
-            
-            // Fix: assign unique IDs to any candidatures that don't have one
-            applications.forEach((app, i) => {
-                if (!app.id) app.id = Date.now() + i + Math.floor(Math.random() * 10000);
-            });
-            saveAll();
+        async function loadData() {
+            try {
+                if (window.GMFleetBackend?.isConfigured()) {
+                    const [remoteApps, remoteVehicles, remotePayments] = await Promise.all([
+                        window.GMFleetBackend.listApplications(),
+                        window.GMFleetBackend.listVehicles(),
+                        window.GMFleetBackend.listPayments()
+                    ]);
+                    applications = remoteApps || [];
+                    vehicles = remoteVehicles || [];
+                    payments = remotePayments || [];
+                    showToast('success', 'Données synchronisées avec Supabase.');
+                } else {
+                    applications = JSON.parse(localStorage.getItem('gmfleet_apps') || 'null') || MOCK_APPS;
+                    vehicles = JSON.parse(localStorage.getItem('gmfleet_vehicles') || 'null') || MOCK_VEHICLES;
+                    payments = JSON.parse(localStorage.getItem('gmfleet_payments') || 'null') || MOCK_PAYMENTS;
+                    applications.forEach((app, i) => {
+                        if (!app.id) app.id = Date.now() + i + Math.floor(Math.random() * 10000);
+                    });
+                    saveAll();
+                }
+            } catch (error) {
+                console.error('Erreur de chargement Supabase:', error);
+                showToast('error', 'Supabase indisponible : affichage des données locales.');
+                applications = JSON.parse(localStorage.getItem('gmfleet_apps') || 'null') || MOCK_APPS;
+                vehicles = JSON.parse(localStorage.getItem('gmfleet_vehicles') || 'null') || MOCK_VEHICLES;
+                payments = JSON.parse(localStorage.getItem('gmfleet_payments') || 'null') || MOCK_PAYMENTS;
+            }
+
             refreshUI();
             populateVehicleSelect();
         }
@@ -1649,28 +1682,35 @@
             openModal('paymentModal');
         }
 
-        function recordPayment() {
+        async function recordPayment() {
             const name = document.getElementById('payDriver').value;
             const amount = parseFloat(document.getElementById('payAmount').value);
             const method = document.getElementById('payMethod').value;
             const date = document.getElementById('payDate').value;
             const ref = document.getElementById('payRef').value.trim();
+            const selectedVehicle = vehicles.find(v => v.driver === name);
 
             if (!name || isNaN(amount) || !date) {
                 showToast('error', 'Veuillez remplir les champs obligatoires.');
                 return;
             }
 
-            const id = Date.now();
-            payments.unshift({ id, driverName: name, amount, date, method, ref });
-            saveAll();
-            refreshUI();
-            closeModal('paymentModal');
-            showToast('success', `Paiement de ${amount}$ enregistré pour ${name}`);
-            
-            // Clear fields for next time
-            document.getElementById('payAmount').value = '';
-            document.getElementById('payRef').value = '';
+            const payment = { id: Date.now(), driverId: selectedVehicle?.id, driverName: name, amount, date, method, ref };
+            try {
+                const savedPayment = window.GMFleetBackend?.isConfigured()
+                    ? await window.GMFleetBackend.createPayment(payment)
+                    : payment;
+                payments.unshift(savedPayment || payment);
+                saveAll();
+                refreshUI();
+                closeModal('paymentModal');
+                showToast('success', `Paiement de ${amount}$ enregistré pour ${name}`);
+                document.getElementById('payAmount').value = '';
+                document.getElementById('payRef').value = '';
+            } catch (error) {
+                console.error('Erreur Supabase:', error);
+                showToast('error', "Le paiement n'a pas pu être enregistré.");
+            }
         }
 
         // ==================== RAPPORT ====================
@@ -1739,63 +1779,107 @@
             openModal('detailModal');
         }
 
-        function changeStatus(id, newStatus) {
+        async function changeStatus(id, newStatus) {
             const app = applications.find(a => a.id === id);
             if (!app) return;
+            const previousStatus = app.status;
             app.status = newStatus;
-            saveAll();
-            refreshUI();
-            showToast(newStatus === 'Validé' ? 'success' : 'error', `Candidature de ${app.name} ${newStatus === 'Validé' ? 'validée' : 'refusée'} !`);
+            try {
+                if (window.GMFleetBackend?.isConfigured()) await window.GMFleetBackend.updateApplicationStatus(id, newStatus);
+                saveAll();
+                refreshUI();
+                showToast(newStatus === 'Validé' ? 'success' : 'error', `Candidature de ${app.name} ${newStatus === 'Validé' ? 'validée' : 'refusée'} !`);
+            } catch (error) {
+                app.status = previousStatus;
+                console.error('Erreur Supabase:', error);
+                showToast('error', "Le statut n'a pas pu être synchronisé.");
+            }
         }
 
-        function changeVehicleStatus(id, newStatus) {
+        async function changeVehicleStatus(id, newStatus) {
             const v = vehicles.find(v => v.id === id);
-            if (v) { v.status = newStatus; saveAll(); renderFlotte(); showToast('info', `Statut mis à jour : ${newStatus}`); }
+            if (!v) return;
+            const previousStatus = v.status;
+            v.status = newStatus;
+            try {
+                if (window.GMFleetBackend?.isConfigured()) await window.GMFleetBackend.updateVehicleStatus(id, newStatus);
+                saveAll();
+                renderFlotte();
+                showToast('info', `Statut mis à jour : ${newStatus}`);
+            } catch (error) {
+                v.status = previousStatus;
+                console.error('Erreur Supabase:', error);
+                showToast('error', "Le statut du véhicule n'a pas pu être synchronisé.");
+            }
         }
 
-        function deleteVehicle(id) {
+        async function deleteVehicle(id) {
+            const oldVehicles = [...vehicles];
             vehicles = vehicles.filter(v => v.id !== id);
-            saveAll();
-            renderFlotte();
-            showToast('error', 'Véhicule supprimé.');
+            try {
+                if (window.GMFleetBackend?.isConfigured()) await window.GMFleetBackend.deleteVehicle(id);
+                saveAll();
+                renderFlotte();
+                showToast('error', 'Véhicule supprimé.');
+            } catch (error) {
+                vehicles = oldVehicles;
+                console.error('Erreur Supabase:', error);
+                showToast('error', "Le véhicule n'a pas pu être supprimé.");
+            }
         }
 
         function openAddModal() { openModal('addModal'); }
         function openAddVehicleModal() { openModal('addVehicleModal'); }
 
-        function addCandidate() {
+        async function addCandidate() {
             const name = document.getElementById('addName').value.trim();
             const vehicle = document.getElementById('addVehicle').value;
             const phone = document.getElementById('addPhone').value.trim();
             const note = document.getElementById('addNote').value.trim();
             if (!name || !vehicle || !phone) { showToast('error', 'Veuillez remplir tous les champs obligatoires.'); return; }
-            const id = Date.now();
-            const date = new Date().toLocaleDateString('fr-FR');
-            applications.unshift({ id, name, vehicle, phone, date, status: 'En attente', note });
-            saveAll();
-            refreshUI();
-            closeModal('addModal');
-            document.getElementById('addName').value = '';
-            document.getElementById('addPhone').value = '';
-            document.getElementById('addNote').value = '';
-            showToast('success', `Candidature de ${name} ajoutée !`);
+            const app = { id: Date.now(), name, vehicle, phone, date: new Date().toLocaleDateString('fr-FR'), status: 'En attente', note };
+            try {
+                const savedApp = window.GMFleetBackend?.isConfigured()
+                    ? await window.GMFleetBackend.createApplication(app)
+                    : app;
+                applications.unshift(savedApp || app);
+                saveAll();
+                refreshUI();
+                closeModal('addModal');
+                document.getElementById('addName').value = '';
+                document.getElementById('addPhone').value = '';
+                document.getElementById('addNote').value = '';
+                showToast('success', `Candidature de ${name} ajoutée !`);
+            } catch (error) {
+                console.error('Erreur Supabase:', error);
+                showToast('error', "La candidature n'a pas pu être enregistrée.");
+            }
         }
 
-        function addVehicle() {
+        async function addVehicle() {
             const model = document.getElementById('vehModel').value.trim();
             const plate = document.getElementById('vehPlate').value.trim();
             const status = document.getElementById('vehStatus').value;
             const driver = document.getElementById('vehDriver').value.trim();
             if (!model || !plate) { showToast('error', 'Modèle et plaque requis.'); return; }
-            const id = Date.now();
-            vehicles.unshift({ id, model, plate, status, driver: driver || '—' });
-            saveAll();
-            renderFlotte();
-            closeModal('addVehicleModal');
-            document.getElementById('vehModel').value = '';
-            document.getElementById('vehPlate').value = '';
-            document.getElementById('vehDriver').value = '';
-            showToast('success', `Véhicule ${model} ajouté !`);
+            const vehicle = { id: Date.now(), model, plate, status, driver: driver || '—' };
+            try {
+                const savedVehicle = window.GMFleetBackend?.isConfigured()
+                    ? await window.GMFleetBackend.createVehicle(vehicle)
+                    : vehicle;
+                vehicles.unshift(savedVehicle || vehicle);
+                saveAll();
+                renderFlotte();
+                populateVehicleSelect();
+                closeModal('addVehicleModal');
+                document.getElementById('vehModel').value = '';
+                document.getElementById('vehPlate').value = '';
+                document.getElementById('vehDriver').value = '';
+                showToast('success', `Véhicule ${model} ajouté !`);
+            } catch (error) {
+                console.error('Erreur Supabase:', error);
+                showToast('error', "Le véhicule n'a pas pu être enregistré.");
+            }
         }
 
         // ==================== EXPORT EXCEL ====================
@@ -1870,8 +1954,9 @@
         }
 
         // ==================== LOGOUT ====================
-        function logout() {
+        async function logout() {
             localStorage.removeItem('gmfleet_admin_logged');
+            if (window.GMFleetBackend?.isConfigured()) await window.GMFleetBackend.signOut();
             window.location.href = 'login.html';
         }
 
@@ -1917,9 +2002,11 @@
 
         // ==================== INIT ====================
         initTheme();
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
+            const allowed = await ensureAdminSession();
+            if (!allowed) return;
             setDate();
-            loadData();
+            await loadData();
         });
     </script>
 

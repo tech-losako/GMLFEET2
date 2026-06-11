@@ -165,11 +165,22 @@
         © 2026 GMFLEET — George Michael Logistics
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabaseClient.js"></script>
     <script>
         // Check if already logged in
-        if (localStorage.getItem('gmfleet_admin_logged') === 'true') {
-            window.location.href = 'admin.html';
-        }
+        (async function redirectAuthenticatedAdmin() {
+            if (!window.GMFleetBackend?.isConfigured()) {
+                if (localStorage.getItem('gmfleet_admin_logged') === 'true') {
+                    window.location.href = 'admin.html';
+                }
+                return;
+            }
+
+            const { data } = await window.GMFleetBackend.getSession();
+            if (data.session) window.location.href = 'admin.html';
+        })();
 
         function togglePassword() {
             const input = document.getElementById('loginPassword');
@@ -183,42 +194,50 @@
             }
         }
 
-        function handleLogin(e) {
+        function showLoginError(message) {
+            const errorEl = document.getElementById('loginError');
+            const errorText = document.getElementById('loginErrorText');
+            const card = document.getElementById('loginCard');
+            errorText.textContent = message;
+            errorEl.classList.remove('hidden');
+            card.classList.add('shake');
+            setTimeout(() => card.classList.remove('shake'), 500);
+        }
+
+        async function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             const errorEl = document.getElementById('loginError');
-            const card = document.getElementById('loginCard');
             const btn = document.getElementById('loginBtn');
 
-            // Loading state
+            errorEl.classList.add('hidden');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Connexion en cours...';
             btn.disabled = true;
 
-            // Simulate network delay
-            setTimeout(() => {
-                // Demo credentials
-                if (email === 'admin@gmfleet.cd' && password === 'admin123') {
+            try {
+                if (window.GMFleetBackend?.isConfigured()) {
+                    const { error } = await window.GMFleetBackend.signIn(email, password);
+                    if (error) throw error;
+                } else if (email === 'admin@gmfleet.cd' && password === 'admin123') {
                     localStorage.setItem('gmfleet_admin_logged', 'true');
                     localStorage.setItem('gmfleet_admin_name', 'Admin GMFLEET');
-
-                    // Success animation
-                    btn.innerHTML = '<i class="fas fa-check mr-2"></i> Connecté !';
-                    btn.classList.remove('bg-gmfRed', 'hover:bg-red-700');
-                    btn.classList.add('bg-green-600');
-
-                    setTimeout(() => {
-                        window.location.href = 'admin.html';
-                    }, 800);
                 } else {
-                    errorEl.classList.remove('hidden');
-                    card.classList.add('shake');
-                    setTimeout(() => card.classList.remove('shake'), 500);
-
-                    btn.innerHTML = '<span>Se connecter</span><i class="fas fa-arrow-right ml-2"></i>';
-                    btn.disabled = false;
+                    throw new Error('Identifiants incorrects');
                 }
-            }, 1200);
+
+                btn.innerHTML = '<i class="fas fa-check mr-2"></i> Connecté !';
+                btn.classList.remove('bg-gmfRed', 'hover:bg-red-700');
+                btn.classList.add('bg-green-600');
+
+                setTimeout(() => {
+                    window.location.href = 'admin.html';
+                }, 500);
+            } catch (error) {
+                showLoginError(error.message || 'Identifiants incorrects');
+                btn.innerHTML = '<span>Se connecter</span><i class="fas fa-arrow-right ml-2"></i>';
+                btn.disabled = false;
+            }
         }
     </script>
 </body>

@@ -57,49 +57,64 @@ function openGeneralModal() {
 }
 
 function handleGeneralVehicleSelect(val) {
-    if(!val) {
-        showFormBtn.classList.add('hidden');
-        document.getElementById('modalCarFeatures').classList.add('hidden');
-        document.getElementById('modalCarImg').src = "./img/fleet_white_bg.png";
-        document.getElementById('modalCarTitle').textContent = "Sélectionnez un véhicule";
+    if (!val) {
+        if (showFormBtn) showFormBtn.classList.add('hidden');
+        const features = document.getElementById('modalCarFeatures');
+        const img = document.getElementById('modalCarImg');
+        const title = document.getElementById('modalCarTitle');
+
+        if (features) features.classList.add('hidden');
+        if (img) img.src = "./img/fleet_white_bg.png";
+        if (title) title.textContent = "Sélectionnez un véhicule";
         return;
     }
+
     const data = carsData[val];
-    document.getElementById('modalCarTitle').textContent = data.name;
-    document.getElementById('modalCarImg').src = data.img;
-    document.getElementById('selectedVehicle').value = data.name;
-    
+    if (!data) return;
+
+    const title = document.getElementById('modalCarTitle');
+    const img = document.getElementById('modalCarImg');
+    const selectedVehicle = document.getElementById('selectedVehicle');
+    const features = document.getElementById('modalCarFeatures');
+
+    if (title) title.textContent = data.name;
+    if (img) img.src = data.img;
+    if (selectedVehicle) selectedVehicle.value = data.name;
+
     updatePricingDisplay();
-    
-    document.getElementById('modalCarFeatures').classList.remove('hidden');
-    
+
+    if (features) features.classList.remove('hidden');
+
     // Auto show form
     showForm();
 }
 
 function updatePricingDisplay() {
-    const val = document.getElementById('generalVehicleSelect') ? document.getElementById('generalVehicleSelect').value : null;
-    if(!val) return;
-    
+    const select = document.getElementById('generalVehicleSelect');
+    const val = select ? select.value : null;
+    if (!val) return;
+
     const data = carsData[val];
-    
+    if (!data) return;
+
     // Default to 12 if no duration specifically selected yet
     const durContainer = document.getElementById('planDuration');
     const selectedDuration = durContainer && durContainer.value ? durContainer.value : "12";
-    
+
     const pricing = data.pricing[selectedDuration];
-    if(pricing) {
-        document.getElementById('modalValPrix').textContent = pricing.total;
-        document.getElementById('modalValAcompte').textContent = pricing.avance;
-        
+    if (pricing) {
+        const totalEl = document.getElementById('modalValPrix');
+        const advanceEl = document.getElementById('modalValAcompte');
         const semaineEl = document.getElementById('modalValSemaine');
-        if(semaineEl) semaineEl.textContent = pricing.week;
+
+        if (totalEl) totalEl.textContent = pricing.total;
+        if (advanceEl) advanceEl.textContent = pricing.avance;
+        if (semaineEl) semaineEl.textContent = pricing.week;
     }
 }
 
 function showForm() {
     // Adjust layout for side-by-side or stacked in detail view
-    const appWrapper = document.getElementById('applicationWrapper');
     const noCarWarn = document.getElementById('noCarSelectedWarning');
     const actualForm = document.getElementById('applicationForm');
 
@@ -107,7 +122,7 @@ function showForm() {
     if (actualForm) actualForm.classList.remove('hidden');
 
     // On mobile, scroll to form
-    if(window.innerWidth < 1024 && actualForm) {
+    if (window.innerWidth < 1024 && actualForm) {
         setTimeout(() => {
             actualForm.scrollIntoView({ behavior: 'smooth' });
         }, 100);
@@ -138,49 +153,71 @@ function closeContactModal() {
     }
 }
 
-function submitForm(e) {
+async function submitForm(e) {
     e.preventDefault();
-    
-    const carName = document.getElementById('selectedVehicle').value;
-    document.getElementById('successCarName').textContent = carName;
-    
-    // Show the modal overlay
-    const successModal = document.getElementById('successModalOverlay');
-    if (successModal) {
-        successModal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden'; // Prevent scrolling
-    }
-    
-    // Hide form inline
+
     const actualForm = document.getElementById('applicationForm');
-    if (actualForm) {
-        // Reset the form so it is completely fresh
-        actualForm.reset();
+    const submitBtn = actualForm ? actualForm.querySelector('button[type="submit"]') : null;
+    const originalBtnContent = submitBtn ? submitBtn.innerHTML : '';
+
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Envoi en cours...';
     }
-    
-    // Save new application data structure
+
+    const carName = document.getElementById('selectedVehicle') ? document.getElementById('selectedVehicle').value : '';
+    const licenseInput = document.getElementById('clientPermisUpload');
+
     const newApp = {
-        name: document.getElementById('clientName') ? document.getElementById('clientName').value : 'Client', 
-        phone: document.getElementById('clientPhone') ? document.getElementById('clientPhone').value : '',
-        address: document.getElementById('clientAddress') ? document.getElementById('clientAddress').value : '',
+        name: document.getElementById('clientName') ? document.getElementById('clientName').value.trim() : 'Client',
+        phone: document.getElementById('clientPhone') ? document.getElementById('clientPhone').value.trim() : '',
+        address: document.getElementById('clientAddress') ? document.getElementById('clientAddress').value.trim() : '',
         experience: document.getElementById('clientExperience') ? document.getElementById('clientExperience').value : '',
-        coBorrowerName: document.getElementById('coBorrowerName') ? document.getElementById('coBorrowerName').value : '',
-        coBorrowerPhone: document.getElementById('coBorrowerPhone') ? document.getElementById('coBorrowerPhone').value : '',
-        coBorrowerAddress: document.getElementById('coBorrowerAddress') ? document.getElementById('coBorrowerAddress').value : '',
+        coBorrowerName: document.getElementById('coBorrowerName') ? document.getElementById('coBorrowerName').value.trim() : '',
+        coBorrowerPhone: document.getElementById('coBorrowerPhone') ? document.getElementById('coBorrowerPhone').value.trim() : '',
+        coBorrowerAddress: document.getElementById('coBorrowerAddress') ? document.getElementById('coBorrowerAddress').value.trim() : '',
         duration: document.getElementById('planDuration') ? document.getElementById('planDuration').value : '',
         vehicle: carName,
         date: new Date().toLocaleDateString('fr-FR'),
-        status: 'En attente'
+        status: 'En attente',
+        licenseFileName: licenseInput && licenseInput.files.length ? licenseInput.files[0].name : ''
     };
-    
-    let applications = JSON.parse(localStorage.getItem('gmfleet_apps') || '[]');
-    applications.push(newApp);
-    localStorage.setItem('gmfleet_apps', JSON.stringify(applications));
+
+    try {
+        if (window.GMFleetBackend?.isConfigured()) {
+            await window.GMFleetBackend.createApplication(newApp);
+        } else {
+            let applications = JSON.parse(localStorage.getItem('gmfleet_apps') || '[]');
+            applications.push({ id: Date.now(), ...newApp });
+            localStorage.setItem('gmfleet_apps', JSON.stringify(applications));
+        }
+
+        const successCarName = document.getElementById('successCarName');
+        if (successCarName) successCarName.textContent = carName;
+
+        const successModal = document.getElementById('successModalOverlay');
+        if (successModal) {
+            successModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        } else if (successMessage) {
+            successMessage.classList.remove('hidden');
+        }
+
+        if (actualForm) actualForm.reset();
+    } catch (error) {
+        console.error('Erreur Supabase:', error);
+        alert("Impossible d'envoyer la candidature pour le moment. Vérifiez la configuration Supabase ou réessayez.");
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnContent;
+        }
+    }
 }
 
 function toggleMobileMenu() {
     const menu = document.getElementById('mobileMenu');
-    if(menu) {
+    if (menu) {
         menu.classList.toggle('hidden');
     }
 }
@@ -190,17 +227,18 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
         const targetId = this.getAttribute('href');
-        if(targetId === '#') return;
-        
+        if (targetId === '#') return;
+
         const targetElement = document.querySelector(targetId);
         if (targetElement) {
             targetElement.scrollIntoView({
                 behavior: 'smooth',
                 block: 'start'
             });
+
             // If mobile menu is open, close it when clicking a link
             const menu = document.getElementById('mobileMenu');
-            if(menu && !menu.classList.contains('hidden')) {
+            if (menu && !menu.classList.contains('hidden')) {
                 menu.classList.add('hidden');
             }
         }
@@ -212,12 +250,12 @@ window.addEventListener('DOMContentLoaded', () => {
     if (window.location.pathname.includes('detail-vehicule.html')) {
         const urlParams = new URLSearchParams(window.location.search);
         const carKey = urlParams.get('car');
-        
+
         if (carKey && carsData[carKey]) {
             // Set the general select so the user sees it reflected
             const selOptions = document.getElementById('generalVehicleSelect');
-            if(selOptions) selOptions.value = carKey;
-            
+            if (selOptions) selOptions.value = carKey;
+
             // Populate the specific data and auto-show the form
             handleGeneralVehicleSelect(carKey);
         }
