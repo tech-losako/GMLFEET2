@@ -12,7 +12,7 @@ const showFormBtn = document.getElementById('showFormBtn');
 const carsData = {
     'IST': {
         name: 'Toyota IST',
-        img: './img/ist.jpeg',
+        img: './img/ist 1.jpg',
         pricing: {
             "12": { total: "10 536 $", avance: "1 300 $", week: "203 $" },
             "15": { total: "11 784 $", avance: "1 300 $", week: "181 $" },
@@ -21,7 +21,7 @@ const carsData = {
     },
     'Blade': {
         name: 'Toyota Blade',
-        img: 'https://www.toyota.bj/media/gamme/modeles/images/e24b1bcb758803114be811d3f2d02bd3.png',
+        img: './img/blade 1.jpg',
         pricing: {
             "12": { total: "11 160 $", avance: "1 400 $", week: "215 $" },
             "15": { total: "12 174 $", avance: "1 400 $", week: "187 $" },
@@ -30,7 +30,7 @@ const carsData = {
     },
     'Swift': {
         name: 'Suzuki Swift',
-        img: 'https://stimg.cardekho.com/images/carexteriorimages/630x420/Maruti/Swift/9226/1755777061785/front-left-side-47.jpg',
+        img: './img/swift 1.jpg',
         pricing: {
             "12": { total: "9 288 $", avance: "1 100 $", week: "179 $" },
             "15": { total: "10 224 $", avance: "1 100 $", week: "157 $" },
@@ -39,7 +39,7 @@ const carsData = {
     },
     'Vitz': {
         name: 'Toyota Vitz',
-        img: './img/vitz.jpeg',
+        img: './img/vitz 1.jpg',
         pricing: {
             "12": { total: "9 288 $", avance: "1 100 $", week: "179 $" },
             "15": { total: "10 224 $", avance: "1 100 $", week: "157 $" },
