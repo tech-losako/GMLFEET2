@@ -206,24 +206,85 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 gap-5">
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">
-                                    Message / Détails (optionnel)
-                                </label>
-                                <textarea id="applicantMessage" rows="4"
-                                    class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-gray-50"
-                                    placeholder="Décrivez votre expérience ou votre besoin..."></textarea>
+                        <!-- Dynamic Fields Container -->
+                        <div id="dynamicFieldsContainer" class="hidden">
+                            <!-- Chauffeur Yango Fields -->
+                            <div id="fieldsYango" class="space-y-5 hidden">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Marque & Modèle du véhicule</label>
+                                        <input type="text" id="yangoCarModel" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-gray-50" placeholder="Ex: Toyota Vitz">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Année du véhicule</label>
+                                        <input type="number" id="yangoCarYear" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-gray-50" placeholder="Ex: 2010">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Photo du Permis de Conduire</label>
+                                        <input type="file" id="yangoPermis" accept="image/*,.pdf" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-gmfBlue hover:file:bg-blue-100">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Carte Rose (Document véhicule)</label>
+                                        <input type="file" id="yangoCarteRose" accept="image/*,.pdf" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-gmfBlue hover:file:bg-blue-100">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="grid grid-cols-1 gap-5">
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">
-                                    Pièce jointe (CV ou Photo du véhicule - optionnel)
-                                </label>
-                                <input type="file" id="applicantFile" accept="image/*,.pdf,.doc,.docx"
-                                    class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-gmfBlue hover:file:bg-blue-100">
+                            <!-- Gestion de Flotte Fields -->
+                            <div id="fieldsFlotte" class="space-y-5 hidden">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Marque & Modèle du véhicule</label>
+                                        <input type="text" id="flotteCarModel" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-gray-50" placeholder="Ex: Toyota Vitz">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">État général du véhicule</label>
+                                        <select id="flotteCarState" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-gray-50">
+                                            <option value="">Sélectionnez...</option>
+                                            <option value="Excellent">Excellent</option>
+                                            <option value="Bon">Bon</option>
+                                            <option value="Moyen">Moyen (réparations légères)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Carte Rose (Document véhicule)</label>
+                                        <input type="file" id="flotteCarteRose" accept="image/*,.pdf" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-gmfBlue hover:file:bg-blue-100">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Photos du véhicule</label>
+                                        <input type="file" id="flottePhotos" accept="image/*" multiple class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-gmfBlue hover:file:bg-blue-100">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recrutement Fields -->
+                            <div id="fieldsRecrutement" class="space-y-5 hidden">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Expérience de conduite</label>
+                                        <select id="recrutementExperience" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-gray-50">
+                                            <option value="">Sélectionnez...</option>
+                                            <option value="Moins de 1 an">Moins d'un an</option>
+                                            <option value="1 à 3 ans">1 à 3 ans</option>
+                                            <option value="3 à 5 ans">3 à 5 ans</option>
+                                            <option value="Plus de 5 ans">Plus de 5 ans</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Photo du Permis de Conduire</label>
+                                        <input type="file" id="recrutementPermis" accept="image/*,.pdf" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-gmfBlue hover:file:bg-blue-100">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 gap-5">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Curriculum Vitae (CV)</label>
+                                        <input type="file" id="recrutementCV" accept=".pdf,.doc,.docx" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-gmfBlue hover:file:bg-blue-100">
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

@@ -135,6 +135,34 @@ function handleServiceSelect(val) {
     
     if (features) features.classList.remove('hidden');
     
+    // Handle dynamic fields
+    const dynContainer = document.getElementById('dynamicFieldsContainer');
+    const fYango = document.getElementById('fieldsYango');
+    const fFlotte = document.getElementById('fieldsFlotte');
+    const fRecrutement = document.getElementById('fieldsRecrutement');
+    
+    if (dynContainer) dynContainer.classList.remove('hidden');
+    if (fYango) fYango.classList.add('hidden');
+    if (fFlotte) fFlotte.classList.add('hidden');
+    if (fRecrutement) fRecrutement.classList.add('hidden');
+    
+    // Add required attributes dynamically (removing from all first)
+    document.querySelectorAll('#dynamicFieldsContainer input, #dynamicFieldsContainer select').forEach(el => el.removeAttribute('required'));
+
+    if (val === 'Chauffeur Yango') {
+        if (fYango) fYango.classList.remove('hidden');
+        document.getElementById('yangoCarModel')?.setAttribute('required', 'true');
+        document.getElementById('yangoPermis')?.setAttribute('required', 'true');
+    } else if (val === 'Gestion de flotte') {
+        if (fFlotte) fFlotte.classList.remove('hidden');
+        document.getElementById('flotteCarModel')?.setAttribute('required', 'true');
+        document.getElementById('flotteCarState')?.setAttribute('required', 'true');
+    } else if (val === 'Recrutement') {
+        if (fRecrutement) fRecrutement.classList.remove('hidden');
+        document.getElementById('recrutementExperience')?.setAttribute('required', 'true');
+        document.getElementById('recrutementPermis')?.setAttribute('required', 'true');
+    }
+
     if (noServiceWarn) noServiceWarn.classList.add('hidden');
     if (form) {
         form.classList.remove('hidden');
@@ -294,17 +322,33 @@ async function submitServiceForm(e) {
     }
 
     const serviceName = document.getElementById('selectedService') ? document.getElementById('selectedService').value : '';
-    const fileInput = document.getElementById('applicantFile');
+    
+    // Extract specific data based on service
+    let specificData = {};
+    if (serviceName === 'Chauffeur Yango') {
+        specificData.carModel = document.getElementById('yangoCarModel')?.value || '';
+        specificData.carYear = document.getElementById('yangoCarYear')?.value || '';
+        specificData.permisFileName = document.getElementById('yangoPermis')?.files[0]?.name || '';
+        specificData.carteRoseFileName = document.getElementById('yangoCarteRose')?.files[0]?.name || '';
+    } else if (serviceName === 'Gestion de flotte') {
+        specificData.carModel = document.getElementById('flotteCarModel')?.value || '';
+        specificData.carState = document.getElementById('flotteCarState')?.value || '';
+        specificData.carteRoseFileName = document.getElementById('flotteCarteRose')?.files[0]?.name || '';
+        specificData.photosCount = document.getElementById('flottePhotos')?.files?.length || 0;
+    } else if (serviceName === 'Recrutement') {
+        specificData.experience = document.getElementById('recrutementExperience')?.value || '';
+        specificData.permisFileName = document.getElementById('recrutementPermis')?.files[0]?.name || '';
+        specificData.cvFileName = document.getElementById('recrutementCV')?.files[0]?.name || '';
+    }
 
     const newApp = {
         name: document.getElementById('applicantName') ? document.getElementById('applicantName').value.trim() : 'Client',
         phone: document.getElementById('applicantPhone') ? document.getElementById('applicantPhone').value.trim() : '',
         address: document.getElementById('applicantAddress') ? document.getElementById('applicantAddress').value.trim() : '',
         service: serviceName,
-        message: document.getElementById('applicantMessage') ? document.getElementById('applicantMessage').value.trim() : '',
+        ...specificData,
         date: new Date().toLocaleDateString('fr-FR'),
         status: 'En attente',
-        fileName: fileInput && fileInput.files.length ? fileInput.files[0].name : '',
         type: 'service'
     };
 
