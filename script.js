@@ -89,6 +89,64 @@ function handleGeneralVehicleSelect(val) {
     showForm();
 }
 
+const servicesData = {
+    'Chauffeur Yango': {
+        icon: 'fas fa-taxi',
+        title: 'Chauffeur Yango',
+        desc: 'Rejoignez notre réseau de chauffeurs et maximisez vos revenus avec Yango sous notre encadrement.'
+    },
+    'Gestion de flotte': {
+        icon: 'fas fa-tasks',
+        title: 'Gestion de flotte',
+        desc: 'Confiez-nous la gestion de votre véhicule. Nous nous occupons de tout : de la recherche de chauffeur à l\'entretien.'
+    },
+    'Recrutement': {
+        icon: 'fas fa-users',
+        title: 'Recrutement',
+        desc: 'Nous sélectionnons et formons des chauffeurs fiables pour votre véhicule.'
+    }
+};
+
+function handleServiceSelect(val) {
+    const icon = document.getElementById('serviceIcon');
+    const title = document.getElementById('modalServiceTitle');
+    const desc = document.getElementById('serviceDescription');
+    const features = document.getElementById('modalServiceFeatures');
+    const selectedService = document.getElementById('selectedService');
+    const noServiceWarn = document.getElementById('noServiceSelectedWarning');
+    const form = document.getElementById('serviceApplicationForm');
+
+    if (!val) {
+        if (icon) icon.className = "fas fa-briefcase fa-3x";
+        if (title) title.textContent = "Sélectionnez un service";
+        if (features) features.classList.add('hidden');
+        if (noServiceWarn) noServiceWarn.classList.remove('hidden');
+        if (form) form.classList.add('hidden');
+        return;
+    }
+
+    const data = servicesData[val];
+    if (!data) return;
+
+    if (icon) icon.className = data.icon + " fa-3x";
+    if (title) title.textContent = data.title;
+    if (desc) desc.textContent = data.desc;
+    if (selectedService) selectedService.value = val;
+    
+    if (features) features.classList.remove('hidden');
+    
+    if (noServiceWarn) noServiceWarn.classList.add('hidden');
+    if (form) {
+        form.classList.remove('hidden');
+        if (window.innerWidth < 1024) {
+            setTimeout(() => {
+                form.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+    }
+}
+
+
 function updatePricingDisplay() {
     const select = document.getElementById('generalVehicleSelect');
     const val = select ? select.value : null;
@@ -131,6 +189,14 @@ function showForm() {
 
 function closeSuccessModal() {
     const successModal = document.getElementById('successModalOverlay');
+    if (successModal) {
+        successModal.classList.add('hidden');
+        document.body.style.overflow = 'auto'; // Restore scroll
+    }
+}
+
+function closeServiceSuccessModal() {
+    const successModal = document.getElementById('serviceSuccessModalOverlay');
     if (successModal) {
         successModal.classList.add('hidden');
         document.body.style.overflow = 'auto'; // Restore scroll
@@ -215,6 +281,68 @@ async function submitForm(e) {
     }
 }
 
+async function submitServiceForm(e) {
+    e.preventDefault();
+
+    const actualForm = document.getElementById('serviceApplicationForm');
+    const submitBtn = actualForm ? actualForm.querySelector('button[type="submit"]') : null;
+    const originalBtnContent = submitBtn ? submitBtn.innerHTML : '';
+
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Envoi en cours...';
+    }
+
+    const serviceName = document.getElementById('selectedService') ? document.getElementById('selectedService').value : '';
+    const fileInput = document.getElementById('applicantFile');
+
+    const newApp = {
+        name: document.getElementById('applicantName') ? document.getElementById('applicantName').value.trim() : 'Client',
+        phone: document.getElementById('applicantPhone') ? document.getElementById('applicantPhone').value.trim() : '',
+        address: document.getElementById('applicantAddress') ? document.getElementById('applicantAddress').value.trim() : '',
+        service: serviceName,
+        message: document.getElementById('applicantMessage') ? document.getElementById('applicantMessage').value.trim() : '',
+        date: new Date().toLocaleDateString('fr-FR'),
+        status: 'En attente',
+        fileName: fileInput && fileInput.files.length ? fileInput.files[0].name : '',
+        type: 'service'
+    };
+
+    try {
+        if (window.GMFleetBackend?.isConfigured()) {
+            await window.GMFleetBackend.createApplication(newApp); // Or a specific createServiceApplication function if needed
+        } else {
+            let applications = JSON.parse(localStorage.getItem('gmfleet_service_apps') || '[]');
+            applications.push({ id: Date.now(), ...newApp });
+            localStorage.setItem('gmfleet_service_apps', JSON.stringify(applications));
+        }
+
+        const successServiceName = document.getElementById('successServiceName');
+        if (successServiceName) successServiceName.textContent = serviceName;
+
+        const successModal = document.getElementById('serviceSuccessModalOverlay');
+        if (successModal) {
+            successModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        if (actualForm) actualForm.reset();
+        
+        // Reset state
+        const selOptions = document.getElementById('generalServiceSelect');
+        if (selOptions) selOptions.value = "";
+        handleServiceSelect("");
+    } catch (error) {
+        console.error('Erreur Supabase:', error);
+        alert("Impossible d'envoyer la candidature pour le moment. Réessayez.");
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnContent;
+        }
+    }
+}
+
 function toggleMobileMenu() {
     const menu = document.getElementById('mobileMenu');
     if (menu) {
@@ -246,6 +374,32 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 window.addEventListener('DOMContentLoaded', () => {
+    // Gestion de l'état actif (couleur rouge) pour les onglets de navigation au clic
+    const navLinks = document.querySelectorAll('nav a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Ignorer le bouton "Devenir Chauffeur" qui est déjà rouge avec texte blanc
+            if (this.classList.contains('bg-gmfRed') && this.classList.contains('text-white')) return;
+
+            // Retirer l'état actif de tous les onglets
+            navLinks.forEach(l => {
+                if (l.classList.contains('bg-gmfRed') && l.classList.contains('text-white')) return;
+                l.classList.remove('text-gmfRed');
+                
+                // Rétablir les classes inactives (text-gray-800 pour mobile, text-gray-600 pour desktop)
+                if (l.classList.contains('block')) {
+                    l.classList.add('text-gray-800', 'hover:text-gmfRed');
+                } else {
+                    l.classList.add('text-gray-600', 'hover:text-gmfRed');
+                }
+            });
+
+            // Appliquer l'état actif (rouge) à l'onglet cliqué
+            this.classList.remove('text-gray-600', 'text-gray-800', 'hover:text-gmfRed');
+            this.classList.add('text-gmfRed');
+        });
+    });
+
     // Handle Detail Page Population
     if (window.location.pathname.includes('detail-vehicule.html')) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -258,6 +412,31 @@ window.addEventListener('DOMContentLoaded', () => {
 
             // Populate the specific data and auto-show the form
             handleGeneralVehicleSelect(carKey);
+        }
+    }
+
+    if (window.location.pathname.includes('detail-service.html')) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const serviceKey = urlParams.get('service');
+
+        if (serviceKey && servicesData[serviceKey]) {
+            const selOptions = document.getElementById('generalServiceSelect');
+            if (selOptions) selOptions.value = serviceKey;
+
+            handleServiceSelect(serviceKey);
+        }
+    }
+
+    // Pré-remplir le formulaire de contact si un service est sélectionné
+    if (window.location.pathname.includes('apropos.html') || window.location.pathname === '/' || window.location.pathname.includes('index.html')) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const service = urlParams.get('service');
+        
+        if (service) {
+            const sujetInput = document.getElementById('contactSujet');
+            if (sujetInput) {
+                sujetInput.value = "Demande d'information - " + service;
+            }
         }
     }
 });
