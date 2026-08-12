@@ -13,6 +13,7 @@ const carsData = {
     'IST': {
         name: 'Toyota IST',
         img: './img/ist 1.jpg',
+        daily: '32,5 $',
         pricing: {
             "12": { total: "10 536 $", avance: "1 300 $", week: "203 $" },
             "15": { total: "11 784 $", avance: "1 300 $", week: "181 $" },
@@ -22,6 +23,7 @@ const carsData = {
     'Blade': {
         name: 'Toyota Blade',
         img: './img/blade 1.jpg',
+        daily: '38,5 $',
         pricing: {
             "12": { total: "11 160 $", avance: "1 400 $", week: "215 $" },
             "15": { total: "12 174 $", avance: "1 400 $", week: "187 $" },
@@ -31,6 +33,7 @@ const carsData = {
     'Swift': {
         name: 'Suzuki Swift',
         img: './img/swift 1.jpg',
+        daily: '29,5 $',
         pricing: {
             "12": { total: "9 288 $", avance: "1 100 $", week: "179 $" },
             "15": { total: "10 224 $", avance: "1 100 $", week: "157 $" },
@@ -40,6 +43,7 @@ const carsData = {
     'Vitz': {
         name: 'Toyota Vitz',
         img: './img/vitz 1.jpg',
+        daily: '29,5 $',
         pricing: {
             "12": { total: "9 288 $", avance: "1 100 $", week: "179 $" },
             "15": { total: "10 224 $", avance: "1 100 $", week: "157 $" },
@@ -183,6 +187,11 @@ function updatePricingDisplay() {
     const data = carsData[val];
     if (!data) return;
 
+    const dailyEl = document.getElementById('modalValJour');
+    if (dailyEl && data.daily) {
+        dailyEl.textContent = data.daily;
+    }
+
     // Default to 12 if no duration specifically selected yet
     const durContainer = document.getElementById('planDuration');
     const selectedDuration = durContainer && durContainer.value ? durContainer.value : "12";
@@ -229,6 +238,29 @@ function closeServiceSuccessModal() {
         successModal.classList.add('hidden');
         document.body.style.overflow = 'auto'; // Restore scroll
     }
+}
+
+function submitContactForm(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('contactName')?.value || '';
+    const phone = document.getElementById('contactPhone')?.value || '';
+    const subject = document.getElementById('contactSujet')?.value || 'Contact depuis le site GMFLEET';
+    const message = document.getElementById('contactMessage')?.value || '';
+    
+    const bodyText = `Nom: ${name}\nTéléphone: ${phone}\n\nMessage:\n${message}`;
+    
+    // Create mailto link
+    const mailtoLink = `mailto:info@georgemichaellogistics.cd?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
+    
+    // Open email client
+    window.location.href = mailtoLink;
+    
+    // Show success modal
+    showContactSuccessModal();
+    
+    // Reset form
+    document.getElementById('contactForm')?.reset();
 }
 
 function showContactSuccessModal() {
