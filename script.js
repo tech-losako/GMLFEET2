@@ -160,7 +160,7 @@ function handleServiceSelect(val) {
     } else if (val === 'Gestion de flotte') {
         if (fFlotte) fFlotte.classList.remove('hidden');
         document.getElementById('flotteCarModel')?.setAttribute('required', 'true');
-        document.getElementById('flotteCarState')?.setAttribute('required', 'true');
+        document.getElementById('flotteCarPlate')?.setAttribute('required', 'true');
     } else if (val === 'Recrutement') {
         if (fRecrutement) fRecrutement.classList.remove('hidden');
         document.getElementById('recrutementExperience')?.setAttribute('required', 'true');
@@ -221,6 +221,110 @@ function showForm() {
         setTimeout(() => {
             actualForm.scrollIntoView({ behavior: 'smooth' });
         }, 100);
+    }
+}
+
+function openDriverModal() {
+    let modal = document.getElementById('driverOffersModal');
+    if (!modal) {
+        const modalHTML = `
+        <div id="driverOffersModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm transition-opacity" onclick="closeDriverModal()"></div>
+            <div class="relative bg-white rounded-3xl shadow-2xl p-6 md:p-8 max-w-3xl w-full mx-auto transform transition-all animate-fadeIn z-10 border border-gray-100 max-h-[90vh] overflow-y-auto no-scrollbar">
+                <button onclick="closeDriverModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+                
+                <div class="text-center mb-8">
+                    <span class="text-xs font-bold text-gmfRed uppercase tracking-widest bg-red-50 px-3 py-1.5 rounded-full border border-red-100">Écosystème GM Fleet</span>
+                    <h3 class="text-2xl md:text-3xl font-black text-gmfBlue mt-3">Vous êtes dans quelle situation ?</h3>
+                    <p class="text-gray-600 text-sm mt-1">Choisissez l'offre GM Fleet adaptée à votre projet</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Situation 1: Drive to Own -->
+                    <div class="bg-gray-50 hover:bg-red-50/60 p-5 rounded-2xl border border-gray-200 hover:border-gmfRed transition-all flex flex-col justify-between group">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-red-100 text-gmfRed flex items-center justify-center text-lg font-bold mb-3 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <h4 class="text-lg font-bold text-gray-900 mb-1">Je veux un véhicule</h4>
+                            <span class="inline-block text-xs font-bold text-gmfRed mb-2">Drive to Own</span>
+                            <p class="text-gray-600 text-xs mb-3 leading-relaxed">
+                                Conduisez aujourd'hui et devenez propriétaire à 100% au terme du financement.
+                            </p>
+                        </div>
+                        <a href="vehicule-credit.html" onclick="closeDriverModal()" class="block w-full bg-gmfRed hover:bg-red-700 text-white text-center font-bold py-2.5 text-sm rounded-xl transition-all shadow-sm">
+                            En savoir plus <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                        </a>
+                    </div>
+
+                    <!-- Situation 2: Agrégateur Yango -->
+                    <div class="bg-gray-50 hover:bg-blue-50/60 p-5 rounded-2xl border border-gray-200 hover:border-gmfBlue transition-all flex flex-col justify-between group">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-blue-100 text-gmfBlue flex items-center justify-center text-lg font-bold mb-3 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-taxi"></i>
+                            </div>
+                            <h4 class="text-lg font-bold text-gray-900 mb-1">Je conduis déjà sur Yango</h4>
+                            <span class="inline-block text-xs font-bold text-gmfBlue mb-2">Agrégateur Yango</span>
+                            <p class="text-gray-600 text-xs mb-3 leading-relaxed">
+                                Conservez votre voiture et passez chez GM Fleet pour des retraits et un support avantageux.
+                            </p>
+                        </div>
+                        <a href="agregateur-yango.html" onclick="closeDriverModal()" class="block w-full bg-gmfBlue hover:bg-blue-900 text-white text-center font-bold py-2.5 text-sm rounded-xl transition-all shadow-sm">
+                            Découvrir les avantages <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                        </a>
+                    </div>
+
+                    <!-- Situation 3: Gestion de flotte -->
+                    <div class="bg-gray-50 hover:bg-green-50/60 p-5 rounded-2xl border border-gray-200 hover:border-green-500 transition-all flex flex-col justify-between group">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-green-100 text-green-600 flex items-center justify-center text-lg font-bold mb-3 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <h4 class="text-lg font-bold text-gray-900 mb-1">Je veux confier ma voiture</h4>
+                            <span class="inline-block text-xs font-bold text-green-600 mb-2">Gestion de flotte</span>
+                            <p class="text-gray-600 text-xs mb-3 leading-relaxed">
+                                Confiez la gestion opérationnelle de votre véhicule à GM Fleet et suivez vos revenus sur mobile.
+                            </p>
+                        </div>
+                        <a href="gestion-flotte.html" onclick="closeDriverModal()" class="block w-full bg-green-600 hover:bg-green-700 text-white text-center font-bold py-2.5 text-sm rounded-xl transition-all shadow-sm">
+                            Faire travailler ma voiture <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                        </a>
+                    </div>
+
+                    <!-- Situation 4: Chauffeur Partenaire -->
+                    <div class="bg-gray-50 hover:bg-purple-50/60 p-5 rounded-2xl border border-gray-200 hover:border-purple-600 transition-all flex flex-col justify-between group">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-lg font-bold mb-3 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h4 class="text-lg font-bold text-gray-900 mb-1">Je suis chauffeur sans voiture</h4>
+                            <span class="inline-block text-xs font-bold text-purple-600 mb-2">Chauffeur Partenaire</span>
+                            <p class="text-gray-600 text-xs mb-3 leading-relaxed">
+                                Conduisez nos véhicules en gestion et préparez votre accès au crédit après 12 mois.
+                            </p>
+                        </div>
+                        <a href="recrutement-chauffeurs.html" onclick="closeDriverModal()" class="block w-full bg-purple-600 hover:bg-purple-700 text-white text-center font-bold py-2.5 text-sm rounded-xl transition-all shadow-sm">
+                            Découvrir le programme <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        modal = document.getElementById('driverOffersModal');
+    }
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeDriverModal() {
+    const modal = document.getElementById('driverOffersModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
     }
 }
 
@@ -363,8 +467,13 @@ async function submitServiceForm(e) {
         specificData.permisFileName = document.getElementById('yangoPermis')?.files[0]?.name || '';
         specificData.carteRoseFileName = document.getElementById('yangoCarteRose')?.files[0]?.name || '';
     } else if (serviceName === 'Gestion de flotte') {
+        specificData.email = document.getElementById('flotteEmail')?.value || '';
+        specificData.idNumber = document.getElementById('flotteID')?.value || '';
+        specificData.carBrand = document.getElementById('flotteCarBrand')?.value || '';
         specificData.carModel = document.getElementById('flotteCarModel')?.value || '';
-        specificData.carState = document.getElementById('flotteCarState')?.value || '';
+        specificData.carPlate = document.getElementById('flotteCarPlate')?.value || '';
+        specificData.carYear = document.getElementById('flotteCarYear')?.value || '';
+        specificData.carChassis = document.getElementById('flotteCarChassis')?.value || '';
         specificData.carteRoseFileName = document.getElementById('flotteCarteRose')?.files[0]?.name || '';
         specificData.photosCount = document.getElementById('flottePhotos')?.files?.length || 0;
     } else if (serviceName === 'Recrutement') {
@@ -494,6 +603,19 @@ window.addEventListener('DOMContentLoaded', () => {
     if (window.location.pathname.includes('detail-service.html')) {
         const urlParams = new URLSearchParams(window.location.search);
         const serviceKey = urlParams.get('service');
+
+        if (serviceKey) {
+            if (serviceKey.toLowerCase().includes('recrutement')) {
+                window.location.href = 'recrutement-chauffeurs.html';
+                return;
+            } else if (serviceKey.toLowerCase().includes('flotte')) {
+                window.location.href = 'gestion-flotte.html';
+                return;
+            } else if (serviceKey.toLowerCase().includes('yango') || serviceKey.toLowerCase().includes('agrégateur')) {
+                window.location.href = 'agregateur-yango.html';
+                return;
+            }
+        }
 
         if (serviceKey && servicesData[serviceKey]) {
             const selOptions = document.getElementById('generalServiceSelect');

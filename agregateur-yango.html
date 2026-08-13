@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agrégateur Yango - Rejoindre GM Fleet Partner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gmfRed: '#dc2626',
+                        gmfBlue: '#1e3a8a',
+                        gmfAccentBlue: '#2563eb',
+                        darkBg: '#0f172a',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50 text-gray-800 antialiased" id="top">
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-sm transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="index.html" class="flex items-center">
+                        <img src="img/logogml-Photoroom.png" alt="GMLFLEET Logo" class="h-16 w-auto object-contain">
+                    </a>
+                </div>
+
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="index.html" class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">Accueil</a>
+                    <a href="index.html#services" class="text-gmfBlue transition font-semibold text-sm uppercase tracking-wide">Nos Services</a>
+                    <a href="vehicules.html" class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">Véhicules</a>
+                    <a href="apropos.html" class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">À Propos</a>
+                    <a href="apropos.html#contact" class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">Contact</a>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-4">
+                    <div class="relative group">
+                        <button onclick="openDriverModal()" class="bg-gmfRed hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-bold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center">
+                            Rejoindre GM Fleet <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right z-50 overflow-hidden border border-gray-100 p-2">
+                            <a href="vehicule-credit.html" class="block px-4 py-3 rounded-xl hover:bg-red-50 text-gray-800 hover:text-gmfRed transition">
+                                <div class="font-bold text-sm flex items-center"><i class="fas fa-car mr-2.5 text-gmfRed"></i>Je veux un véhicule</div>
+                                <div class="text-xs text-gray-500 pl-6">Drive to Own / Véhicule à crédit</div>
+                            </a>
+                            <a href="agregateur-yango.html" class="block px-4 py-3 rounded-xl bg-blue-50 text-gmfBlue font-bold">
+                                <div class="text-sm flex items-center"><i class="fas fa-taxi mr-2.5 text-gmfBlue"></i>Je conduis déjà sur Yango</div>
+                                <div class="text-xs text-gray-500 pl-6 font-normal">Agrégateur Yango</div>
+                            </a>
+                            <a href="gestion-flotte.html" class="block px-4 py-3 rounded-xl hover:bg-green-50 text-gray-800 hover:text-green-600 transition">
+                                <div class="font-bold text-sm flex items-center"><i class="fas fa-tasks mr-2.5 text-green-600"></i>Je veux confier ma voiture</div>
+                                <div class="text-xs text-gray-500 pl-6">Gestion de flotte sur mesure</div>
+                            </a>
+                            <a href="recrutement-chauffeurs.html" class="block px-4 py-3 rounded-xl hover:bg-purple-50 text-gray-800 hover:text-purple-600 transition">
+                                <div class="font-bold text-sm flex items-center"><i class="fas fa-users mr-2.5 text-purple-600"></i>Je suis chauffeur sans voiture</div>
+                                <div class="text-xs text-gray-500 pl-6">Chauffeur Partenaire</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hamburger Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobileMenuBtn" onclick="toggleMobileMenu()" class="text-gmfBlue hover:text-gmfRed focus:outline-none transition">
+                        <i class="fas fa-bars fa-2x"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MOBILE MENU -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-gray-100 shadow-xl overflow-hidden transition-all">
+            <div class="px-4 pt-4 pb-6 space-y-4">
+                <a href="index.html" class="block text-gray-800 font-bold hover:text-gmfRed transition">Accueil</a>
+                <a href="index.html#services" class="block text-gmfBlue font-bold transition">Nos Services</a>
+                <a href="vehicules.html" class="block text-gray-800 font-bold hover:text-gmfRed transition">Véhicules</a>
+                <a href="apropos.html" class="block text-gray-800 font-bold hover:text-gmfRed transition">À Propos</a>
+                <a href="apropos.html#contact" class="block text-gray-800 font-bold hover:text-gmfRed transition">Contact</a>
+                <div class="pt-4 border-t border-gray-100 flex flex-col space-y-2">
+                    <a href="vehicule-credit.html" class="bg-red-50 text-gmfRed border border-red-100 px-4 py-2 rounded-xl font-bold text-sm flex items-center">
+                        <i class="fas fa-car mr-2"></i>Je veux un véhicule (Crédit)
+                    </a>
+                    <a href="agregateur-yango.html" class="bg-blue-50 text-gmfBlue border border-blue-100 px-4 py-2 rounded-xl font-bold text-sm flex items-center">
+                        <i class="fas fa-taxi mr-2"></i>Je conduis déjà sur Yango
+                    </a>
+                    <a href="gestion-flotte.html" class="bg-green-50 text-green-700 border border-green-100 px-4 py-2 rounded-xl font-bold text-sm flex items-center">
+                        <i class="fas fa-tasks mr-2"></i>Je veux confier ma voiture
+                    </a>
+                    <a href="recrutement-chauffeurs.html" class="bg-purple-50 text-purple-700 border border-purple-100 px-4 py-2 rounded-xl font-bold text-sm flex items-center">
+                        <i class="fas fa-users mr-2"></i>Je suis chauffeur sans voiture
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-32 pb-20 lg:pt-44 lg:pb-32 overflow-hidden bg-gmfBlue text-white">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-gradient-to-r from-gmfBlue via-blue-900 to-gmfAccentBlue opacity-95"></div>
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-3xl">
+                <span class="inline-block text-xs font-bold uppercase tracking-widest text-blue-300 bg-white/10 border border-white/20 px-4 py-1.5 rounded-full mb-6" data-aos="fade-down">
+                    Partenaire Agrégateur Officiel
+                </span>
+                <h1 class="text-4xl md:text-6xl font-black tracking-tight mb-4 leading-tight" data-aos="fade-right">
+                    VOUS CONDUISEZ DÉJÀ SUR YANGO ?
+                </h1>
+                <h2 class="text-3xl md:text-5xl font-black text-gmfRed mb-6" data-aos="fade-right" data-aos-delay="100">
+                    Passez chez GM Fleet.
+                </h2>
+                <p class="text-lg md:text-xl text-gray-200 font-light mb-8 leading-relaxed" data-aos="fade-right" data-aos-delay="200">
+                    Vous avez déjà votre véhicule et votre compte Yango ? Vous pouvez rejoindre <strong>GM Fleet comme partenaire Yango</strong> sans nous confier la gestion de votre voiture.
+                </p>
+                <div class="bg-white/10 backdrop-blur border border-white/20 p-5 rounded-2xl mb-10 text-sm md:text-base font-semibold text-gray-100" data-aos="fade-up" data-aos-delay="300">
+                    ✨ <strong>Votre voiture reste la vôtre. Votre activité reste la vôtre. Vous changez simplement de partenaire.</strong>
+                </div>
+
+                <div data-aos="fade-up" data-aos-delay="400">
+                    <a href="#rejoindre-form" class="bg-gmfRed hover:bg-red-700 text-white font-bold py-4 px-8 rounded-full text-lg transition-all shadow-xl hover:shadow-2xl inline-flex items-center gap-2 group">
+                        Rejoindre GM Fleet sur Yango
+                        <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WHY GM FLEET (4 Compact Blocks) -->
+    <section class="py-20 bg-white border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16" data-aos="fade-up">
+                <span class="text-xs font-bold text-gmfBlue uppercase tracking-widest bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100">Pourquoi changer ?</span>
+                <h2 class="text-3xl md:text-4xl font-black text-gmfBlue mt-3">Pourquoi choisir GM Fleet ?</h2>
+                <p class="text-gray-600 text-base mt-2">Profitez de conditions taillées pour la rentabilité et le confort des chauffeurs.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Block 1 -->
+                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 hover:border-gmfBlue transition-all flex flex-col justify-between" data-aos="fade-up" data-aos-delay="100">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-blue-100 text-gmfBlue flex items-center justify-center text-xl font-bold mb-4">
+                            💸
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2">Retraits avantageux</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">Profitez des meilleures conditions de retrait GM Fleet selon les offres en vigueur.</p>
+                    </div>
+                </div>
+
+                <!-- Block 2 -->
+                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 hover:border-gmfBlue transition-all flex flex-col justify-between" data-aos="fade-up" data-aos-delay="200">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-blue-100 text-gmfBlue flex items-center justify-center text-xl font-bold mb-4">
+                            🎯
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2">Bonus & promotions</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">Accédez aux campagnes de primes et avantages exclusifs liés à votre niveau d'activité.</p>
+                    </div>
+                </div>
+
+                <!-- Block 3 -->
+                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 hover:border-gmfBlue transition-all flex flex-col justify-between" data-aos="fade-up" data-aos-delay="300">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-blue-100 text-gmfBlue flex items-center justify-center text-xl font-bold mb-4">
+                            🛠
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2">Écosystème automobile</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">Accès au garage, parking, tracker, DashCam et services GM Fleet disponibles séparément.</p>
+                    </div>
+                </div>
+
+                <!-- Block 4 -->
+                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 hover:border-gmfBlue transition-all flex flex-col justify-between" data-aos="fade-up" data-aos-delay="400">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-blue-100 text-gmfBlue flex items-center justify-center text-xl font-bold mb-4">
+                            🤝
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2">Support chauffeur</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">Un partenaire local réactif à Kinshasa pour vous soutenir au quotidien dans votre travail.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DISTINCTIVE CALLOUT BANNER -->
+    <section class="py-12 bg-gray-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8" data-aos="zoom-in">
+            <div class="bg-blue-50 border-2 border-dashed border-gmfBlue/40 rounded-3xl p-8 text-center relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-gmfBlue">
+                    <i class="fas fa-info-circle fa-10x"></i>
+                </div>
+                <div class="inline-block bg-gmfBlue text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3">
+                    Remarque importante
+                </div>
+                <h3 class="text-xl md:text-2xl font-bold text-gmfBlue mb-3">
+                    Rejoindre GM Fleet comme agrégateur ne signifie pas confier votre véhicule en gestion.
+                </h3>
+                <p class="text-gray-700 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+                    La Gestion de Flotte, le crédit véhicule et les services technologiques restent des produits complètement séparés. Vous conservez la totale autonomie sur votre véhicule.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMMENT REJOINDRER (4 STEPS) -->
+    <section class="py-20 bg-white border-t border-gray-100">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <span class="text-xs font-bold text-gmfRed uppercase tracking-widest bg-red-50 px-3 py-1.5 rounded-full border border-red-100">4 Étapes Simples</span>
+                <h2 class="text-3xl md:text-4xl font-black text-gmfBlue mt-3">Comment rejoindre ?</h2>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 text-center" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-10 h-10 bg-gmfRed text-white rounded-full flex items-center justify-center font-bold mx-auto mb-4">1</div>
+                    <h4 class="font-bold text-gray-900 text-base mb-1">Changement de partenaire</h4>
+                    <p class="text-xs text-gray-600">Demandez le transfert de flotte directement.</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 text-center" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-10 h-10 bg-gmfRed text-white rounded-full flex items-center justify-center font-bold mx-auto mb-4">2</div>
+                    <h4 class="font-bold text-gray-900 text-base mb-1">Sélectionnez GM Fleet</h4>
+                    <p class="text-xs text-gray-600">Choisissez GM Fleet comme flotte d'attachement.</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 text-center" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-10 h-10 bg-gmfRed text-white rounded-full flex items-center justify-center font-bold mx-auto mb-4">3</div>
+                    <h4 class="font-bold text-gray-900 text-base mb-1">Finalisez le rattachement</h4>
+                    <p class="text-xs text-gray-600">Validation rapide dans l'application Yango Driver.</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 text-center" data-aos="fade-up" data-aos-delay="400">
+                    <div class="w-10 h-10 bg-gmfRed text-white rounded-full flex items-center justify-center font-bold mx-auto mb-4">4</div>
+                    <h4 class="font-bold text-gray-900 text-base mb-1">Accédez aux avantages</h4>
+                    <p class="text-xs text-gray-600">Commencez immédiatement à rouler avec GM Fleet.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ATTACHMENT FORM / FINAL CTA -->
+    <section id="rejoindre-form" class="py-20 bg-gray-50 border-t border-gray-100">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-3xl shadow-xl p-8 md:p-10 border border-gray-100" data-aos="fade-up">
+                <div class="text-center mb-8">
+                    <i class="fas fa-taxi text-gmfBlue text-4xl mb-3"></i>
+                    <h3 class="text-2xl md:text-3xl font-black text-gmfBlue">Formulaire de Rattachement Rapide</h3>
+                    <p class="text-gray-600 text-sm mt-1">Transmettez vos coordonnées pour valider votre basculement vers GM Fleet.</p>
+                </div>
+
+                <form id="serviceApplicationForm" class="space-y-5" onsubmit="submitServiceForm(event)">
+                    <input type="hidden" id="selectedService" name="service" value="Chauffeur Yango">
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Prénom & Nom du Chauffeur *</label>
+                        <input type="text" id="applicantName" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue outline-none bg-gray-50" placeholder="Votre nom complet">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Numéro Téléphone Whatsapp *</label>
+                            <input type="tel" id="applicantPhone" required oninput="this.value = this.value.replace(/[^0-9+\s]/g, '')" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue outline-none bg-gray-50" placeholder="+243 ...">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Adresse Domicile *</label>
+                            <input type="text" id="applicantAddress" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue outline-none bg-gray-50" placeholder="Commune / Quartier">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Marque & Modèle du Véhicule *</label>
+                            <input type="text" id="yangoCarModel" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue outline-none bg-gray-50" placeholder="Ex: Toyota Vitz">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Année du Véhicule *</label>
+                            <input type="number" id="yangoCarYear" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue outline-none bg-gray-50" placeholder="Ex: 2012">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Photo du Permis de Conduire *</label>
+                            <input type="file" id="yangoPermis" accept="image/*,.pdf" required class="w-full px-4 py-2 rounded-xl border border-gray-300 bg-white file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-gmfBlue">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Carte Rose / Document Véhicule</label>
+                            <input type="file" id="yangoCarteRose" accept="image/*,.pdf" class="w-full px-4 py-2 rounded-xl border border-gray-300 bg-white file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-gmfBlue">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gmfBlue hover:bg-blue-900 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all text-base flex items-center justify-center">
+                        <i class="fas fa-arrow-right mr-2"></i> Ouvrir Yango et rejoindre GM Fleet
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Service Success Modal Overlay -->
+    <div id="serviceSuccessModalOverlay" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
+        <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm transition-opacity" onclick="closeServiceSuccessModal()"></div>
+        <div class="relative bg-white rounded-3xl shadow-2xl p-8 md:p-10 max-w-lg w-full mx-4 transform transition-all text-center animate-fadeIn z-10">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 text-green-500 mb-6 shadow-inner">
+                <i class="fas fa-check fa-3x"></i>
+            </div>
+            <h4 class="text-3xl font-black text-gray-900 mb-3">Demande enregistrée !</h4>
+            <p class="text-gray-600 mb-6 leading-relaxed">
+                Votre demande de rattachement à la flotte <strong>GM Fleet Partner</strong> a bien été enregistrée. Notre support va procéder à l'association de votre compte Yango.
+            </p>
+            <a href="index.html" class="w-full inline-block bg-gmfBlue hover:bg-blue-900 text-white font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all">
+                <i class="fas fa-check-circle mr-2"></i> Retour à l'accueil
+            </a>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 pt-16 pb-8 border-t-4 border-gmfRed">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="md:col-span-2">
+                    <a href="index.html" class="block mb-6">
+                        <img src="img/logogml-Photoroom.png" alt="GMLFLEET Logo" class="h-20 w-auto object-contain">
+                    </a>
+                    <p class="text-gray-400 max-w-sm mb-6">
+                        Une initiative de George Michael Logistics. Nous finançons l'avenir de la mobilité en donnant aux chauffeurs l'accès à la propriété de véhicules.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">Navigation</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="index.html" class="text-gray-400 hover:text-white">Accueil</a></li>
+                        <li><a href="vehicule-credit.html" class="text-gray-400 hover:text-white">Véhicule à crédit</a></li>
+                        <li><a href="agregateur-yango.html" class="text-gmfBlue font-semibold">Agrégateur Yango</a></li>
+                        <li><a href="gestion-flotte.html" class="text-gray-400 hover:text-white">Gestion de flotte</a></li>
+                        <li><a href="recrutement-chauffeurs.html" class="text-gray-400 hover:text-white">Chauffeurs partenaires</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">Contact</h4>
+                    <ul class="space-y-3 text-gray-400 text-sm">
+                        <li class="flex items-center"><i class="fas fa-envelope mr-3 text-gmfRed"></i> info@georgemichaellogistics.cd</li>
+                        <li class="flex items-center"><i class="fas fa-phone-alt mr-3 text-gmfRed"></i> +243851686846</li>
+                        <li class="flex items-start"><i class="fas fa-map-marker-alt mr-3 mt-1 text-gmfRed"></i> 01, ngongo lutete kinshasa gombe</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-sm">© 2026 GMFLEET (George Michael Logistics). Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script> AOS.init({ duration: 800, once: true }); </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabaseClient.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

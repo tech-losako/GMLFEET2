@@ -73,10 +73,15 @@
                 </div>
 
                 <div class="hidden md:flex items-center space-x-4">
-                    <a href="detail-vehicule.html"
-                        class="bg-gmfRed hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-bold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                        Devenir Chauffeur
-                    </a>
+                    <div class="relative group">
+                        <button onclick="openDriverModal()" class="bg-gmfRed hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-bold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center">
+                            Devenir Chauffeur <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right z-50 overflow-hidden">
+                            <a href="detail-service.html?service=Recrutement" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-gmfBlue font-semibold border-b border-gray-100"><i class="fas fa-users mr-2 text-gmfBlue"></i>Recrutement Chauffeur</a>
+                            <a href="detail-vehicule.html" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-gmfRed font-semibold"><i class="fas fa-car mr-2 text-gmfRed"></i>Chauffeur à Crédit</a>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Hamburger Button -->
@@ -103,9 +108,14 @@
                     class="block text-gray-800 font-bold hover:text-gmfRed transition">Contact</a>
 
                 <div class="pt-4 border-t border-gray-100 flex flex-col space-y-3">
+                    <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 text-center">Devenir Chauffeur :</div>
+                    <a href="detail-service.html?service=Recrutement"
+                        class="bg-blue-50 text-center text-gmfBlue border border-blue-100 px-6 py-3 rounded-xl font-bold transition-all shadow-sm">
+                        <i class="fas fa-users mr-2"></i>Recrutement Chauffeur
+                    </a>
                     <a href="detail-vehicule.html"
                         class="bg-gmfRed text-center text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md">
-                        Devenir Chauffeur
+                        <i class="fas fa-car mr-2"></i>Chauffeur à Crédit
                     </a>
                 </div>
             </div>

@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion de Flotte - GM Fleet pour Propriétaires</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gmfRed: '#dc2626',
+                        gmfBlue: '#1e3a8a',
+                        gmfAccentBlue: '#2563eb',
+                        gmfGreen: '#16a34a',
+                        darkBg: '#0f172a',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50 text-gray-800 antialiased" id="top">
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-sm transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="index.html" class="flex items-center">
+                        <img src="img/logogml-Photoroom.png" alt="GMLFLEET Logo" class="h-16 w-auto object-contain">
+                    </a>
+                </div>
+
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="index.html" class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">Accueil</a>
+                    <a href="index.html#services" class="text-gmfGreen transition font-semibold text-sm uppercase tracking-wide">Nos Services</a>
+                    <a href="vehicules.html" class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">Véhicules</a>
+                    <a href="apropos.html" class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">À Propos</a>
+                    <a href="apropos.html#contact" class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">Contact</a>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-4">
+                    <div class="relative group">
+                        <button onclick="openDriverModal()" class="bg-gmfRed hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-bold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center">
+                            Rejoindre GM Fleet <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right z-50 overflow-hidden border border-gray-100 p-2">
+                            <a href="vehicule-credit.html" class="block px-4 py-3 rounded-xl hover:bg-red-50 text-gray-800 hover:text-gmfRed transition">
+                                <div class="font-bold text-sm flex items-center"><i class="fas fa-car mr-2.5 text-gmfRed"></i>Je veux un véhicule</div>
+                                <div class="text-xs text-gray-500 pl-6">Drive to Own / Véhicule à crédit</div>
+                            </a>
+                            <a href="agregateur-yango.html" class="block px-4 py-3 rounded-xl hover:bg-blue-50 text-gray-800 hover:text-gmfBlue transition">
+                                <div class="font-bold text-sm flex items-center"><i class="fas fa-taxi mr-2.5 text-gmfBlue"></i>Je conduis déjà sur Yango</div>
+                                <div class="text-xs text-gray-500 pl-6">Agrégateur Yango</div>
+                            </a>
+                            <a href="gestion-flotte.html" class="block px-4 py-3 rounded-xl bg-green-50 text-gmfGreen font-bold">
+                                <div class="text-sm flex items-center"><i class="fas fa-tasks mr-2.5 text-gmfGreen"></i>Je veux confier ma voiture</div>
+                                <div class="text-xs text-gray-500 pl-6 font-normal">Gestion de flotte sur mesure</div>
+                            </a>
+                            <a href="recrutement-chauffeurs.html" class="block px-4 py-3 rounded-xl hover:bg-purple-50 text-gray-800 hover:text-purple-600 transition">
+                                <div class="font-bold text-sm flex items-center"><i class="fas fa-users mr-2.5 text-purple-600"></i>Je suis chauffeur sans voiture</div>
+                                <div class="text-xs text-gray-500 pl-6">Chauffeur Partenaire</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hamburger Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobileMenuBtn" onclick="toggleMobileMenu()" class="text-gmfBlue hover:text-gmfRed focus:outline-none transition">
+                        <i class="fas fa-bars fa-2x"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MOBILE MENU -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-gray-100 shadow-xl overflow-hidden transition-all">
+            <div class="px-4 pt-4 pb-6 space-y-4">
+                <a href="index.html" class="block text-gray-800 font-bold hover:text-gmfRed transition">Accueil</a>
+                <a href="index.html#services" class="block text-gmfGreen font-bold transition">Nos Services</a>
+                <a href="vehicules.html" class="block text-gray-800 font-bold hover:text-gmfRed transition">Véhicules</a>
+                <a href="apropos.html" class="block text-gray-800 font-bold hover:text-gmfRed transition">À Propos</a>
+                <a href="apropos.html#contact" class="block text-gray-800 font-bold hover:text-gmfRed transition">Contact</a>
+                <div class="pt-4 border-t border-gray-100 flex flex-col space-y-2">
+                    <a href="vehicule-credit.html" class="bg-red-50 text-gmfRed border border-red-100 px-4 py-2 rounded-xl font-bold text-sm flex items-center">
+                        <i class="fas fa-car mr-2"></i>Je veux un véhicule (Crédit)
+                    </a>
+                    <a href="agregateur-yango.html" class="bg-blue-50 text-gmfBlue border border-blue-100 px-4 py-2 rounded-xl font-bold text-sm flex items-center">
+                        <i class="fas fa-taxi mr-2"></i>Je conduis déjà sur Yango
+                    </a>
+                    <a href="gestion-flotte.html" class="bg-green-50 text-gmfGreen border border-green-100 px-4 py-2 rounded-xl font-bold text-sm flex items-center">
+                        <i class="fas fa-tasks mr-2"></i>Je veux confier ma voiture
+                    </a>
+                    <a href="recrutement-chauffeurs.html" class="bg-purple-50 text-purple-700 border border-purple-100 px-4 py-2 rounded-xl font-bold text-sm flex items-center">
+                        <i class="fas fa-users mr-2"></i>Je suis chauffeur sans voiture
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-32 pb-24 lg:pt-44 lg:pb-32 overflow-hidden bg-gray-900 text-white">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-gradient-to-r from-gray-950 via-gray-900 to-gmfBlue opacity-95"></div>
+            <img src="./img/fleet_white_bg.png" alt="Gestion de flotte" class="w-full h-full object-cover mix-blend-overlay opacity-20">
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-3xl">
+                <span class="inline-block text-xs font-bold uppercase tracking-widest text-gmfGreen bg-green-500/10 border border-green-500/30 px-4 py-1.5 rounded-full mb-6" data-aos="fade-down">
+                    Gestion de Flotte Professionnelle
+                </span>
+                <h1 class="text-4xl md:text-6xl font-black tracking-tight mb-4 leading-tight" data-aos="fade-right">
+                    VOTRE VOITURE PEUT TRAVAILLER POUR VOUS
+                </h1>
+                <h2 class="text-3xl md:text-5xl font-black text-gmfGreen mb-6" data-aos="fade-right" data-aos-delay="100">
+                    Confiez sa gestion à GM Fleet.
+                </h2>
+                <p class="text-lg md:text-xl text-gray-300 font-light mb-8 leading-relaxed" data-aos="fade-right" data-aos-delay="200">
+                    Vous avez une voiture que vous n’utilisez pas pleinement ? Nous l’inspectons, l’équipons, lui affectons un chauffeur sélectionné, l’intégrons à notre réseau Yango et suivons son exploitation pour vous.
+                </p>
+                <div class="bg-white/10 backdrop-blur border border-white/15 p-5 rounded-2xl mb-10 text-sm md:text-base font-semibold text-gray-200" data-aos="fade-up" data-aos-delay="300">
+                    🔑 <strong>Vous restez propriétaire. Nous gérons l’opérationnel.</strong>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4" data-aos="fade-up" data-aos-delay="400">
+                    <a href="#evaluer-form" class="bg-gmfGreen hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full text-lg transition-all shadow-xl hover:shadow-2xl text-center flex items-center justify-center gap-2 group">
+                        Enregistrer ma voiture
+                        <i class="fas fa-arrow-down group-hover:translate-y-1 transition-transform"></i>
+                    </a>
+                    <a href="#app-mockup" class="bg-white/10 hover:bg-white/20 backdrop-blur text-white font-bold py-4 px-8 rounded-full text-lg transition-all border border-white/30 text-center flex items-center justify-center gap-2">
+                        <i class="fas fa-mobile-alt"></i> Découvrir GML Mobile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CATEGORY CALCULATOR SECTION -->
+    <section class="py-24 bg-white border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+                <span class="text-xs font-bold text-gmfGreen uppercase tracking-widest bg-green-50 px-3 py-1.5 rounded-full border border-green-100">Grille de Rentabilité</span>
+                <h2 class="text-3xl md:text-5xl font-black text-gmfBlue mt-3">Revenus Cibles par Catégorie</h2>
+                <p class="text-gray-600 text-lg mt-3">Estimez le rendement mensuel potentiel de votre véhicule selon son année et son état.</p>
+            </div>
+
+            <!-- 3 Category Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <!-- Catégorie A -->
+                <div class="bg-gradient-to-b from-green-50/50 to-white p-8 rounded-3xl border-2 border-gmfGreen/30 shadow-lg hover:shadow-2xl transition-all duration-300 relative" data-aos="fade-up" data-aos-delay="100">
+                    <span class="absolute top-6 right-6 text-xs font-black uppercase tracking-widest text-gmfGreen bg-green-100 px-3 py-1 rounded-full">Top Véhicules</span>
+                    <h3 class="text-2xl font-black text-gray-900 mb-2">CATÉGORIE A</h3>
+                    <p class="text-sm font-semibold text-gray-600 mb-6">Véhicule récent — jusqu’à 2 ans</p>
+                    <div class="border-t border-gray-200 pt-6 mb-6">
+                        <div class="text-xs text-gray-500 font-semibold uppercase tracking-wide">Règlement mensuel cible</div>
+                        <div class="text-3xl md:text-4xl font-black text-gmfGreen mt-2">Jusqu’à 500 USD <span class="text-lg font-normal text-gray-500">/ mois*</span></div>
+                    </div>
+                    <ul class="text-xs text-gray-600 space-y-2">
+                        <li class="flex items-center"><i class="fas fa-check text-gmfGreen mr-2"></i>Priorité d'affectation chauffeur</li>
+                        <li class="flex items-center"><i class="fas fa-check text-gmfGreen mr-2"></i>Véhicule hautement prisé sur Yango</li>
+                    </ul>
+                </div>
+
+                <!-- Catégorie B -->
+                <div class="bg-gradient-to-b from-blue-50/50 to-white p-8 rounded-3xl border border-gray-200 shadow-md hover:shadow-xl transition-all duration-300 relative" data-aos="fade-up" data-aos-delay="200">
+                    <h3 class="text-2xl font-black text-gray-900 mb-2">CATÉGORIE B</h3>
+                    <p class="text-sm font-semibold text-gray-600 mb-6">Plus de 2 ans à 4 ans</p>
+                    <div class="border-t border-gray-200 pt-6 mb-6">
+                        <div class="text-xs text-gray-500 font-semibold uppercase tracking-wide">Règlement mensuel cible</div>
+                        <div class="text-3xl md:text-4xl font-black text-gmfBlue mt-2">Jusqu’à 450 USD <span class="text-lg font-normal text-gray-500">/ mois*</span></div>
+                    </div>
+                    <ul class="text-xs text-gray-600 space-y-2">
+                        <li class="flex items-center"><i class="fas fa-check text-gmfBlue mr-2"></i>Excellente rentabilité urbaine</li>
+                        <li class="flex items-center"><i class="fas fa-check text-gmfBlue mr-2"></i>Entretien suivi rigoureusement</li>
+                    </ul>
+                </div>
+
+                <!-- Catégorie C -->
+                <div class="bg-gradient-to-b from-gray-50 to-white p-8 rounded-3xl border border-gray-200 shadow-md hover:shadow-xl transition-all duration-300 relative" data-aos="fade-up" data-aos-delay="300">
+                    <h3 class="text-2xl font-black text-gray-900 mb-2">CATÉGORIE C</h3>
+                    <p class="text-sm font-semibold text-gray-600 mb-6">Plus de 4 ans</p>
+                    <div class="border-t border-gray-200 pt-6 mb-6">
+                        <div class="text-xs text-gray-500 font-semibold uppercase tracking-wide">Règlement mensuel cible</div>
+                        <div class="text-3xl md:text-4xl font-black text-gray-800 mt-2">Jusqu’à 400 USD <span class="text-lg font-normal text-gray-500">/ mois*</span></div>
+                    </div>
+                    <ul class="text-xs text-gray-600 space-y-2">
+                        <li class="flex items-center"><i class="fas fa-check text-gray-700 mr-2"></i>Valorisation optimale d'un actif dormant</li>
+                        <li class="flex items-center"><i class="fas fa-check text-gray-700 mr-2"></i>Inspection préalable indispensable</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Disclaimer note -->
+            <p class="text-center text-xs text-gray-500 italic max-w-2xl mx-auto">
+                * Sous réserve de l’inspection technique, de la disponibilité du véhicule et des conditions contractuelles d’exploitation.
+            </p>
+        </div>
+    </section>
+
+    <!-- NOUS NOUS OCCUPONS DE TOUT (6 Features) -->
+    <section class="py-24 bg-gray-50 border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+                <span class="text-xs font-bold text-gmfGreen uppercase tracking-widest bg-green-50 px-3 py-1.5 rounded-full border border-green-100">Gestion clé en main</span>
+                <h2 class="text-3xl md:text-5xl font-black text-gmfBlue mt-3">Nous nous occupons de tout</h2>
+                <p class="text-gray-600 text-lg mt-3">Libérez-vous des tracas quotidiens de gestion automobile.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 1 -->
+                <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm hover:shadow-lg transition-all" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-14 h-14 rounded-2xl bg-green-50 text-gmfGreen flex items-center justify-center text-2xl font-bold mb-6">👤</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Chauffeur sélectionné</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">GML recrute, teste, vérifie les antécédents et affecte un chauffeur professionnel à votre véhicule.</p>
+                </div>
+
+                <!-- 2 -->
+                <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm hover:shadow-lg transition-all" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-14 h-14 rounded-2xl bg-green-50 text-gmfGreen flex items-center justify-center text-2xl font-bold mb-6">🚕</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Réseau Yango</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">Nous intégrons et suivons la voiture dans notre flotte partenaire Yango pour garantir des courses en continu.</p>
+                </div>
+
+                <!-- 3 -->
+                <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm hover:shadow-lg transition-all" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-14 h-14 rounded-2xl bg-green-50 text-gmfGreen flex items-center justify-center text-2xl font-bold mb-6">📍</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">GPS & télématique</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">Suivi du véhicule en temps réel, alertes de zones non autorisées et horaires contrôlés.</p>
+                </div>
+
+                <!-- 4 -->
+                <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm hover:shadow-lg transition-all" data-aos="fade-up" data-aos-delay="400">
+                    <div class="w-14 h-14 rounded-2xl bg-green-50 text-gmfGreen flex items-center justify-center text-2xl font-bold mb-6">📹</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">DashCam embarquée</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">Visibilité vidéo et sécurité supplémentaires pour protéger l'habitacle et votre patrimoine.</p>
+                </div>
+
+                <!-- 5 -->
+                <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm hover:shadow-lg transition-all" data-aos="fade-up" data-aos-delay="500">
+                    <div class="w-14 h-14 rounded-2xl bg-green-50 text-gmfGreen flex items-center justify-center text-2xl font-bold mb-6">🔧</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Maintenance préventive</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">Nous suivons les anomalies mécaniques, contrôlons le véhicule régulièrement et prévenons l'usure.</p>
+                </div>
+
+                <!-- 6 -->
+                <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm hover:shadow-lg transition-all" data-aos="fade-up" data-aos-delay="600">
+                    <div class="w-14 h-14 rounded-2xl bg-green-50 text-gmfGreen flex items-center justify-center text-2xl font-bold mb-6">💰</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Règlements propriétaire</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">Vos revenus mensuels et historiques de règlements sont visibles en transparence dans votre application.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- OWNER APP MOCKUP SECTION (GML Mobile) -->
+    <section id="app-mockup" class="py-24 bg-gray-900 text-white overflow-hidden relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div data-aos="fade-right">
+                    <span class="text-xs font-bold uppercase tracking-widest text-gmfGreen bg-green-500/10 border border-green-500/30 px-4 py-1.5 rounded-full mb-4 inline-block">Application Propriétaire</span>
+                    <h2 class="text-4xl md:text-5xl font-black mb-6 leading-tight">
+                        Votre véhicule dans votre poche.
+                    </h2>
+                    <p class="text-gray-300 text-lg mb-8 leading-relaxed">
+                        Avec <strong>GML Mobile</strong>, conservez une transparence totale et un contrôle permanent sur votre actif, où que vous soyez.
+                    </p>
+
+                    <!-- Feature Tags -->
+                    <div class="flex flex-wrap gap-2.5 mb-10">
+                        <span class="bg-white/10 backdrop-blur px-4 py-2 rounded-xl text-sm font-semibold border border-white/10"><i class="fas fa-map-marker-alt text-gmfGreen mr-2"></i> Localisation</span>
+                        <span class="bg-white/10 backdrop-blur px-4 py-2 rounded-xl text-sm font-semibold border border-white/10"><i class="fas fa-wallet text-gmfGreen mr-2"></i> Revenus</span>
+                        <span class="bg-white/10 backdrop-blur px-4 py-2 rounded-xl text-sm font-semibold border border-white/10"><i class="fas fa-history text-gmfGreen mr-2"></i> Historique</span>
+                        <span class="bg-white/10 backdrop-blur px-4 py-2 rounded-xl text-sm font-semibold border border-white/10"><i class="fas fa-bell text-gmfGreen mr-2"></i> Alertes</span>
+                        <span class="bg-white/10 backdrop-blur px-4 py-2 rounded-xl text-sm font-semibold border border-white/10"><i class="fas fa-wrench text-gmfGreen mr-2"></i> Maintenance</span>
+                        <span class="bg-white/10 backdrop-blur px-4 py-2 rounded-xl text-sm font-semibold border border-white/10"><i class="fas fa-video text-gmfGreen mr-2"></i> DashCam</span>
+                        <span class="bg-white/10 backdrop-blur px-4 py-2 rounded-xl text-sm font-semibold border border-white/10"><i class="fas fa-tools text-gmfGreen mr-2"></i> Réparations</span>
+                        <span class="bg-white/10 backdrop-blur px-4 py-2 rounded-xl text-sm font-semibold border border-white/10"><i class="fas fa-hand-holding-usd text-gmfGreen mr-2"></i> Retraits</span>
+                    </div>
+
+                    <a href="#evaluer-form" class="bg-gmfGreen hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full text-lg transition-all shadow-xl inline-flex items-center gap-2">
+                        Télécharger GML Mobile <i class="fas fa-download"></i>
+                    </a>
+                </div>
+
+                <!-- Phone Visual Mockup -->
+                <div class="flex justify-center" data-aos="fade-left">
+                    <div class="relative w-72 md:w-80 bg-gray-950 rounded-[45px] p-4 shadow-2xl border-4 border-gray-800 ring-1 ring-white/20">
+                        <!-- Camera Notch -->
+                        <div class="w-32 h-5 bg-gray-900 rounded-b-2xl mx-auto mb-4 border-b border-gray-800"></div>
+
+                        <!-- App Screen Simulation -->
+                        <div class="bg-gray-900 rounded-[30px] p-5 border border-gray-800 text-white space-y-4">
+                            <div class="flex justify-between items-center pb-2 border-b border-gray-800">
+                                <div>
+                                    <div class="text-[10px] text-gray-400 font-bold uppercase">GML Mobile Owner</div>
+                                    <div class="text-sm font-bold text-gmfGreen">Toyota Vitz (1234AB01)</div>
+                                </div>
+                                <div class="w-8 h-8 rounded-full bg-green-500/20 text-gmfGreen flex items-center justify-center text-xs font-bold">
+                                    <i class="fas fa-wifi"></i>
+                                </div>
+                            </div>
+
+                            <!-- Revenue Widget -->
+                            <div class="bg-gradient-to-r from-gmfGreen/20 to-emerald-950 p-4 rounded-2xl border border-green-500/30">
+                                <div class="text-xs text-gray-300">Revenus du mois (Cible)</div>
+                                <div class="text-2xl font-black text-gmfGreen mt-1">450.00 USD</div>
+                                <div class="text-[10px] text-green-300 mt-1 flex items-center"><i class="fas fa-check-circle mr-1"></i> Règlement à jour</div>
+                            </div>
+
+                            <!-- Live Telematics -->
+                            <div class="bg-gray-800/80 p-3 rounded-xl border border-gray-700 flex items-center justify-between text-xs">
+                                <span class="flex items-center text-gray-300"><i class="fas fa-map-marker-alt text-red-500 mr-2"></i> Kinshasa / Gombe</span>
+                                <span class="text-gmfGreen font-bold bg-green-500/10 px-2 py-0.5 rounded">En course</span>
+                            </div>
+
+                            <!-- Health check -->
+                            <div class="bg-gray-800/80 p-3 rounded-xl border border-gray-700 space-y-2 text-xs">
+                                <div class="flex justify-between text-gray-300">
+                                    <span>État du véhicule</span>
+                                    <span class="text-green-400 font-bold">Excellent</span>
+                                </div>
+                                <div class="w-full bg-gray-700 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-gmfGreen h-full w-11/12"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MECHANICAL PROBLEM FLOW (UNE PANNE ? VOUS GARDEZ LE CONTRÔLE) -->
+    <section class="py-24 bg-white border-t border-gray-100">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+                <span class="text-xs font-bold text-gmfGreen uppercase tracking-widest bg-green-50 px-3 py-1.5 rounded-full border border-green-100">Transparence & Sécurité</span>
+                <h2 class="text-3xl md:text-5xl font-black text-gmfBlue mt-3">UNE PANNE ? VOUS GARDEZ LE CONTRÔLE.</h2>
+                <p class="text-gray-600 text-base md:text-lg mt-3">
+                    Nos outils permettent d'identifier les anomalies plus tôt. Si une réparation est nécessaire, vous recevez le diagnostic et le coût estimé avant toute intervention.
+                </p>
+            </div>
+
+            <!-- Process Step Flow -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 text-center mb-12" data-aos="fade-up">
+                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200 flex flex-col items-center justify-center">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 text-gmfBlue font-bold flex items-center justify-center mb-2">1</div>
+                    <h4 class="font-bold text-gray-900 text-sm">Diagnostic</h4>
+                </div>
+                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200 flex flex-col items-center justify-center">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 text-gmfBlue font-bold flex items-center justify-center mb-2">2</div>
+                    <h4 class="font-bold text-gray-900 text-sm">Devis détaillé</h4>
+                </div>
+                <div class="bg-green-50 p-5 rounded-2xl border-2 border-gmfGreen flex flex-col items-center justify-center">
+                    <div class="w-10 h-10 rounded-full bg-gmfGreen text-white font-bold flex items-center justify-center mb-2">3</div>
+                    <h4 class="font-bold text-gmfGreen text-sm">Votre approbation</h4>
+                </div>
+                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200 flex flex-col items-center justify-center">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 text-gmfBlue font-bold flex items-center justify-center mb-2">4</div>
+                    <h4 class="font-bold text-gray-900 text-sm">Réparation garage</h4>
+                </div>
+                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200 flex flex-col items-center justify-center">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 text-gmfBlue font-bold flex items-center justify-center mb-2">5</div>
+                    <h4 class="font-bold text-gray-900 text-sm">Retour en activité</h4>
+                </div>
+            </div>
+
+            <!-- Payment Facility Callout -->
+            <div class="bg-gray-50 p-6 md:p-8 rounded-3xl border border-gray-200 text-gray-700 text-sm md:text-base leading-relaxed" data-aos="fade-up">
+                <p>
+                    💡 <strong>Facilité de paiement :</strong> Si vous ne pouvez pas financer immédiatement une réparation approuvée, GM Fleet peut, après validation, proposer une facilité de paiement récupérée progressivement sur vos futurs règlements.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEES SECTION -->
+    <section class="py-16 bg-gray-50 border-t border-gray-100">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-aos="fade-up">
+            <h3 class="text-2xl font-black text-gmfBlue mb-6">Conditions Contractuelles Simples</h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <div class="text-xs text-gray-400 font-bold uppercase">Engagement Initial</div>
+                    <div class="text-2xl font-black text-gray-900 mt-1">Contrat 12 mois</div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <div class="text-xs text-gray-400 font-bold uppercase">Frais de Gestion GM Fleet</div>
+                    <div class="text-2xl font-black text-gmfGreen mt-1">64 USD / mois <span class="text-xs font-normal text-gray-500">(1ère année)</span></div>
+                </div>
+            </div>
+
+            <p class="text-xs text-gray-500 max-w-xl mx-auto">
+                En cas de renouvellement, la tarification est revue à la baisse lorsque les équipements déjà installés (GPS, DashCam) n’ont pas besoin d’être rachetés.
+            </p>
+        </div>
+    </section>
+
+    <!-- EVALUATION FORM & FINAL CTA -->
+    <section id="evaluer-form" class="py-24 bg-white border-t border-gray-100">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gray-50 rounded-3xl shadow-xl p-8 md:p-12 border border-gray-200" data-aos="fade-up">
+                <div class="text-center mb-10">
+                    <span class="text-xs font-bold text-gmfGreen uppercase tracking-widest bg-green-100 px-3 py-1.5 rounded-full">Évaluation Gratuite</span>
+                    <h2 class="text-3xl md:text-4xl font-black text-gmfBlue mt-3">Faire évaluer ma voiture</h2>
+                    <p class="text-gray-600 text-sm md:text-base mt-2">Soumettez les informations de votre véhicule. Un expert GM Fleet vous contactera sous 24h pour programmer l'inspection.</p>
+                </div>
+
+                <form id="serviceApplicationForm" class="space-y-6" onsubmit="submitServiceForm(event)">
+                    <input type="hidden" id="selectedService" name="service" value="Gestion de flotte">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Prénom & Nom du Propriétaire *</label>
+                            <input type="text" id="applicantName" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfGreen outline-none bg-white" placeholder="Votre nom complet">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Téléphone Whatsapp *</label>
+                            <input type="tel" id="applicantPhone" required oninput="this.value = this.value.replace(/[^0-9+\s]/g, '')" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfGreen outline-none bg-white" placeholder="+243 ...">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">E-mail de contact *</label>
+                            <input type="email" id="flotteEmail" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfGreen outline-none bg-white" placeholder="votre@email.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Adresse Domicile *</label>
+                            <input type="text" id="applicantAddress" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfGreen outline-none bg-white" placeholder="Kinshasa, Commune...">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Marque du Véhicule *</label>
+                            <input type="text" id="flotteCarBrand" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfGreen outline-none bg-white" placeholder="Ex: Toyota">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Modèle *</label>
+                            <input type="text" id="flotteCarModel" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfGreen outline-none bg-white" placeholder="Ex: Vitz / IST">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Année *</label>
+                            <input type="number" id="flotteCarYear" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfGreen outline-none bg-white" placeholder="Ex: 2016">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Plaque d'Immatriculation *</label>
+                            <input type="text" id="flotteCarPlate" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfGreen outline-none bg-white" placeholder="Ex: 1234AB01">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Numéro de Châssis (VIN)</label>
+                            <input type="text" id="flotteCarChassis" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfGreen outline-none bg-white" placeholder="Facultatif">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Carte Rose / Document véhicule *</label>
+                            <input type="file" id="flotteCarteRose" accept="image/*,.pdf" required class="w-full px-4 py-2 rounded-xl border border-gray-300 bg-white file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-gmfGreen">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Photos du véhicule</label>
+                            <input type="file" id="flottePhotos" accept="image/*" multiple class="w-full px-4 py-2 rounded-xl border border-gray-300 bg-white file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-gmfGreen">
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                        <button type="submit" class="flex-1 bg-gmfGreen hover:bg-green-700 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all text-base flex items-center justify-center">
+                            <i class="fas fa-car-side mr-2"></i> Faire évaluer ma voiture
+                        </button>
+                        <a href="#app-mockup" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-4 px-6 rounded-xl transition-all text-center flex items-center justify-center">
+                            Continuer dans GML Mobile
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Service Success Modal Overlay -->
+    <div id="serviceSuccessModalOverlay" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
+        <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm transition-opacity" onclick="closeServiceSuccessModal()"></div>
+        <div class="relative bg-white rounded-3xl shadow-2xl p-8 md:p-10 max-w-lg w-full mx-4 transform transition-all text-center animate-fadeIn z-10">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 text-green-500 mb-6 shadow-inner">
+                <i class="fas fa-check fa-3x"></i>
+            </div>
+            <h4 class="text-3xl font-black text-gray-900 mb-3">Demande d'Évaluation Transmise !</h4>
+            <p class="text-gray-600 mb-6 leading-relaxed">
+                Votre dossier de <strong>Gestion de Flotte</strong> a bien été enregistré. Notre équipe prendra contact avec vous pour fixer le rendez-vous d'inspection technique.
+            </p>
+            <a href="index.html" class="w-full inline-block bg-gmfGreen hover:bg-green-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all">
+                <i class="fas fa-check-circle mr-2"></i> Retour à l'accueil
+            </a>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 pt-16 pb-8 border-t-4 border-gmfRed">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="md:col-span-2">
+                    <a href="index.html" class="block mb-6">
+                        <img src="img/logogml-Photoroom.png" alt="GMLFLEET Logo" class="h-20 w-auto object-contain">
+                    </a>
+                    <p class="text-gray-400 max-w-sm mb-6">
+                        Une initiative de George Michael Logistics. Nous finançons l'avenir de la mobilité en donnant aux chauffeurs l'accès à la propriété de véhicules.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">Navigation</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="index.html" class="text-gray-400 hover:text-white">Accueil</a></li>
+                        <li><a href="vehicule-credit.html" class="text-gray-400 hover:text-white">Véhicule à crédit</a></li>
+                        <li><a href="agregateur-yango.html" class="text-gray-400 hover:text-white">Agrégateur Yango</a></li>
+                        <li><a href="gestion-flotte.html" class="text-gmfGreen font-semibold">Gestion de flotte</a></li>
+                        <li><a href="recrutement-chauffeurs.html" class="text-gray-400 hover:text-white">Chauffeurs partenaires</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">Contact</h4>
+                    <ul class="space-y-3 text-gray-400 text-sm">
+                        <li class="flex items-center"><i class="fas fa-envelope mr-3 text-gmfRed"></i> info@georgemichaellogistics.cd</li>
+                        <li class="flex items-center"><i class="fas fa-phone-alt mr-3 text-gmfRed"></i> +243851686846</li>
+                        <li class="flex items-start"><i class="fas fa-map-marker-alt mr-3 mt-1 text-gmfRed"></i> 01, ngongo lutete kinshasa gombe</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-sm">© 2026 GMFLEET (George Michael Logistics). Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script> AOS.init({ duration: 800, once: true }); </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabaseClient.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

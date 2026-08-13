@@ -70,12 +70,29 @@
                         class="text-gray-600 hover:text-gmfRed transition font-semibold text-sm uppercase tracking-wide">Contact</a>
                 </div>
                 <div class="hidden md:flex items-center space-x-4">
-                    <a href="detail-vehicule.html"
-                        class="bg-gmfRed hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-bold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">Devenir
-                        Chauffeur</a>
-                    <!-- <a href="admin.html"
-                        class="text-gmfBlue hover:text-gmfRed font-bold text-sm underline-offset-4 hover:underline">Admin
-                        <i class="fas fa-lock ml-1 text-xs"></i></a> -->
+                    <div class="relative group">
+                        <button onclick="openDriverModal()" class="bg-gmfRed hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-bold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center">
+                            Rejoindre GM Fleet <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right z-50 overflow-hidden border border-gray-100 p-2">
+                            <a href="vehicule-credit.html" class="block px-4 py-3 rounded-xl hover:bg-red-50 text-gray-800 hover:text-gmfRed transition">
+                                <div class="font-bold text-sm flex items-center"><i class="fas fa-car mr-2.5 text-gmfRed"></i>Je veux un véhicule</div>
+                                <div class="text-xs text-gray-500 pl-6">Drive to Own / Véhicule à crédit</div>
+                            </a>
+                            <a href="agregateur-yango.html" class="block px-4 py-3 rounded-xl hover:bg-blue-50 text-gray-800 hover:text-gmfBlue transition">
+                                <div class="font-bold text-sm flex items-center"><i class="fas fa-taxi mr-2.5 text-gmfBlue"></i>Je conduis déjà sur Yango</div>
+                                <div class="text-xs text-gray-500 pl-6">Agrégateur Yango</div>
+                            </a>
+                            <a href="gestion-flotte.html" class="block px-4 py-3 rounded-xl hover:bg-green-50 text-gray-800 hover:text-green-600 transition">
+                                <div class="font-bold text-sm flex items-center"><i class="fas fa-tasks mr-2.5 text-green-600"></i>Je veux confier ma voiture</div>
+                                <div class="text-xs text-gray-500 pl-6">Gestion de flotte sur mesure</div>
+                            </a>
+                            <a href="recrutement-chauffeurs.html" class="block px-4 py-3 rounded-xl hover:bg-purple-50 text-gray-800 hover:text-purple-600 transition">
+                                <div class="font-bold text-sm flex items-center"><i class="fas fa-users mr-2.5 text-purple-600"></i>Je suis chauffeur sans voiture</div>
+                                <div class="text-xs text-gray-500 pl-6">Chauffeur Partenaire</div>
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Hamburger Button -->
@@ -100,13 +117,24 @@
                 <a href="apropos.html" class="block text-gray-800 font-bold hover:text-gmfRed transition">À Propos</a>
                 <a href="apropos.html#contact"
                     class="block text-gray-800 font-bold hover:text-gmfRed transition">Contact</a>
-                <div class="pt-4 border-t border-gray-100 flex flex-col space-y-3">
-                    <a href="detail-vehicule.html"
-                        class="bg-gmfRed text-center text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md">Devenir
-                        Chauffeur</a>
-                    <!-- <a href="admin.html"
-                        class="text-center text-gmfBlue font-bold underline-offset-4 hover:underline py-2">Espace Admin
-                        <i class="fas fa-lock ml-1 text-xs"></i></a> -->
+                <div class="pt-4 border-t border-gray-100 flex flex-col space-y-2">
+                    <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 text-center">Vous êtes dans quelle situation ?</div>
+                    <a href="vehicule-credit.html"
+                        class="bg-red-50 text-gmfRed border border-red-100 px-4 py-2.5 rounded-xl font-bold transition-all text-sm flex items-center">
+                        <i class="fas fa-car mr-2"></i>Je veux un véhicule (Crédit)
+                    </a>
+                    <a href="agregateur-yango.html"
+                        class="bg-blue-50 text-gmfBlue border border-blue-100 px-4 py-2.5 rounded-xl font-bold transition-all text-sm flex items-center">
+                        <i class="fas fa-taxi mr-2"></i>Je conduis déjà sur Yango
+                    </a>
+                    <a href="gestion-flotte.html"
+                        class="bg-green-50 text-green-700 border border-green-100 px-4 py-2.5 rounded-xl font-bold transition-all text-sm flex items-center">
+                        <i class="fas fa-tasks mr-2"></i>Je veux confier ma voiture
+                    </a>
+                    <a href="recrutement-chauffeurs.html"
+                        class="bg-purple-50 text-purple-700 border border-purple-100 px-4 py-2.5 rounded-xl font-bold transition-all text-sm flex items-center">
+                        <i class="fas fa-users mr-2"></i>Je suis chauffeur sans voiture
+                    </a>
                 </div>
             </div>
         </div>
@@ -207,134 +235,194 @@
         </div>
     </section>
 
+    <!-- SITUATION ROUTER SECTION -->
+    <section class="py-12 bg-white relative z-20 -mt-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-gradient-to-r from-gmfBlue to-blue-900 rounded-3xl shadow-2xl p-8 md:p-10 text-white border border-blue-800" data-aos="fade-up">
+            <div class="text-center max-w-3xl mx-auto mb-8">
+                <span class="text-xs font-bold uppercase tracking-widest text-gmfRed bg-white/10 px-3 py-1 rounded-full border border-white/20">Orientation rapide</span>
+                <h2 class="text-3xl md:text-4xl font-black mt-3">Vous êtes dans quelle situation ?</h2>
+                <p class="text-gray-300 text-sm md:text-base mt-2">Accédez directement à la solution GM Fleet conçue pour votre profil.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Option 1 -->
+                <a href="vehicule-credit.html" class="bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20 p-5 rounded-2xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between group">
+                    <div>
+                        <div class="w-10 h-10 rounded-xl bg-gmfRed text-white flex items-center justify-center text-lg font-bold mb-3 shadow-md group-hover:scale-110 transition-transform">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-1 text-white">Je veux un véhicule</h3>
+                        <p class="text-xs text-gray-300 mb-4">Drive to Own · Devenez propriétaire</p>
+                    </div>
+                    <span class="text-xs font-bold text-gmfRed bg-white px-3 py-2 rounded-xl text-center flex items-center justify-center group-hover:bg-red-50 transition-colors">
+                        En savoir plus <i class="fas fa-arrow-right ml-1.5 text-[10px]"></i>
+                    </span>
+                </a>
+
+                <!-- Option 2 -->
+                <a href="agregateur-yango.html" class="bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20 p-5 rounded-2xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between group">
+                    <div>
+                        <div class="w-10 h-10 rounded-xl bg-blue-500 text-white flex items-center justify-center text-lg font-bold mb-3 shadow-md group-hover:scale-110 transition-transform">
+                            <i class="fas fa-taxi"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-1 text-white">Je conduis déjà sur Yango</h3>
+                        <p class="text-xs text-gray-300 mb-4">Agrégateur Yango · Gardez votre voiture</p>
+                    </div>
+                    <span class="text-xs font-bold text-gmfBlue bg-white px-3 py-2 rounded-xl text-center flex items-center justify-center group-hover:bg-blue-50 transition-colors">
+                        Découvrir les avantages <i class="fas fa-arrow-right ml-1.5 text-[10px]"></i>
+                    </span>
+                </a>
+
+                <!-- Option 3 -->
+                <a href="gestion-flotte.html" class="bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20 p-5 rounded-2xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between group">
+                    <div>
+                        <div class="w-10 h-10 rounded-xl bg-green-500 text-white flex items-center justify-center text-lg font-bold mb-3 shadow-md group-hover:scale-110 transition-transform">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-1 text-white">Je veux confier ma voiture</h3>
+                        <p class="text-xs text-gray-300 mb-4">Gestion de flotte · Suivi sur mobile</p>
+                    </div>
+                    <span class="text-xs font-bold text-green-700 bg-white px-3 py-2 rounded-xl text-center flex items-center justify-center group-hover:bg-green-50 transition-colors">
+                        Faire travailler ma voiture <i class="fas fa-arrow-right ml-1.5 text-[10px]"></i>
+                    </span>
+                </a>
+
+                <!-- Option 4 -->
+                <a href="recrutement-chauffeurs.html" class="bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20 p-5 rounded-2xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between group">
+                    <div>
+                        <div class="w-10 h-10 rounded-xl bg-purple-500 text-white flex items-center justify-center text-lg font-bold mb-3 shadow-md group-hover:scale-110 transition-transform">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-1 text-white">Je suis chauffeur sans voiture</h3>
+                        <p class="text-xs text-gray-300 mb-4">Chauffeur Partenaire · Évolution 12 mois</p>
+                    </div>
+                    <span class="text-xs font-bold text-purple-700 bg-white px-3 py-2 rounded-xl text-center flex items-center justify-center group-hover:bg-purple-50 transition-colors">
+                        Découvrir le programme <i class="fas fa-arrow-right ml-1.5 text-[10px]"></i>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </section>
+
     <!-- SERVICES SECTION -->
-    <section id="services" class="py-20 bg-white border-t border-gray-100">
+    <section id="services" class="py-20 bg-gray-50 border-t border-gray-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 class="text-4xl font-extrabold text-gmfBlue mb-4" data-aos="fade-up">Nos <span class="text-gmfRed">Services</span></h2>
-            <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-16" data-aos="fade-up" data-aos-delay="100">Des solutions sur mesure pour les chauffeurs et les propriétaires de véhicules.</p>
-
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-16" data-aos="fade-up" data-aos-delay="100">Découvrez l'écosystème complet GM Fleet avant de faire votre choix.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-                <!-- Service 1 -->
-                <div class="bg-gray-50 p-8 rounded-3xl shadow-sm border border-gray-200 hover:shadow-lg transition-all relative group flex flex-col h-full text-left" data-aos="zoom-in" data-aos-delay="100">
+                <!-- Discovery Card 1: Véhicule à crédit -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-200 hover:shadow-xl transition-all relative group flex flex-col h-full text-left" data-aos="zoom-in" data-aos-delay="100">
                     <div class="absolute top-0 left-0 w-full h-2 bg-gmfRed transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-                    <i class="fas fa-car text-5xl text-gmfBlue mb-6 mt-2 group-hover:scale-110 transition-transform origin-left"></i>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Véhicule à crédit</h3>
-                    <p class="text-gray-600 mb-6 flex-grow">Obtenez un véhicule à crédit grâce à notre programme et devenez-en pleinement propriétaire au terme de votre contrat. Une opportunité sur-mesure pour développer votre activité et bâtir votre propre avenir.</p>
+                    <div class="w-14 h-14 rounded-2xl bg-red-50 text-gmfRed flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-car text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Véhicule à crédit</h3>
+                    <p class="text-gmfRed font-bold text-sm mb-4">Conduisez. Remboursez. Devenez propriétaire.</p>
+                    <p class="text-gray-600 text-sm mb-6 flex-grow">Un programme structuré de financement avec partenaire bancaire pour acquérir votre propre voiture tout en travaillant sur le réseau Yango.</p>
                     
-                    <div class="border-t border-gray-200 pt-6 mt-auto">
-                        <h4 class="font-bold text-gray-900 mb-4 uppercase text-xs tracking-wider">Avantages & Offres :</h4>
+                    <div class="border-t border-gray-100 pt-6 mt-auto">
                         <ul class="space-y-3 mb-6">
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-gmfRed mt-1 mr-3"></i>
-                                <span class="text-gray-600 text-sm">Apport initial de 20%</span>
+                            <li class="flex items-center text-sm text-gray-700">
+                                <i class="fas fa-check-circle text-gmfRed mr-2.5 text-base"></i>
+                                <span>Apport à partir de 20 %</span>
                             </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-gmfRed mt-1 mr-3"></i>
-                                <span class="text-gray-600 text-sm">Véhicule de qualité et assuré</span>
+                            <li class="flex items-center text-sm text-gray-700">
+                                <i class="fas fa-check-circle text-gmfRed mr-2.5 text-base"></i>
+                                <span>Suivi GM Fleet continu</span>
                             </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-gmfRed mt-1 mr-3"></i>
-                                <span class="text-gray-600 text-sm">Accompagnement continu</span>
+                            <li class="flex items-center text-sm text-gray-700">
+                                <i class="fas fa-check-circle text-gmfRed mr-2.5 text-base"></i>
+                                <span>Programme Drive to Own</span>
                             </li>
                         </ul>
-                        <a href="detail-vehicule.html" class="block w-full bg-gmfRed text-white text-center font-bold py-3 rounded-xl transition-all hover:bg-red-700 mt-auto">
-                            Postuler
+                        <a href="vehicule-credit.html" class="block w-full bg-gmfRed text-white text-center font-bold py-3.5 rounded-xl transition-all hover:bg-red-700 shadow-md">
+                            En savoir plus <i class="fas fa-arrow-right ml-1"></i>
                         </a>
                     </div>
                 </div>
 
-                <!-- Service 2 -->
-                <div class="bg-gray-50 p-8 rounded-3xl shadow-sm border border-gray-200 hover:shadow-lg transition-all relative group flex flex-col h-full text-left" data-aos="zoom-in" data-aos-delay="200">
+                <!-- Discovery Card 2: Agrégateur Yango -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-200 hover:shadow-xl transition-all relative group flex flex-col h-full text-left" data-aos="zoom-in" data-aos-delay="200">
                     <div class="absolute top-0 left-0 w-full h-2 bg-gmfBlue transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-                    <i class="fas fa-taxi text-5xl text-gmfRed mb-6 mt-2 group-hover:scale-110 transition-transform origin-left"></i>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Agrégateur Yango</h3>
-                    <p class="text-gray-600 mb-6 flex-grow">Vous êtes chauffeur Yango et souhaitez booster votre activité ? Rejoignez-nous via notre service d'agrégateur pour bénéficier de notre encadrement, d'un support dédié et maximiser votre rentabilité.</p>
+                    <div class="w-14 h-14 rounded-2xl bg-blue-50 text-gmfBlue flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-taxi text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Agrégateur Yango</h3>
+                    <p class="text-gmfBlue font-bold text-sm mb-4">Vous conduisez déjà ? Passez chez GM Fleet.</p>
+                    <p class="text-gray-600 text-sm mb-6 flex-grow">Bénéficiez de conditions de retrait avantageuses, de promotions et de l'écosystème GM Fleet sans céder la gestion de votre véhicule.</p>
                     
-                    <div class="border-t border-gray-200 pt-6 mt-auto">
-                        <h4 class="font-bold text-gray-900 mb-4 uppercase text-xs tracking-wider">Avantages & Offres :</h4>
+                    <div class="border-t border-gray-100 pt-6 mt-auto">
                         <ul class="space-y-3 mb-6">
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-gmfBlue mt-1 mr-3"></i>
-                                <span class="text-gray-600 text-sm">Inscription rapide et facilitée</span>
+                            <li class="flex items-center text-sm text-gray-700">
+                                <i class="fas fa-check-circle text-gmfBlue mr-2.5 text-base"></i>
+                                <span>Votre véhicule reste sous votre gestion</span>
                             </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-gmfBlue mt-1 mr-3"></i>
-                                <span class="text-gray-600 text-sm">Conseils pour augmenter la rentabilité</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-gmfBlue mt-1 mr-3"></i>
-                                <span class="text-gray-600 text-sm">Support technique et administratif</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-gmfBlue mt-1 mr-3"></i>
-                                <span class="text-gray-600 text-sm">Possibilité de prendre un crédit (pour les bons chauffeurs)</span>
+                            <li class="flex items-center text-sm text-gray-700">
+                                <i class="fas fa-check-circle text-gmfBlue mr-2.5 text-base"></i>
+                                <span>Profitez des avantages de notre réseau</span>
                             </li>
                         </ul>
-                        <a href="detail-service.html?service=Agrégateur Yango" class="block w-full bg-gmfBlue text-white text-center font-bold py-3 rounded-xl transition-all hover:bg-blue-900 mt-auto">
-                            Postuler
+                        <a href="agregateur-yango.html" class="block w-full bg-gmfBlue text-white text-center font-bold py-3.5 rounded-xl transition-all hover:bg-blue-900 shadow-md">
+                            Découvrir les avantages <i class="fas fa-arrow-right ml-1"></i>
                         </a>
                     </div>
                 </div>
 
-                <!-- Service 3 -->
-                <div class="bg-gray-50 p-8 rounded-3xl shadow-sm border border-gray-200 hover:shadow-lg transition-all relative group flex flex-col h-full text-left" data-aos="zoom-in" data-aos-delay="300">
+                <!-- Discovery Card 3: Gestion de flotte -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-200 hover:shadow-xl transition-all relative group flex flex-col h-full text-left" data-aos="zoom-in" data-aos-delay="300">
                     <div class="absolute top-0 left-0 w-full h-2 bg-green-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-                    <i class="fas fa-tasks text-5xl text-gmfBlue mb-6 mt-2 group-hover:scale-110 transition-transform origin-left"></i>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Gestion de flotte</h3>
-                    <p class="text-gray-600 mb-6 flex-grow">Propriétaire d'un véhicule ? Confiez-nous sa gestion de A à Z. Nous nous chargeons de lui assigner un chauffeur qualifié, d'assurer son suivi rigoureux et de vous garantir des revenus réguliers.</p>
+                    <div class="w-14 h-14 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-tasks text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Gestion de flotte</h3>
+                    <p class="text-green-600 font-bold text-sm mb-4">Votre voiture peut travailler pour vous.</p>
+                    <p class="text-gray-600 text-sm mb-6 flex-grow">Confiez votre voiture à GM Fleet : nous recrutons le chauffeur, l'équipons (GPS, DashCam) et gérons tout l'opérationnel pour vous.</p>
                     
-                    <div class="border-t border-gray-200 pt-6 mt-auto">
-                        <h4 class="font-bold text-gray-900 mb-4 uppercase text-xs tracking-wider">Avantages & Offres :</h4>
+                    <div class="border-t border-gray-100 pt-6 mt-auto">
                         <ul class="space-y-3 mb-6">
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
-                                <span class="text-gray-600 text-sm">Revenus passifs garantis</span>
+                            <li class="flex items-start text-sm text-gray-700">
+                                <i class="fas fa-check-circle text-green-500 mt-0.5 mr-2.5 text-base flex-shrink-0"></i>
+                                <span>Revenus mensuels selon la catégorie et les conditions d’exploitation</span>
                             </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
-                                <span class="text-gray-600 text-sm">Suivi rigoureux de l'état du véhicule</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
-                                <span class="text-gray-600 text-sm">Transparence totale des comptes</span>
+                            <li class="flex items-start text-sm text-gray-700">
+                                <i class="fas fa-check-circle text-green-500 mt-0.5 mr-2.5 text-base flex-shrink-0"></i>
+                                <span>Chauffeur + Yango + technologie + suivi</span>
                             </li>
                         </ul>
-                        <a href="detail-service.html?service=Gestion de flotte" class="block w-full bg-green-500 text-white text-center font-bold py-3 rounded-xl transition-all hover:bg-green-600 mt-auto">
-                            Postuler
+                        <a href="gestion-flotte.html" class="block w-full bg-green-600 text-white text-center font-bold py-3.5 rounded-xl transition-all hover:bg-green-700 shadow-md">
+                            Faire travailler ma voiture <i class="fas fa-arrow-right ml-1"></i>
                         </a>
                     </div>
                 </div>
 
-                <!-- Service 4 -->
-                <div class="bg-gray-50 p-8 rounded-3xl shadow-sm border border-gray-200 hover:shadow-lg transition-all relative group flex flex-col h-full text-left" data-aos="zoom-in" data-aos-delay="400">
+                <!-- Discovery Card 4: Chauffeurs partenaires -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-200 hover:shadow-xl transition-all relative group flex flex-col h-full text-left" data-aos="zoom-in" data-aos-delay="400">
                     <div class="absolute top-0 left-0 w-full h-2 bg-purple-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-                    <i class="fas fa-users text-5xl text-gmfRed mb-6 mt-2 group-hover:scale-110 transition-transform origin-left"></i>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Recrutement des chauffeurs</h3>
-                    <p class="text-gray-600 mb-6 flex-grow">Vous êtes un chauffeur professionnel cherchant de bonnes opportunités ? Nous recrutons pour conduire les véhicules de nos partenaires en gestion de flotte. Intégrez un réseau sérieux et profitez de conditions optimales.</p>
+                    <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-users text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Chauffeurs partenaires</h3>
+                    <p class="text-purple-600 font-bold text-sm mb-4">Pas de voiture ? Commencez avec la nôtre.</p>
+                    <p class="text-gray-600 text-sm mb-6 flex-grow">Conduisez un véhicule d'un propriétaire partenaire. Prouvez votre sérieux et ouvrez la voie vers votre propre véhicule financé.</p>
                     
-                    <div class="border-t border-gray-200 pt-6 mt-auto">
-                        <h4 class="font-bold text-gray-900 mb-4 uppercase text-xs tracking-wider">Avantages & Offres :</h4>
+                    <div class="border-t border-gray-100 pt-6 mt-auto">
                         <ul class="space-y-3 mb-6">
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-purple-500 mt-1 mr-3"></i>
-                                <span class="text-gray-600 text-sm">Accès immédiat à un véhicule géré par nos soins</span>
+                            <li class="flex items-start text-sm text-gray-700">
+                                <i class="fas fa-check-circle text-purple-500 mt-0.5 mr-2.5 text-base flex-shrink-0"></i>
+                                <span>Conduisez un véhicule GM Fleet</span>
                             </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-purple-500 mt-1 mr-3"></i>
-                                <span class="text-gray-600 text-sm">Conditions de travail transparentes et équitables</span>
+                            <li class="flex items-start text-sm text-gray-700">
+                                <i class="fas fa-check-circle text-purple-500 mt-0.5 mr-2.5 text-base flex-shrink-0"></i>
+                                <span>Possibilité d’être affecté à un véhicule après validation</span>
                             </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-purple-500 mt-1 mr-3"></i>
-                                <span class="text-gray-600 text-sm">Formation continue et accompagnement dédié</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-purple-500 mt-1 mr-3"></i>
-                                <span class="text-gray-600 text-sm">Accès facilité au programme "Véhicule à crédit" pour les meilleurs chauffeurs</span>
+                            <li class="flex items-start text-sm text-gray-700">
+                                <i class="fas fa-check-circle text-purple-500 mt-0.5 mr-2.5 text-base flex-shrink-0"></i>
+                                <span>Après 12 mois, progression vers Drive to Own</span>
                             </li>
                         </ul>
-                        <a href="detail-service.html?service=Recrutement des chauffeurs" class="block w-full bg-purple-500 text-white text-center font-bold py-3 rounded-xl transition-all hover:bg-purple-600 mt-auto">
-                            Postuler
+                        <a href="recrutement-chauffeurs.html" class="block w-full bg-purple-600 text-white text-center font-bold py-3.5 rounded-xl transition-all hover:bg-purple-700 shadow-md">
+                            Découvrir le programme <i class="fas fa-arrow-right ml-1"></i>
                         </a>
                     </div>
                 </div>
