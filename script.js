@@ -476,16 +476,16 @@ async function submitServiceForm(e) {
         specificData.carChassis = document.getElementById('flotteCarChassis')?.value || '';
         specificData.carteRoseFileName = document.getElementById('flotteCarteRose')?.files[0]?.name || '';
         specificData.photosCount = document.getElementById('flottePhotos')?.files?.length || 0;
-    } else if (serviceName === 'Recrutement') {
-        specificData.experience = document.getElementById('recrutementExperience')?.value || '';
-        specificData.permisFileName = document.getElementById('recrutementPermis')?.files[0]?.name || '';
+    } else if (serviceName === 'Recrutement' || serviceName === 'Recrutement Chauffeur') {
+        specificData.experience = document.getElementById('recrutementExperience')?.value || document.getElementById('applicantExperience')?.value || '';
+        specificData.permisFileName = document.getElementById('recrutementPermis')?.files[0]?.name || document.getElementById('applicantDocument')?.files[0]?.name || '';
         specificData.cvFileName = document.getElementById('recrutementCV')?.files[0]?.name || '';
     }
 
     const newApp = {
-        name: document.getElementById('applicantName') ? document.getElementById('applicantName').value.trim() : 'Client',
+        name: document.getElementById('applicantName')?.value.trim() || [document.getElementById('applicantFirstName')?.value.trim(), document.getElementById('applicantLastName')?.value.trim()].filter(Boolean).join(' '),
         phone: document.getElementById('applicantPhone') ? document.getElementById('applicantPhone').value.trim() : '',
-        address: document.getElementById('applicantAddress') ? document.getElementById('applicantAddress').value.trim() : '',
+        address: document.getElementById('applicantAddress')?.value.trim() || document.getElementById('applicantCommune')?.value.trim() || '',
         service: serviceName,
         ...specificData,
         date: new Date().toLocaleDateString('fr-FR'),
@@ -495,17 +495,17 @@ async function submitServiceForm(e) {
 
     try {
         if (window.GMFleetBackend?.isConfigured()) {
-            await window.GMFleetBackend.createApplication(newApp); // Or a specific createServiceApplication function if needed
+            await window.GMFleetBackend.createApplication(newApp);
         } else {
-            let applications = JSON.parse(localStorage.getItem('gmfleet_service_apps') || '[]');
-            applications.push({ id: Date.now(), ...newApp });
-            localStorage.setItem('gmfleet_service_apps', JSON.stringify(applications));
+            let applications = JSON.parse(localStorage.getItem('gmfleet_apps') || '[]');
+            applications.push({ id: Date.now(), ...newApp, vehicle: newApp.service });
+            localStorage.setItem('gmfleet_apps', JSON.stringify(applications));
         }
 
         const successServiceName = document.getElementById('successServiceName');
         if (successServiceName) successServiceName.textContent = serviceName;
 
-        const successModal = document.getElementById('serviceSuccessModalOverlay');
+        const successModal = document.getElementById('serviceSuccessModalOverlay') || document.getElementById('successModalOverlay');
         if (successModal) {
             successModal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
@@ -516,7 +516,7 @@ async function submitServiceForm(e) {
         // Reset state
         const selOptions = document.getElementById('generalServiceSelect');
         if (selOptions) selOptions.value = "";
-        handleServiceSelect("");
+        if (selOptions) handleServiceSelect("");
     } catch (error) {
         console.error('Erreur Supabase:', error);
         alert("Impossible d'envoyer la candidature pour le moment. Réessayez.");

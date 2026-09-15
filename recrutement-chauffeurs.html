@@ -264,7 +264,7 @@
                     <p class="text-gray-600 text-sm md:text-base mt-2">Remplissez ce formulaire pour soumettre votre candidature. Nous étudions les profils chaque semaine.</p>
                 </div>
 
-                <form id="applicationForm" class="space-y-6" onsubmit="submitForm(event)">
+                <form id="serviceApplicationForm" class="space-y-6" onsubmit="submitServiceForm(event)">
                     <input type="hidden" id="selectedService" name="service" value="Recrutement Chauffeur">
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -376,18 +376,6 @@
     <script src="supabase-config.js"></script>
     <script src="supabaseClient.js"></script>
     <script src="script.js"></script>
-    <script>
-        // Form handling functions specific to this page can be added here or in script.js
-        function submitForm(event) {
-            event.preventDefault();
-            // Show modal for demonstration (actual submission via Supabase in script.js)
-            document.getElementById('successModalOverlay').classList.remove('hidden');
-        }
-
-        function closeSuccessModal() {
-            document.getElementById('successModalOverlay').classList.add('hidden');
-        }
-    </script>
 </body>
 
 </html>

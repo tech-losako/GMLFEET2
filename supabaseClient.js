@@ -28,7 +28,14 @@
         return new Date(`${value}T00:00:00`).toLocaleDateString('fr-FR');
     };
 
+    const serviceFields = ['email', 'idNumber', 'carBrand', 'carModel', 'carPlate',
+        'carYear', 'carChassis', 'permisFileName', 'carteRoseFileName', 'photosCount', 'cvFileName'];
+
     const appFromDb = (row) => ({
+        ...Object.fromEntries(serviceFields.filter(key => row.service_details?.[key] !== undefined)
+            .map(key => [key, row.service_details[key]])),
+        type: row.application_type || 'vehicle',
+        service: row.service || '',
         id: row.id,
         name: row.name,
         phone: row.phone,
@@ -38,7 +45,7 @@
         coBorrowerPhone: row.co_borrower_phone || '',
         coBorrowerAddress: row.co_borrower_address || '',
         duration: row.plan_duration_months ? String(row.plan_duration_months) : '',
-        vehicle: row.vehicle,
+        vehicle: row.service || row.vehicle || '',
         date: toFrDate(row.created_on),
         status: row.status,
         note: row.note || '',
@@ -54,11 +61,15 @@
         co_borrower_phone: app.coBorrowerPhone || null,
         co_borrower_address: app.coBorrowerAddress || null,
         plan_duration_months: app.duration ? Number(app.duration) : null,
-        vehicle: app.vehicle,
+        vehicle: app.vehicle || app.service || '',
+        application_type: app.service ? 'service' : 'vehicle',
+        service: app.service || null,
+        service_details: Object.fromEntries(serviceFields.filter(key => app[key] !== undefined)
+            .map(key => [key, app[key]])),
         created_on: toIsoDate(app.date),
         status: app.status || 'En attente',
         note: app.note || null,
-        license_file_name: app.licenseFileName || null
+        license_file_name: app.licenseFileName || app.permisFileName || null
     });
 
     const vehicleFromDb = (row) => ({
