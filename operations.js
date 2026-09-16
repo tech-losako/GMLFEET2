@@ -48,7 +48,9 @@
  }
  function render() {
   document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===state.view));
-  $('pageTitle').textContent={overview:'Tableau de bord',applications:'Candidatures',appointments:'Rendez-vous'}[state.view];
+  $('pageTitle').textContent={overview:'Tableau de bord',applications:'Candidatures',appointments:'Rendez-vous',contracts:'Contrats & véhicules',payments:'Caisse / versements',reconciliation:'Rapprochement LOLC'}[state.view];
+  document.getElementById('newApplication').hidden=['contracts','payments','reconciliation'].includes(state.view);
+  if(['contracts','payments','reconciliation'].includes(state.view)) { window.GMFleetFinance.render(state.view,{db,escape,date,person,notify,rows,staff:state.staff,user:state.user,apps:state.apps}); return; }
   if(state.view==='overview') renderOverview();
   else if(state.view==='applications') renderApplications();
   else renderAppointments();
@@ -208,7 +210,7 @@
    $('today').textContent=new Intl.DateTimeFormat('fr-FR',{dateStyle:'full',timeZone:'Africa/Kinshasa'}).format(new Date());
    await reload();$('access').hidden=true;$('workspace').hidden=false;
    db.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT')location.replace('/login.html');});
-   setInterval(async()=>{if(document.hidden||$('caseDialog').open||$('intake').open)return;try{await reload();}catch(e){notify('Actualisation interrompue. '+fail(e),true);}},60000);
+   setInterval(async()=>{if(document.hidden||document.querySelector('dialog[open]'))return;try{await reload();}catch(e){notify('Actualisation interrompue. '+fail(e),true);}},60000);
   } catch(e) {$('access').innerHTML=`<h1>Connexion indisponible</h1><p>${escape(fail(e))}</p><button class="secondary" id="retry">Réessayer</button>`;$('retry').onclick=()=>location.reload();}
  }
  init();
