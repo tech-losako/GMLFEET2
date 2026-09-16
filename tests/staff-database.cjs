@@ -155,6 +155,34 @@ const assert=require('node:assert/strict');
  await rpc('manage_staff',{...staffPayload,role:'agent',revision:4});
  await assert.rejects(()=>as('authenticated',other,'select public.list_staff_accounts()'),/Super Admin/);
  console.log('PASS: super-admin bootstrap, staff creation, role restrictions, stale update rejection, self-lockout protection, immediate disabling, reactivation, audit privacy, finance permissions.');
+
+ await db.exec('reset role; create role service_role;');
+ await db.exec(fs.readFileSync(require('node:path').join(__dirname,'../supabase/migrations/20260916142620_staff_email_and_removal.sql'),'utf8'));
+ await assert.rejects(()=>rpc('delete_staff',{user_id:admin,revision:1}),/propre compte/);
+ await assert.rejects(()=>rpc('delete_staff',{user_id:admin,revision:1},other),/Super Admin/);
+ await assert.rejects(()=>rpc('begin_staff_email',{user_id:other,revision:5,email:'invalid'}),/invalide/);
+ await assert.rejects(()=>rpc('begin_staff_email',{user_id:other,revision:4,email:'corrected@example.test'}),/changé/);
+ const job=await rpc('begin_staff_email',{user_id:other,revision:5,email:'corrected@example.test'});
+ assert.equal(job.new_email,'corrected@example.test');
+ assert.equal((await rpc('begin_staff_email',{user_id:other,revision:5,email:'corrected@example.test'})).id,job.id);
+ await assert.rejects(()=>rpc('manage_staff',{...staffPayload,revision:5}),/en cours/);
+ await assert.rejects(()=>rpc('delete_staff',{user_id:other,revision:5}),/modification e-mail/);
+ await assert.rejects(()=>rpc('begin_staff_email',{user_id:other,revision:5,email:'different@example.test'}),/déjà en cours/);
+ await assert.rejects(()=>as('authenticated',admin,`select public.finish_staff_email('${job.id}')`),/permission denied/);
+ await db.exec('reset role');await db.query('update auth.users set email=$1 where id=$2',['corrected@example.test',other]);
+ const finished=(await as('service_role',null,`select public.finish_staff_email('${job.id}') as result`)).rows[0].result;
+ assert.equal(finished.state,'completed');assert.equal(finished.revision,6);
+ const failed=await rpc('begin_staff_email',{user_id:other,revision:6,email:'duplicate@example.test'});
+ assert.equal((await as('service_role',null,`select public.finish_staff_email('${failed.id}') as result`)).rows[0].result.state,'failed');
+ await assert.rejects(()=>rpc('delete_staff',{user_id:other,revision:6}),/changé/);
+ await rpc('delete_staff',{user_id:other,revision:7});
+ assert.equal((await members()).rows[0].members.some(x=>x.user_id===other),false);
+ assert.equal((await as('authenticated',other,'select * from applications')).rows.length,0);
+ await assert.rejects(()=>rpc('manage_staff',{...staffPayload,revision:8}),/supprimé/);
+ assert.ok((await as('authenticated',admin,'select * from staff_events')).rows.some(e=>e.action==='deleted'));
+ console.log('PASS: protected deletion, removed-account access denial and no revival; email validation, retry, concurrent edit blocking, server-only completion and audit.');
+
  await db.close();
 })().catch(e=>{console.error(e);process.exit(1)});
+
 

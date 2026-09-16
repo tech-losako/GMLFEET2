@@ -9,10 +9,10 @@ function staffFixture(){
   const db=make(...args),me=window.fixtureTables.staff_members[0];
   me.role=window.testRole||'super_admin';me.email='owner@example.test';me.confirmed=true;me.revision=1;
   db.rpc=async(name,{p}={})=>{
-   if(name==='list_staff_accounts')return {data:window.fixtureTables.staff_members,error:null};
-   const member=window.fixtureTables.staff_members.find(s=>s.user_id===p.user_id);Object.assign(member,p,{revision:member.revision+1});return {data:member.user_id,error:null};
+   if(name==='list_staff_accounts')return {data:window.fixtureTables.staff_members.filter(s=>!s.deleted_at),error:null};
+   const member=window.fixtureTables.staff_members.find(s=>s.user_id===p.user_id);Object.assign(member,p,{revision:member.revision+1});if(name==='delete_staff'){member.deleted_at=new Date().toISOString();member.active=false;}return {data:member.user_id,error:null};
   };
-  db.functions={invoke:async(name,{body})=>{const id=crypto.randomUUID();window.fixtureTables.staff_members.push({...body,user_id:id,active:true,confirmed:false,revision:1});return {data:{email:body.email,link:'https://gmfleet.georgemichaellogistics.cd/set-password.html#token_hash=test-only'},error:null};}};
+  db.functions={invoke:async(name,{body})=>{if(name==='staff-email'){const member=window.fixtureTables.staff_members.find(s=>s.user_id===body.user_id);member.email=body.email;member.revision++;return {data:{email:member.email,revision:member.revision},error:null};}const id=crypto.randomUUID();window.fixtureTables.staff_members.push({...body,user_id:id,active:true,confirmed:false,revision:1});return {data:{email:body.email,link:'https://gmfleet.georgemichaellogistics.cd/set-password.html#token_hash=test-only'},error:null};}};
   db.auth.verifyOtp=async p=>{window.verifiedToken=p;return {error:null};};
   db.auth.updateUser=async p=>{window.passwordUpdated=!!p.password;return {error:null};};
   return db;
@@ -30,7 +30,8 @@ function staffFixture(){
   await page.locator('[name=display_name]').fill('Cashier Test');await page.locator('#userForm [name=email]').fill('cashier@example.test');await page.locator('[name=role]').selectOption('cashier');await page.locator('#userForm [type=submit]').click();
   await page.locator('#invitationLink').waitFor();assert.ok((await page.locator('#invitationLink').inputValue()).includes('#token_hash='));
   await page.locator('[data-close=userDialog]').click();assert.equal(await page.locator('#invitationLink').count(),0);
-  await page.locator('[data-edit-user]').last().click();await page.locator('[name=active]').selectOption('false');await page.locator('#userForm [type=submit]').click();await page.locator('#content').getByText('Désactivé',{exact:true}).waitFor();
+  await page.locator('[data-edit-user]').last().click();await page.locator('#userForm [name=email]').fill('corrected@example.test');await page.locator('[name=active]').selectOption('false');await page.locator('#userForm [type=submit]').click();await page.locator('#content').getByText('Désactivé',{exact:true}).waitFor();
+  await page.getByText('corrected@example.test',{exact:true}).waitFor();await page.locator('[data-delete-user]').click();await page.locator('[data-close=userDialog]').first().click();assert.equal(await page.locator('[data-delete-user]').count(),1);await page.locator('[data-delete-user]').click();await page.locator('[name=confirmation]').fill('SUPPRIMER');await page.locator('#deleteUserForm [type=submit]').click();await page.getByText('1 utilisateur(s)',{exact:true}).waitFor();assert.equal(await page.locator('[data-delete-user]').count(),0);
   await page.locator('[data-edit-user]').first().click();assert.equal(await page.locator('[name=role]').isDisabled(),true);assert.equal(await page.locator('[name=active]').isDisabled(),true);await page.locator('[data-close=userDialog]').click();
   await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   await page.screenshot({path:path.join(__dirname,'staff-mobile.png'),fullPage:true});

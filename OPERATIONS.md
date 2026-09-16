@@ -61,3 +61,9 @@ The existing admin@losakoholding.cd account is now Super Admin. Open `/admin`, t
 - No staff accounts were created during deployment. Browser/Edge tests use fixtures; database tests use isolated PostgreSQL. Authenticated production invitation acceptance still needs a real staff member's first use.
 
 Verification: `tests/staff-database.cjs`, `tests/staff-browser.cjs`, `tests/staff-edge.cjs`; finance browser regression also passes. Set `PGLITE_MODULE` and `PLAYWRIGHT_MODULE` as for the existing test suite.
+
+### Email editing and removal
+- **Modifier** includes the login email. The `staff-email` Edge Function uses Auth Admin `updateUserById`; pending email operations can be retried. Another staff edit or deletion is blocked while an email operation is pending. Email and profile changes are separate operations; if the latter fails, the UI retains and reports the successful email change.
+- **Supprimer** requires typing SUPPRIMER, rejects self-deletion, removes the staff entry from the management list and permanently revokes its staff access. This is a logical staff deletion: the Auth identity and records remain for transaction/audit references, and the email is not freed for a new identity. No destructive Auth deletion or record cascade is performed.
+- Deleted entries cannot be reactivated through the normal staff RPC. Email operations and deletions are audited. Only the service role can finish an email operation, and completion checks the actual Auth email.
+- Added tests cover deletion, no self-deletion, denied access after deletion, no resurrection, email validation, retry/concurrent mutation blocking, duplicate-email errors, and service-only finalization. No production accounts were changed during verification.
