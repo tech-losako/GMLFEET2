@@ -42,15 +42,17 @@
    rows('appointments',q=>q.order('starts_at').order('id')),
    rows('staff_members',q=>q.eq('active',true).order('display_name').order('user_id'))]);
   Object.assign(state,{apps,appointments,staff});
+  $('usersNav').hidden=!staff.some(s=>s.user_id===state.user.id&&s.role==='super_admin');
   $('navCount').textContent=apps.filter(a=>a.workflow_stage==='new').length;
   $('syncStatus').textContent='Dernière actualisation : '+date(new Date().toISOString(),true)+' · Heure de Kinshasa';
   render();
  }
  function render() {
   document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===state.view));
-  $('pageTitle').textContent={overview:'Tableau de bord',applications:'Candidatures',appointments:'Rendez-vous',contracts:'Contrats & véhicules',payments:'Caisse / versements',reconciliation:'Rapprochement LOLC'}[state.view];
-  document.getElementById('newApplication').hidden=['contracts','payments','reconciliation'].includes(state.view);
+  $('pageTitle').textContent={overview:'Tableau de bord',applications:'Candidatures',appointments:'Rendez-vous',contracts:'Contrats & véhicules',payments:'Caisse / versements',reconciliation:'Rapprochement LOLC',users:'Utilisateurs'}[state.view];
+  document.getElementById('newApplication').hidden=['users','contracts','payments','reconciliation'].includes(state.view);
   if(['contracts','payments','reconciliation'].includes(state.view)) { window.GMFleetFinance.render(state.view,{db,escape,date,person,notify,rows,staff:state.staff,user:state.user,apps:state.apps}); return; }
+  if(state.view==='users') {window.GMFleetUsers.render({db,escape,notify,staff:state.staff,user:state.user});return;}
   if(state.view==='overview') renderOverview();
   else if(state.view==='applications') renderApplications();
   else renderAppointments();
