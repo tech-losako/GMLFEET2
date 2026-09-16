@@ -166,12 +166,7 @@
     <script>
         // Check if already logged in
         (async function redirectAuthenticatedAdmin() {
-            if (!window.GMFleetBackend?.isConfigured()) {
-                if (localStorage.getItem('gmfleet_admin_logged') === 'true') {
-                    window.location.href = 'admin.html';
-                }
-                return;
-            }
+            if (!window.GMFleetBackend?.isConfigured()) return;
 
             const { data } = await window.GMFleetBackend.getSession();
             if (data.session) window.location.href = 'admin.html';
@@ -214,12 +209,7 @@
                 if (window.GMFleetBackend?.isConfigured()) {
                     const { error } = await window.GMFleetBackend.signIn(email, password);
                     if (error) throw error;
-                } else if (email === 'admin@gmfleet.cd' && password === 'admin123') {
-                    localStorage.setItem('gmfleet_admin_logged', 'true');
-                    localStorage.setItem('gmfleet_admin_name', 'Admin GMFLEET');
-                } else {
-                    throw new Error('Identifiants incorrects');
-                }
+                } else { throw new Error('Service de connexion indisponible.'); }
 
                 btn.innerHTML = '<i class="fas fa-check mr-2"></i> Connecté !';
                 btn.classList.remove('bg-gmfRed', 'hover:bg-red-700');

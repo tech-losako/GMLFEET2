@@ -1,0 +1,4 @@
+supabase/.temp/
+node_modules/
+work/
+tests/*.png
