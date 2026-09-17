@@ -65,12 +65,11 @@ Deno.serve(async req=>{
   }
   if(req.method!=='POST')return reply(405,{error:'Méthode non autorisée'});
   const raw=await req.text();if(raw.length>5000)return reply(400,{error:'Requête trop longue'});const p=JSON.parse(raw);
-  if(p.action==='phone-login'){
-   const caller=createClient(supabaseUrl,Deno.env.get('SUPABASE_ANON_KEY')!,{global:{headers:{Authorization:req.headers.get('Authorization')||''}},auth:{persistSession:false,autoRefreshToken:false}});
-   const {data:identity,error}=await caller.auth.getUser();
-   if(error||!identity.user?.phone_confirmed_at||!identity.user.phone)return reply(401,{error:'Vérifiez votre numéro par SMS.'});
+  if(p.action==='driver-lookup'){
+   if(typeof p.phone!=='string'||p.phone.length>30||typeof p.plate!=='string'||p.plate.length>40)return reply(400,{error:'Téléphone et plaque requis.'});
    const token=secretToken();
-   await rpc(db,'issue_driver_phone_access',{p:{user_id:identity.user.id,token_hash:await hash(token)}});
+   const result=await rpc(db,'issue_driver_plate_access',{p:{phone:p.phone,plate:p.plate,token_hash:await hash(token),ip_hash:await hash(req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()||'unknown')}});
+   if(!result.ok)return reply(result.limited?429:400,{error:result.error});
    return reply(200,{token});
   }
   if(['health','staff-check'].includes(p.action)){
@@ -84,6 +83,7 @@ Deno.serve(async req=>{
   }
   if(typeof p.token!=='string'||!/^[a-f0-9]{64}$/.test(p.token))return reply(401,{error:'Ouvrez votre lien de paiement personnel fourni par GM Fleet.'});
   const tokenHash=await hash(p.token),context=await rpc(db,'driver_payment_context',{token:tokenHash});
+  if(p.action==='receipt')return reply(200,await rpc(db,'driver_payment_receipt',{p:{token_hash:tokenHash,receipt_id:p.receipt_id}}));
   if(p.action==='context')return reply(200,context);
   if(p.action==='check'){
    const {data:attempt}=await db.from('araka_attempts').select('*').eq('id',p.id).eq('contract_id',context.contract_id).maybeSingle();if(!attempt)return reply(404,{error:'Paiement introuvable'});
