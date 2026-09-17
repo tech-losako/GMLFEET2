@@ -1,0 +1,2 @@
+[functions.araka-payments]
+verify_jwt = false

@@ -639,4 +639,5 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-});
+});// A public entry point; individual contracts are accessed only through private payment links.
+document.addEventListener('DOMContentLoaded',()=>{if(/login|admin|set-password|payer/.test(location.pathname))return;const a=document.createElement('a');a.href='/payer.html';a.textContent='Payer mon versement';a.style.cssText='position:fixed;right:20px;bottom:22px;background:#d83d3a;color:white;padding:14px 20px;border-radius:30px;box-shadow:0 4px 18px #0003;z-index:45;text-decoration:none;font:600 14px sans-serif';document.body.append(a);});

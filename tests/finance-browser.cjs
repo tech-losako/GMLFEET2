@@ -22,7 +22,7 @@ function fixture(){
    return {data:this.one?(items[0]||null):items.slice(this.offset,this.end+1),error:null};
   }).then(resolve,reject);}
  }
- Object.assign(tables,{contracts:[],drivers:[],vehicles:[],repayment_schedules:[],payments:[],payment_allocations:[],lolc_deposits:[],lolc_deposit_items:[],finance_events:[]});
+ Object.assign(tables,{contracts:[],drivers:[],vehicles:[],repayment_schedules:[],payments:[],payment_allocations:[],lolc_deposits:[],lolc_deposit_items:[],finance_events:[],araka_attempts:[]});
  staff.role='admin';window.rpcCalls=[];
  async function financeRpc(name,{p}){
   window.rpcCalls.push({name,p:JSON.parse(JSON.stringify(p))});

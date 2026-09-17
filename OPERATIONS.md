@@ -76,3 +76,16 @@ The public Edge Function validates applicant fields, file signatures and size li
 Staff open Candidatures, then the dossier and Documents privés for image previews and signed links to originals/PDFs. Public document rows use created_by=null. Public visitors cannot read document rows or storage. Previous submissions saved only filenames; missing file contents must be resent.
 
 Tests cover atomicity, idempotency, access controls, multipart bytes, signatures, upload failures, all four program forms and actual admin image rendering. Production smoke checks use invalid submissions without creating applicant records.
+
+## Araka driver payments
+The public Payer mon versement button opens payer.html. Cashiers/admins create a private payment link from an active contract; renewing it revokes the previous link. Only its hash is stored in the private link table. It authorizes a limited contract balance/payment view, not access to the operations dashboard. No messages are sent automatically.
+
+The driver selects MPESA, AIRTEL, ORANGE or AFRIMONEY and confirms an amount and wallet. Amount/currency/contract association are enforced server-side. An attempt is reserved before the provider call. An uncertain request is never automatically sent again; inquiry by reference recovers a lost response only when the provider echoes the matching reference. One pending attempt per contract prevents an accidental second charge. An attempt stuck after an ambiguous request requires staff/provider investigation, not blind retry.
+
+The server reads ARAKA_EMAIL, ARAKA_PASSWORD, ARAKA_PAYMENT_PAGE_ID and ARAKA_BASE_URL from Edge secrets. It authenticates via /api/login and uses the payment-request and transaction-status endpoints documented in Araka manual v2.7. UAT/test hostnames cannot collect or credit live driver payments. The staff-only connection button checks configuration and API login without charging a wallet. Card collection is not implemented in this release.
+
+Callbacks require a random per-attempt capability in redirectURL. This is not Araka HMAC signing: no ARAKA_CALLBACK_SECRET is assumed. Callback bodies are never trusted. The server queries Araka with its own credentials and requires an APPROVED status with code 200 and the correct transaction ID/reference; amount/currency are also checked when returned. A 202 ACCEPTED response remains pending. Browser polling and the cashier check button also reconcile pending attempts. No background polling schedule is installed.
+
+A matching approval posts exactly one receipt using the tested oldest-due LOLC/GML allocation. If the balance changed (for example another cash receipt arrived), approval is recorded for staff review rather than over-crediting. Provider receipts cannot be reversed as if they were cash: refunds require a separate provider/refund accounting workflow. Verified receipts are available for existing weekly LOLC reconciliation. The receipt date is the date the payment is verified in Kinshasa; delayed provider confirmations should be reviewed by finance.
+
+Tests: araka-database.cjs, araka-edge.cjs, araka-browser.cjs and finance-browser.cjs. These use isolated PostgreSQL and mocked provider responses; they do not charge real money. Actual credentials and the first live payment still require verification using the production connection check and an authorised payer.
