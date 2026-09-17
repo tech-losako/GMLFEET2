@@ -383,6 +383,20 @@ function closeContactModal() {
     }
 }
 
+// Retain the same submission ID on retry; editing the form starts a new submission.
+document.addEventListener('input',event=>{if(event.target.form)delete event.target.form.dataset.submissionId;});
+document.addEventListener('change',event=>{if(event.target.form)delete event.target.form.dataset.submissionId;});
+function applicationFiles(service){
+ const ids=service==='Chauffeur Yango'?['yangoPermis','yangoCarteRose']:service==='Gestion de flotte'?['flotteCarteRose','flottePhotos']:service?['recrutementPermis','recrutementCV','applicantDocument']:['clientPermisUpload'];
+ return ids.flatMap(id=>Array.from(document.getElementById(id)?.files||[]));
+}
+async function sendPublicApplication(app,form){
+ if(!window.GMFleetBackend?.isConfigured())throw new Error('Le service est indisponible. Réessayez plus tard.');
+ const id=form.dataset.submissionId||(form.dataset.submissionId=crypto.randomUUID());
+ await window.GMFleetBackend.createApplication(app,applicationFiles(app.service),id);
+ delete form.dataset.submissionId;
+}
+
 async function submitForm(e) {
     e.preventDefault();
 
@@ -414,13 +428,7 @@ async function submitForm(e) {
     };
 
     try {
-        if (window.GMFleetBackend?.isConfigured()) {
-            await window.GMFleetBackend.createApplication(newApp);
-        } else {
-            let applications = JSON.parse(localStorage.getItem('gmfleet_apps') || '[]');
-            applications.push({ id: Date.now(), ...newApp });
-            localStorage.setItem('gmfleet_apps', JSON.stringify(applications));
-        }
+        await sendPublicApplication(newApp,actualForm);
 
         const successCarName = document.getElementById('successCarName');
         if (successCarName) successCarName.textContent = carName;
@@ -436,7 +444,7 @@ async function submitForm(e) {
         if (actualForm) actualForm.reset();
     } catch (error) {
         console.error('Erreur Supabase:', error);
-        alert("Impossible d'envoyer la candidature pour le moment. Vérifiez la configuration Supabase ou réessayez.");
+        alert(error.message || 'Envoi interrompu. Réessayez.');
     } finally {
         if (submitBtn) {
             submitBtn.disabled = false;
@@ -494,13 +502,7 @@ async function submitServiceForm(e) {
     };
 
     try {
-        if (window.GMFleetBackend?.isConfigured()) {
-            await window.GMFleetBackend.createApplication(newApp);
-        } else {
-            let applications = JSON.parse(localStorage.getItem('gmfleet_apps') || '[]');
-            applications.push({ id: Date.now(), ...newApp, vehicle: newApp.service });
-            localStorage.setItem('gmfleet_apps', JSON.stringify(applications));
-        }
+        await sendPublicApplication(newApp,actualForm);
 
         const successServiceName = document.getElementById('successServiceName');
         if (successServiceName) successServiceName.textContent = serviceName;
@@ -519,7 +521,7 @@ async function submitServiceForm(e) {
         if (selOptions) handleServiceSelect("");
     } catch (error) {
         console.error('Erreur Supabase:', error);
-        alert("Impossible d'envoyer la candidature pour le moment. Réessayez.");
+        alert(error.message || 'Envoi interrompu. Réessayez.');
     } finally {
         if (submitBtn) {
             submitBtn.disabled = false;

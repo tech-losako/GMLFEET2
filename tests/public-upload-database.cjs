@@ -182,5 +182,27 @@ const assert=require('node:assert/strict');
  assert.ok((await as('authenticated',admin,'select * from staff_events')).rows.some(e=>e.action==='deleted'));
  console.log('PASS: protected deletion, removed-account access denial and no revival; email validation, retry, concurrent edit blocking, server-only completion and audit.');
 
+
+ await db.exec('reset role');
+ await db.exec(fs.readFileSync(require('node:path').join(__dirname,'../supabase/migrations/20260916144208_public_application_uploads.sql'),'utf8'));
+ const request=uid(),file={name:'license.png',key:'0-test.png',type:'image/png',size:100};
+ const submission={request_id:request,fingerprint:'test-fingerprint',application:{name:'Public with file',phone:'000',vehicle:'Toyota',application_type:'vehicle',service_details:{},workflow_stage:'approved'},files:[file]};
+ async function serviceRpc(name,args){await as('service_role',null,'select 1');return (await db.query('select public.'+name+'($1) as result',[args])).rows[0].result;}
+ await assert.rejects(()=>rpc('reserve_public_submission',submission),/permission denied/);
+ const reserved=await serviceRpc('reserve_public_submission',submission);
+ assert.equal((await serviceRpc('reserve_public_submission',submission)).application_id,reserved.application_id);
+ await assert.rejects(()=>serviceRpc('reserve_public_submission',{...submission,fingerprint:'changed'}),/changé/);
+ await assert.rejects(()=>serviceRpc('complete_public_submission',request),/fichier manque/);
+ await db.exec('reset role');assert.equal((await db.query('select count(*) n from applications where id=$1',[reserved.application_id])).rows[0].n,0);
+ const objectPath=reserved.application_id+'/'+request+'/'+file.key;
+ await db.query('insert into storage.objects(bucket_id,name) values($1,$2)',['application-documents',objectPath]);
+ await serviceRpc('complete_public_submission',request);await serviceRpc('complete_public_submission',request);
+ await db.exec('reset role');
+ const uploaded=(await db.query('select * from documents where application_id=$1',[reserved.application_id])).rows;assert.equal(uploaded.length,1);assert.equal(uploaded[0].created_by,null);
+ assert.equal((await db.query('select workflow_stage from applications where id=$1',[reserved.application_id])).rows[0].workflow_stage,'new');
+ assert.equal((await as('authenticated',other,'select * from storage.objects')).rows.length,0);
+ await assert.rejects(()=>as('anon',null,'select * from documents'),/permission denied/);
+ console.log('PASS: public uploads use service-only registration, no incomplete application, idempotent completion, private documents and forced initial workflow.');
+
  await db.close();
 })().catch(e=>{console.error(e);process.exit(1)});

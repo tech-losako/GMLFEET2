@@ -22,7 +22,7 @@ function fixture(){
    return {data:this.one?(items[0]||null):items.slice(this.offset,this.end+1),error:null};
   }).then(resolve,reject);}
  }
- window.supabase={createClient:()=>({from:t=>new Query(t),auth:{getUser:async()=>({data:{user:{id:staff.user_id}}}),getSession:async()=>({data:{session:{user:{id:staff.user_id}}}}),onAuthStateChange:()=>{},signOut:async()=>{}},storage:{from:()=>({upload:async()=>({data:{},error:null}),remove:async()=>({data:{},error:null}),createSignedUrl:async()=>({data:{signedUrl:'about:blank'},error:null})})}})};
+ window.supabase={createClient:()=>({from:t=>new Query(t),auth:{getUser:async()=>({data:{user:{id:staff.user_id}}}),getSession:async()=>({data:{session:{user:{id:staff.user_id}}}}),onAuthStateChange:()=>{},signOut:async()=>{}},storage:{from:()=>({upload:async()=>({data:{},error:null}),remove:async()=>({data:{},error:null}),createSignedUrl:async path=>({data:{signedUrl:path.endsWith('.png')?'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aD1sAAAAASUVORK5CYII=':'about:blank'},error:null})})}})};
 }
 (async()=>{
  const server=http.createServer((req,res)=>{
@@ -61,6 +61,10 @@ function fixture(){
   await page.locator('#documentForm input').setInputFiles({name:'permis.pdf',mimeType:'application/pdf',buffer:Buffer.from('%PDF-1.4 test')});
   await page.getByRole('button',{name:'Téléverser',exact:true}).click();
   await page.waitForFunction(()=>window.fixtureTables.documents.length===1);
+  await page.locator('#documentForm input').setInputFiles({name:'photo.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aD1sAAAAASUVORK5CYII=','base64')});
+  await page.locator('#documentForm button').click();
+  await page.waitForFunction(()=>document.querySelector('.document-preview img')?.naturalWidth===1);
+  await page.locator('#caseDialog').screenshot({path:path.join(__dirname,'document-preview.png')});
   await page.screenshot({path:path.join(__dirname,'dashboard-case.png'),fullPage:true});
   await page.locator('[data-close="caseDialog"]').click();
   await page.getByRole('button',{name:'＋ Nouvelle candidature'}).click();

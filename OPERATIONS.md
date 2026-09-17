@@ -67,3 +67,12 @@ Verification: `tests/staff-database.cjs`, `tests/staff-browser.cjs`, `tests/staf
 - **Supprimer** requires typing SUPPRIMER, rejects self-deletion, removes the staff entry from the management list and permanently revokes its staff access. This is a logical staff deletion: the Auth identity and records remain for transaction/audit references, and the email is not freed for a new identity. No destructive Auth deletion or record cascade is performed.
 - Deleted entries cannot be reactivated through the normal staff RPC. Email operations and deletions are audited. Only the service role can finish an email operation, and completion checks the actual Auth email.
 - Added tests cover deletion, no self-deletion, denied access after deletion, no resurrection, email validation, retry/concurrent mutation blocking, duplicate-email errors, and service-only finalization. No production accounts were changed during verification.
+
+## Public application attachments
+Public vehicle, Yango, fleet and recruitment forms submit real file bytes through submit-application. Supported: JPG, PNG, WebP and PDF; 10 MiB per file, 8 files / 20 MiB total. Convert Word and HEIC files before submitting.
+
+The public Edge Function validates applicant fields, file signatures and size limits. Server-only RPCs reserve a stable application ID and atomically register the application and documents after every file exists in the private application-documents bucket. Retrying the same request reuses uploaded files and cannot duplicate the application. Editing the form starts a new submission. Interrupted uploads remain private and staged for retry. Abandoned staged objects and old submission manifests currently require administrative retention cleanup.
+
+Staff open Candidatures, then the dossier and Documents privés for image previews and signed links to originals/PDFs. Public document rows use created_by=null. Public visitors cannot read document rows or storage. Previous submissions saved only filenames; missing file contents must be resent.
+
+Tests cover atomicity, idempotency, access controls, multipart bytes, signatures, upload failures, all four program forms and actual admin image rendering. Production smoke checks use invalid submissions without creating applicant records.

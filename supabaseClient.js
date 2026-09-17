@@ -157,17 +157,15 @@
             return selectRows(TABLES.applications, appFromDb, 'created_at');
         },
 
-        async createApplication(app) {
-            if (!client) return null;
-            const payload = appToDb(app);
-            const { data: sessionData } = await client.auth.getSession();
-
-            if (sessionData.session) {
-                return insertRow(TABLES.applications, payload, appFromDb);
-            }
-
-            const { error } = await client.from(TABLES.applications).insert(payload);
-            if (error) throw error;
+        async createApplication(app, files = [], requestId = crypto.randomUUID()) {
+            if (!client) throw new Error('Le service est indisponible. Réessayez plus tard.');
+            if(files.length>8 || files.reduce((n,f)=>n+f.size,0)>20*1024*1024) throw new Error('Maximum 8 fichiers et 20 Mo au total.');
+            for(const file of files) if(!file.size || file.size>10*1024*1024 || !['image/jpeg','image/png','image/webp','application/pdf'].includes(file.type)) throw new Error('Choisissez des fichiers JPG, PNG, WebP ou PDF de 10 Mo maximum chacun.');
+            const body=new FormData();body.append('request_id',requestId);body.append('application',JSON.stringify(appToDb(app)));
+            files.forEach(file=>body.append('files',file,file.name));
+            const {data,error}=await client.functions.invoke('submit-application',{body});
+            if(error){let message='Envoi interrompu. Réessayez sans fermer le formulaire.';try{message=(await error.context.json()).error||message;}catch{}throw new Error(message);}
+            if(!data?.success)throw new Error(data?.error||'La demande n’a pas été confirmée. Réessayez.');
             return app;
         },
 
