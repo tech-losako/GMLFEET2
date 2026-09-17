@@ -77,6 +77,7 @@ function fixture(){
   await page.locator('[data-close="caseDialog"]').click();
   await page.locator('#search').fill('');
   assert.equal(await page.locator('tbody img').count(),0,'Escaped applicant names must not create HTML');
+  await page.locator('nav [data-view="appointments"]').click();await page.getByRole('button',{name:'＋ Programmer un rendez-vous',exact:true}).click();await page.locator('#chooseAppointmentForm button').click();await page.locator('#appointmentForm [name="starts_at"]').waitFor();assert.equal(await page.locator('#intake').evaluate(e=>e.open),false);await page.locator('[data-close="caseDialog"]').click();
   await page.setViewportSize({width:390,height:844});
   await page.locator('nav [data-view="overview"]').click();
   await page.screenshot({path:path.join(__dirname,'dashboard-mobile.png'),fullPage:true});

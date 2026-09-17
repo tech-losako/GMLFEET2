@@ -42,7 +42,7 @@ async function verify(db:any,attempt:any,force=false){
  const matches=byId?data.transactionId===attempt.transaction_id:[data.originatingTransactionId,data.transactionReference].includes(attempt.reference);
  if(!matches)return attempt.state;
  if(data.currency!==undefined&&data.currency!==attempt.currency)return attempt.state;
- if(data.amount!==undefined&&Number(data.amount)!==Number(attempt.amount))return attempt.state;
+ if(data.amount!==undefined&&Number(data.amount)!==Number(attempt.total_charged))return attempt.state;
  const status=String(data.statusDescription||data.status||'').toUpperCase();
  const approved=status==='APPROVED'&&Number(data.statusCode)===200;
  const declined=status==='DECLINED'&&Number(data.statusCode)===400;
@@ -65,6 +65,14 @@ Deno.serve(async req=>{
   }
   if(req.method!=='POST')return reply(405,{error:'Méthode non autorisée'});
   const raw=await req.text();if(raw.length>5000)return reply(400,{error:'Requête trop longue'});const p=JSON.parse(raw);
+  if(p.action==='phone-login'){
+   const caller=createClient(supabaseUrl,Deno.env.get('SUPABASE_ANON_KEY')!,{global:{headers:{Authorization:req.headers.get('Authorization')||''}},auth:{persistSession:false,autoRefreshToken:false}});
+   const {data:identity,error}=await caller.auth.getUser();
+   if(error||!identity.user?.phone_confirmed_at||!identity.user.phone)return reply(401,{error:'Vérifiez votre numéro par SMS.'});
+   const token=secretToken();
+   await rpc(db,'issue_driver_phone_access',{p:{user_id:identity.user.id,token_hash:await hash(token)}});
+   return reply(200,{token});
+  }
   if(['health','staff-check'].includes(p.action)){
    const caller=createClient(supabaseUrl,Deno.env.get('SUPABASE_ANON_KEY')!,{global:{headers:{Authorization:req.headers.get('Authorization')||''}},auth:{persistSession:false,autoRefreshToken:false}});
    const {data:identity,error}=await caller.auth.getUser();if(error||!identity.user)return reply(401,{error:'Reconnectez-vous'});
@@ -88,7 +96,7 @@ Deno.serve(async req=>{
   const attempt=await rpc(db,'begin_araka_payment',{p:{id:p.id,token_hash:tokenHash,amount:p.amount,provider:p.provider,wallet:p.wallet,callback_hash:await hash(callbackToken)}});
   if(attempt.dispatch){
    try{
-    const result=await api('/api/pay/paymentrequest',{order:{paymentPageId:config.page,customerFullName:attempt.driver_name,customerPhoneNumber:attempt.wallet,transactionReference:attempt.reference,amount:Number(attempt.amount),currency:attempt.currency,redirectURL:supabaseUrl+'/functions/v1/araka-payments?callback='+callbackToken},paymentChannel:{channel:'MOBILEMONEY',provider:attempt.provider,walletID:attempt.wallet}});
+    const result=await api('/api/pay/paymentrequest',{order:{paymentPageId:config.page,customerFullName:attempt.driver_name,customerPhoneNumber:attempt.wallet,transactionReference:attempt.reference,amount:Number(attempt.total_charged),currency:attempt.currency,redirectURL:supabaseUrl+'/functions/v1/araka-payments?callback='+callbackToken},paymentChannel:{channel:'MOBILEMONEY',provider:attempt.provider,walletID:attempt.wallet}});
     if(result.data&&typeof result.data.transactionId==='string'&&result.data.transactionId){
      // Request acceptance (including 202) is never proof of payment.
      await rpc(db,'record_araka_status',{p:{id:attempt.id,transaction_id:result.data.transactionId,status:'PENDING'}});

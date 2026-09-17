@@ -125,6 +125,8 @@ function fixture(){
   await page.getByRole('button',{name:/Caisse \/ versements/}).click();
   await page.getByRole('button',{name:'＋ Enregistrer un versement'}).click();
   await page.locator('#paymentForm [name="amount"]').fill('10');
+  await page.locator('#paymentForm [name="method"]').selectOption('M-Pesa');assert.match(await page.locator('#cashFeePreview').innerText(),/10,30/);assert.equal(await page.locator('#receivedTotalLabel').isVisible(),true);
+  await page.locator('#paymentForm [name="method"]').selectOption('Espèces');assert.equal(await page.locator('#receivedTotalLabel').isVisible(),false);assert.match(await page.locator('#cashFeePreview').innerText(),/0,00/);
   await page.locator('#paymentForm [name="reference"]').fill('UI-RECEIPT-01');
   await page.locator('#paymentForm [name="reason"]').fill('Paiement au bureau');
   await page.evaluate(()=>window.rejectPaymentOnce=true);

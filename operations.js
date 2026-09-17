@@ -49,6 +49,7 @@
  }
  function render() {
   document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===state.view));
+  $('newApplication').textContent=state.view==='appointments'?'＋ Programmer un rendez-vous':'＋ Nouvelle candidature';
   $('pageTitle').textContent={overview:'Tableau de bord',applications:'Candidatures',appointments:'Rendez-vous',contracts:'Contrats & véhicules',payments:'Caisse / versements',reconciliation:'Rapprochement LOLC',users:'Utilisateurs'}[state.view];
   document.getElementById('newApplication').hidden=['users','contracts','payments','reconciliation'].includes(state.view);
   if(['contracts','payments','reconciliation'].includes(state.view)) { window.GMFleetFinance.render(state.view,{db,escape,date,person,notify,rows,staff:state.staff,user:state.user,apps:state.apps}); return; }
@@ -183,6 +184,12 @@
    } catch(e) {select.value=select.dataset.original;notify(fail(e),true);} finally {select.disabled=false;}
   }));
  }
+ function chooseAppointment(){
+  let dialog=$('appointmentPicker');if(!dialog){dialog=document.createElement('dialog');dialog.id='appointmentPicker';document.body.append(dialog);}
+  dialog.innerHTML='<div class="dialog-title"><h2>Programmer un rendez-vous</h2><button class="icon" data-close="appointmentPicker" aria-label="Fermer">×</button></div><p>Choisissez le dossier du candidat.</p>'+(state.apps.length?'<form id="chooseAppointmentForm"><label>Candidat<select name="application_id">'+state.apps.map(a=>'<option value="'+a.id+'">'+escape(a.name)+' · '+escape(a.phone)+'</option>').join('')+'</select></label><button class="primary">Continuer</button></form>':'<p>Aucun dossier disponible. Créez d’abord une candidature.</p>');
+  dialog.showModal();
+  if($('chooseAppointmentForm'))$('chooseAppointmentForm').onsubmit=async event=>{event.preventDefault();const id=event.currentTarget.elements.application_id.value;dialog.close();await openCase(id);const form=$('appointmentForm');if(form){form.closest('details').open=true;form.scrollIntoView({block:'center'});form.elements.starts_at.focus();}};
+ }
  document.addEventListener('click',async e=>{
   const b=e.target.closest('button');if(!b) return;
   if(b.dataset.view) {state.view=b.dataset.view;render();}
@@ -195,7 +202,7 @@
    catch(error) {preview?.close();notify(fail(error),true);} finally {b.disabled=false;}
   }
  });
- $('newApplication').addEventListener('click',()=>{$('intakeForm').reset();$('intakeForm').querySelector('.form-error').textContent='';$('intake').showModal();});
+ $('newApplication').addEventListener('click',()=>{if(state.view==='appointments'){chooseAppointment();return;}$('intakeForm').reset();$('intakeForm').querySelector('.form-error').textContent='';$('intake').showModal();});
  submit($('intakeForm'),async f=>{
   const program=f.get('program'),service=services[program];
   const payload={name:f.get('name').trim(),phone:f.get('phone').trim(),source:f.get('source'),vehicle:f.get('vehicle').trim()||service||'À préciser',service,application_type:service?'service':'vehicle',assigned_to:state.user.id,service_details:{licenseNumber:f.get('licenseNumber').trim(),carPlate:f.get('carPlate').trim(),carModel:f.get('vehicle').trim(),yangoStatus:f.get('yangoStatus').trim()}};
