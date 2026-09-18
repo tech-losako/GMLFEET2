@@ -26,6 +26,8 @@ async function run({action='check',providerData={transactionId:'TX-1',statusCode
  const arrayApproved=await run({providerData:[{transactionId:'OTHER',statusCode:200,status:'APPROVED'},{transactionId:'TX-1',statusCode:200,status:'APPROVED',amount:10.3,currency:'USD'}]});assert.ok(arrayApproved.updates.some(p=>p.status==='APPROVED'));
  const arrayAccepted=await run({providerData:[{transactionId:'TX-1',statusCode:202,status:'ACCEPTED'}]});assert.ok(arrayAccepted.updates.every(p=>p.status!=='APPROVED'));
  const arrayRecovery=await run({transactionId:null,providerData:[{transactionId:'TX-1',transactionReference:'GMTEST',statusCode:200,status:'APPROVED'}]});assert.ok(arrayRecovery.updates.some(p=>p.status==='APPROVED'));
+ for(const status of ['DECLINED','FAILED','CANCELLED','EXPIRED']){const failed=await run({providerData:{transactionId:'TX-1',statusCode:400,status}});assert.ok(failed.updates.some(p=>p.status==='DECLINED'));}
+ const rejected=await run({action:'pay',initiationData:{statusCode:400,statusDescription:'DECLINED'}});assert.ok(rejected.updates.some(p=>p.status==='DECLINED'));assert.equal(rejected.charges,1);
  const phone=await run({action:'driver-lookup'});assert.equal(phone.status,200);assert.match(phone.data.token,/^[a-f0-9]{64}$/);assert.equal(phone.updates[0].phone,'0812345678');assert.equal(phone.updates[0].plate,'AB123');assert.equal(phone.charges,0);
  assert.equal((await run({action:'driver-lookup',lookupResult:{error:'Mismatch'}})).status,400);
  assert.equal((await run({action:'driver-lookup',lookupResult:{error:'Too many',limited:true}})).status,429);

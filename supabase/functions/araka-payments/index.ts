@@ -67,7 +67,7 @@ async function verify(db:any,attempt:any,force=false){
  if(data.amount!==undefined&&Number(data.amount)!==Number(attempt.total_charged))return attempt.state;
  const status=String(data.statusDescription||data.status||'').toUpperCase();
  const approved=status==='APPROVED'&&Number(data.statusCode)===200;
- const declined=status==='DECLINED'&&Number(data.statusCode)===400;
+ const declined=['DECLINED','FAILED','CANCELLED','CANCELED','EXPIRED'].includes(status)&&Number(data.statusCode)!==202;
  return rpc(db,'record_araka_status',{p:{id:attempt.id,transaction_id:data.transactionId,status:approved?'APPROVED':declined?'DECLINED':'PENDING'}});
 }
 Deno.serve(async req=>{
@@ -122,7 +122,10 @@ Deno.serve(async req=>{
    let initiationError='';
    try{
     const result=await api('/api/pay/paymentrequest',{order:{paymentPageId:config.page,customerFullName:attempt.driver_name,customerPhoneNumber:attempt.wallet.replace(/^\+/,''),customerEmailAddress:'',transactionReference:attempt.reference,amount:Number(attempt.total_charged),currency:attempt.currency,redirectURL:supabaseUrl+'/functions/v1/araka-payments?callback='+callbackToken},paymentChannel:{channel:'MOBILEMONEY',provider:attempt.provider,walletID:attempt.wallet.replace(/^\+/,'')}});
-    if(result.data&&typeof result.data.transactionId==='string'&&result.data.transactionId){
+    const rejected=String(result.data?.statusDescription||result.data?.status||'').toUpperCase()==='DECLINED'&&Number(result.data?.statusCode)===400;
+    if(rejected){
+     await rpc(db,'record_araka_status',{p:{id:attempt.id,transaction_id:result.data.transactionId||null,status:'DECLINED'}});
+    }else if(result.data&&typeof result.data.transactionId==='string'&&result.data.transactionId){
      // Request acceptance (including 202) is never proof of payment.
      await rpc(db,'record_araka_status',{p:{id:attempt.id,transaction_id:result.data.transactionId,status:'PENDING'}});
     }else{

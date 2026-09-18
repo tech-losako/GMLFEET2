@@ -5,6 +5,9 @@ function fixture(){
  const slip={id:123,reference:'GMTEST',driver_name:'Éric Test',vehicle:data.vehicle,contract_reference:'GML-2026-123',currency:'USD',amount:10,transaction_fee:0.3,total_charged:10.3,paid_on:'2026-09-17',confirmed_at:'2026-09-17T12:00:00Z',method:'Araka MPESA',status:'confirmed'};
  window.supabase={createClient:()=>({functions:{invoke:async(name,{body})=>{
   window.calls.push(body);
+  if(body.action==='pay'&&window.slowPay)await new Promise(r=>setTimeout(r,700));
+  if(body.action==='check'&&window.checkError)return {data:{error:'Connexion interrompue'}};
+  if(body.action==='check'&&window.decline){data.attempts[0].state='declined';return {data:JSON.parse(JSON.stringify(data))};}
   if(body.action==='driver-lookup')return body.phone==='+243812345678'&&body.plate==='1234AB/01'?{data:{token:'b'.repeat(64)}}:{data:{error:'Téléphone ou plaque incorrects'}};
   if(body.action==='pay')data.attempts=[{id:body.id,reference:'GMTEST',amount:Number(body.amount),transaction_fee:0.3,total_charged:10.3,currency:'USD',provider:body.provider,state:'pending'}];
   if(body.action==='check'){data.attempts[0].state='approved';data.attempts[0].receipt_id=123;data.total_remaining=90;data.due=0;data.receipts=[slip];}
@@ -22,10 +25,16 @@ function fixture(){
  await page.locator('#payAllDue').click();assert.equal(await page.locator('[name=amount]').inputValue(),'20.00');
  await page.locator('[name=amount]').fill('7.5');assert.match(await page.locator('#feeSummary').innerText(),/7,73/);
  await page.locator('[name=wallet]').fill('810000000');await page.locator('[name=amount]').fill('10');await page.getByRole('button',{name:'Payer maintenant'}).click();await page.locator('#checkPayment').waitFor();assert.equal(await page.evaluate(()=>window.calls.find(c=>c.action==='pay').amount),'10');assert.equal(await page.locator('#driverPayForm').count(),0);assert.equal(await page.locator('[data-download-receipt]').count(),0);
- await page.locator('#checkPayment').click();await page.getByText('Paiement confirmé',{exact:false}).waitFor();await page.getByText('Reçu #123',{exact:false}).waitFor();
+ await page.locator('#checkPayment').click();await page.getByText('Paiement confirmé',{exact:true}).waitFor();await page.getByText('Reçu #123',{exact:false}).waitFor();
  const waiting=page.waitForEvent('download');await page.getByRole('button',{name:'Télécharger le reçu PDF'}).click();const download=await waiting;assert.equal(download.suggestedFilename(),'GMFleet-recu-123.pdf');const dest=path.join(artifacts,download.suggestedFilename());await download.saveAs(dest);assert.equal(fs.readFileSync(dest).subarray(0,5).toString(),'%PDF-');
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.equal(new URL(page.url()).hash,'');await page.screenshot({path:path.join(artifacts,'driver-payments-mobile.png'),fullPage:true});
- await page.locator('#changeDriver').click();await page.locator('#phoneForm').waitFor();await page.goto(base+'/payer.html#token='+'a'.repeat(64));await page.locator('#driverPayForm').waitFor();assert.deepEqual(errors,[]);
+ await page.locator('#changeDriver').click();await page.locator('#phoneForm').waitFor();await page.goto(base+'/payer.html#token='+'a'.repeat(64));await page.locator('#driverPayForm').waitFor();await page.evaluate(()=>window.slowPay=true);
+ await page.locator('[name=wallet]').fill('810000000');await page.locator('[name=provider]').selectOption('ORANGE');await page.locator('[name=amount]').fill('7.5');
+ await page.getByRole('button',{name:'Payer maintenant',exact:true}).click();await page.locator('#paymentStatus[data-state="sending"]').waitFor();assert.equal(await page.locator('[name=wallet]').isDisabled(),true);
+ await page.locator('#paymentStatus[data-state="pending"]').waitFor();await page.evaluate(()=>window.checkError=true);await page.locator('#checkPayment').click();await page.locator('#paymentStatus[data-state="unknown"]').waitFor();assert.equal(await page.locator('#driverPayForm').count(),0);
+ await page.evaluate(()=>{window.checkError=false;window.decline=true;});await page.locator('#checkPayment').click();await page.locator('#paymentStatus[data-state="declined"]').waitFor();assert.equal(await page.locator('[name=wallet]').inputValue(),'810000000');assert.equal(await page.locator('[name=provider]').inputValue(),'ORANGE');assert.equal(await page.locator('[name=amount]').inputValue(),'7.5');
+ await page.evaluate(()=>window.decline=false);await page.getByRole('button',{name:'Réessayer le paiement',exact:true}).click();await page.locator('#paymentStatus[data-state="pending"]').waitFor();await page.locator('#checkPayment').click();await page.locator('#paymentStatus[data-state="approved"]').waitFor();
+ const ids=await page.evaluate(()=>window.calls.filter(x=>x.action==='pay').map(x=>x.id));assert.equal(new Set(ids).size,ids.length);assert.deepEqual(errors,[]);
  console.log('PASS: no SMS, phone and plate required, incorrect lookup stays private, 3% preview, pending has no slip, confirmed payment downloads a PDF, personal links and mobile layout work.');
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);process.exit(1)});
