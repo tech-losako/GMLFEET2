@@ -8,10 +8,15 @@ let cachedToken='',tokenUntil=0;
 function configuration(){
  const names=['ARAKA_EMAIL','ARAKA_PASSWORD','ARAKA_PAYMENT_PAGE_ID','ARAKA_BASE_URL'];
  if(names.some(n=>!Deno.env.get(n)))throw new Error('Configuration Araka incomplète. Contactez GM Fleet.');
- const endpoint=new URL(Deno.env.get('ARAKA_BASE_URL')!);
- if(endpoint.protocol!=='https:'||endpoint.username||endpoint.password||endpoint.search||endpoint.hash||!/(^|\.)arakapay\.com$|(^|\.)proxypay\.africa$|^araka[-a-z0-9]*\.azurewebsites\.net$/i.test(endpoint.hostname))throw new Error('Adresse API Araka à vérifier dans la configuration.');
- const base=endpoint.href.replace(/\/$/,'').replace(/\/api$/,'');
- if(new URL(base).pathname!=='/')throw new Error('Utilisez l’adresse racine de l’API Araka, sans chemin Swagger.');
+ const endpoint=new URL(Deno.env.get('ARAKA_BASE_URL')!.trim());
+ // Araka's production merchant frontend publishes this API origin.
+ if(endpoint.hostname==='merchant.arakapay.com'&&['/','/auth/login','/auth/login/'].includes(endpoint.pathname)&&endpoint.protocol==='https:'&&!endpoint.username&&!endpoint.password&&!endpoint.search){
+  endpoint.hostname='pcesarakapayprodapi01.eastus.cloudapp.azure.com';endpoint.pathname='/';endpoint.hash='';
+ }
+ if(endpoint.protocol!=='https:'||endpoint.username||endpoint.password||endpoint.search||(endpoint.hostname!=='pcesarakapayprodapi01.eastus.cloudapp.azure.com'&&!/(^|\.)arakapay\.com$|(^|\.)proxypay\.africa$|^araka[-a-z0-9]*\.azurewebsites\.net$/i.test(endpoint.hostname)))throw new Error('Adresse API Araka à vérifier dans la configuration.');
+ // Normalize standard API/documentation addresses without accepting arbitrary paths.
+ if(!/^\/(?:api\/?|swagger(?:\/index\.html|\/v[0-9]+\/swagger\.json)?\/?)?$/i.test(endpoint.pathname))throw new Error('Adresse API Araka invalide : utilisez la racine API ou son adresse Swagger.');
+ const base=endpoint.origin;
  return {base,test:/uat|sandbox|staging|test/i.test(endpoint.hostname),page:Deno.env.get('ARAKA_PAYMENT_PAGE_ID')!};
 }
 async function login(){
@@ -37,7 +42,7 @@ async function verify(db:any,attempt:any,force=false){
  const byId=!!attempt.transaction_id;
  const lookup=await api('/api/reporting/'+(byId?'transactionstatus/':'transactionstatusbyreference/')+encodeURIComponent(byId?attempt.transaction_id:attempt.reference));
  const data=lookup.data;
- if(lookup.http!==200||!data||typeof data.transactionId!=='string')return attempt.state;
+ if(lookup.http!==200||!data||typeof data.transactionId!=='string')throw new Error('Vérification Araka indisponible (HTTP '+lookup.http+', code '+String(data?.statusCode??'absent').slice(0,20)+'). Référence : '+attempt.reference+'. Aucun nouveau débit ne sera lancé.');
  // A lost initiation response requires the provider to echo our reference before trusting the recovered transaction ID.
  const matches=byId?data.transactionId===attempt.transaction_id:[data.originatingTransactionId,data.transactionReference].includes(attempt.reference);
  if(!matches)return attempt.state;
@@ -79,7 +84,7 @@ Deno.serve(async req=>{
    if(!staff?.active||!['super_admin','admin','cashier'].includes(staff.role))return reply(403,{error:'Accès réservé à la caisse'});
    if(p.action==='health'){const config=configuration();await login();return reply(200,{connected:true,environment:config.test?'test':'live'});}
    const {data:attempt}=await db.from('araka_attempts').select('*').eq('id',p.id).maybeSingle();if(!attempt)return reply(404,{error:'Paiement introuvable'});
-   return reply(200,{state:await verify(db,attempt)});
+   return reply(200,{state:await verify(db,attempt,true)});
   }
   if(typeof p.token!=='string'||!/^[a-f0-9]{64}$/.test(p.token))return reply(401,{error:'Ouvrez votre lien de paiement personnel fourni par GM Fleet.'});
   const tokenHash=await hash(p.token),context=await rpc(db,'driver_payment_context',{token:tokenHash});
@@ -95,13 +100,17 @@ Deno.serve(async req=>{
   const callbackToken=secretToken();
   const attempt=await rpc(db,'begin_araka_payment',{p:{id:p.id,token_hash:tokenHash,amount:p.amount,provider:p.provider,wallet:p.wallet,callback_hash:await hash(callbackToken)}});
   if(attempt.dispatch){
+   let initiationError='';
    try{
     const result=await api('/api/pay/paymentrequest',{order:{paymentPageId:config.page,customerFullName:attempt.driver_name,customerPhoneNumber:attempt.wallet,transactionReference:attempt.reference,amount:Number(attempt.total_charged),currency:attempt.currency,redirectURL:supabaseUrl+'/functions/v1/araka-payments?callback='+callbackToken},paymentChannel:{channel:'MOBILEMONEY',provider:attempt.provider,walletID:attempt.wallet}});
     if(result.data&&typeof result.data.transactionId==='string'&&result.data.transactionId){
      // Request acceptance (including 202) is never proof of payment.
      await rpc(db,'record_araka_status',{p:{id:attempt.id,transaction_id:result.data.transactionId,status:'PENDING'}});
+    }else{
+     initiationError='Araka n’a pas confirmé la réception de la demande (HTTP '+result.http+', code '+String(result.data?.statusCode??'absent').slice(0,20)+'). Référence : '+attempt.reference+'. Vérifiez le statut avant tout nouvel essai.';
     }
-   }catch{/* Ambiguous network outcomes are reconciled by reference, never re-sent. */}
+   }catch{initiationError='Réponse Araka non reçue. Référence : '+attempt.reference+'. Vérifiez le statut avant tout nouvel essai.';}
+   if(initiationError)throw new Error(initiationError);
   }
   return reply(200,await rpc(db,'driver_payment_context',{token:tokenHash}));
  }catch(error){return reply(400,{error:error instanceof Error?error.message:'Service indisponible. Réessayez.'});}
