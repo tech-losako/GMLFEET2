@@ -33,6 +33,13 @@ async function api(path:string,body?:unknown){
  if(r.status===401){cachedToken='';tokenUntil=0;}
  const data=await r.json().catch(()=>null);return {http:r.status,data};
 }
+async function checkCollectionRoute(){
+ if(configuration().base!=='https://pcesarakapayprodapi01.eastus.cloudapp.azure.com')return;
+ // A GET cannot initiate a payment. The merchant API may not expose the e-commerce API.
+ const result=await api('/api/pay/paymentrequest');
+ if(result.http===404)throw new Error('Paiement indisponible : cette adresse Araka ne fournit pas l’API e-commerce. GM Fleet doit configurer l’adresse de production fournie par Araka. Aucune demande de paiement envoyée.');
+ if(result.http!==405&&result.http!==200)throw new Error('API de paiement Araka indisponible. Aucune demande de paiement envoyée.');
+}
 async function rpc(db:any,name:string,p:any){const {data,error}=await db.rpc(name,p);if(error)throw new Error(error.message);return data;}
 async function verify(db:any,attempt:any,force=false){
  if(attempt.state==='approved')return 'approved';
@@ -82,7 +89,7 @@ Deno.serve(async req=>{
    const {data:identity,error}=await caller.auth.getUser();if(error||!identity.user)return reply(401,{error:'Reconnectez-vous'});
    const {data:staff}=await caller.from('staff_members').select('role,active').eq('user_id',identity.user.id).maybeSingle();
    if(!staff?.active||!['super_admin','admin','cashier'].includes(staff.role))return reply(403,{error:'Accès réservé à la caisse'});
-   if(p.action==='health'){const config=configuration();await login();return reply(200,{connected:true,environment:config.test?'test':'live'});}
+   if(p.action==='health'){const config=configuration();await login();await checkCollectionRoute();return reply(200,{connected:true,environment:config.test?'test':'live'});}
    const {data:attempt}=await db.from('araka_attempts').select('*').eq('id',p.id).maybeSingle();if(!attempt)return reply(404,{error:'Paiement introuvable'});
    return reply(200,{state:await verify(db,attempt,true)});
   }
@@ -97,6 +104,7 @@ Deno.serve(async req=>{
   if(p.action!=='pay')return reply(400,{error:'Action invalide'});
   const config=configuration();if(config.test)return reply(409,{error:'Araka est configuré en test. Les versements chauffeurs attendent les identifiants de production.'});
   await login(); // Fail before reserving an attempt when authentication/configuration is invalid.
+  await checkCollectionRoute();
   const callbackToken=secretToken();
   const attempt=await rpc(db,'begin_araka_payment',{p:{id:p.id,token_hash:tokenHash,amount:p.amount,provider:p.provider,wallet:p.wallet,callback_hash:await hash(callbackToken)}});
   if(attempt.dispatch){
