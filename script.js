@@ -170,7 +170,7 @@ function handleServiceSelect(val) {
     if (noServiceWarn) noServiceWarn.classList.add('hidden');
     if (form) {
         form.classList.remove('hidden');
-        if (window.innerWidth < 1024) {
+        if (window.innerWidth < 1024 && !document.querySelector('link[href*="public-ui"]')) {
             setTimeout(() => {
                 form.scrollIntoView({ behavior: 'smooth' });
             }, 100);
@@ -217,7 +217,7 @@ function showForm() {
     if (actualForm) actualForm.classList.remove('hidden');
 
     // On mobile, scroll to form
-    if (window.innerWidth < 1024 && actualForm) {
+    if (window.innerWidth < 1024 && actualForm && !document.querySelector('link[href*="public-ui"]')) {
         setTimeout(() => {
             actualForm.scrollIntoView({ behavior: 'smooth' });
         }, 100);
@@ -444,7 +444,7 @@ async function submitForm(e) {
         if (actualForm) actualForm.reset();
     } catch (error) {
         console.error('Erreur Supabase:', error);
-        alert(error.message || 'Envoi interrompu. Réessayez.');
+        if(actualForm?.classList.contains('pub-wizard'))actualForm.dispatchEvent(new CustomEvent('gmfleet-error',{detail:error.message||'Envoi interrompu. Vos informations sont conservées. Réessayez.'}));else alert(error.message || 'Envoi interrompu. Réessayez.');
     } finally {
         if (submitBtn) {
             submitBtn.disabled = false;
@@ -521,7 +521,7 @@ async function submitServiceForm(e) {
         if (selOptions) handleServiceSelect("");
     } catch (error) {
         console.error('Erreur Supabase:', error);
-        alert(error.message || 'Envoi interrompu. Réessayez.');
+        if(actualForm?.classList.contains('pub-wizard'))actualForm.dispatchEvent(new CustomEvent('gmfleet-error',{detail:error.message||'Envoi interrompu. Vos informations sont conservées. Réessayez.'}));else alert(error.message || 'Envoi interrompu. Réessayez.');
     } finally {
         if (submitBtn) {
             submitBtn.disabled = false;
@@ -640,4 +640,4 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 });// A public entry point; individual contracts are accessed only through private payment links.
-document.addEventListener('DOMContentLoaded',()=>{if(/login|admin|set-password|payer/.test(location.pathname))return;const a=document.createElement('a');a.href='/payer.html';a.textContent='Payer mon versement';a.style.cssText='position:fixed;right:20px;bottom:22px;background:#d83d3a;color:white;padding:14px 20px;border-radius:30px;box-shadow:0 4px 18px #0003;z-index:45;text-decoration:none;font:600 14px sans-serif';document.body.append(a);});
+document.addEventListener('DOMContentLoaded',()=>{if(/login|admin|set-password|payer/.test(location.pathname)||document.querySelector('link[href*="public-ui"]'))return;const a=document.createElement('a');a.href='/payer.html';a.textContent='Payer mon versement';a.style.cssText='position:fixed;right:20px;bottom:22px;background:#d83d3a;color:white;padding:14px 20px;border-radius:30px;box-shadow:0 4px 18px #0003;z-index:45;text-decoration:none;font:600 14px sans-serif';document.body.append(a);});
