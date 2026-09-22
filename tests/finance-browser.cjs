@@ -122,6 +122,12 @@ function fixture(){
   await page.waitForFunction(()=>window.fixtureTables.contracts.length===1);
   assert.equal(await page.evaluate(()=>window.rpcCalls[0].p.daily_lolc),'20');
   assert.equal(await page.evaluate(()=>window.rpcCalls[0].p.daily_gml),'5');
+  const exportWait=page.waitForEvent('download');await page.getByRole('button',{name:'Exporter les contrats (CSV)'}).click();const exported=await exportWait;
+  assert.match(exported.suggestedFilename(),/^GMFleet-chauffeurs-contrats-.*\.csv$/);const csv=fs.readFileSync(await exported.path(),'utf8');
+  assert.equal(csv.charCodeAt(0),0xFEFF);assert.ok(csv.includes('"UI-CONTRACT-01"'));assert.ok(csv.includes('"20.00";"5.00";"25.00"'));assert.ok(csv.includes('"Téléphone"'));assert.equal(csv.trim().split('\r\n').length,2);
+  await page.evaluate(()=>{window.fixtureTables.drivers[0].full_name='=1+1;"Test"';});await page.locator('#refresh').click();
+  const safeWait=page.waitForEvent('download');await page.getByRole('button',{name:'Exporter les contrats (CSV)'}).click();const safe=fs.readFileSync(await (await safeWait).path(),'utf8');assert.ok(safe.includes(`"'=1+1;""Test"""`));
+
   await page.getByRole('button',{name:/Caisse \/ versements/}).click();
   await page.getByRole('button',{name:'＋ Enregistrer un versement'}).click();
   await page.locator('#paymentForm [name="amount"]').fill('10');
