@@ -3,6 +3,22 @@
 
 <head>
     <meta charset="UTF-8">
+    <!-- Keep the legacy source layout off screen until the public UI is ready. -->
+    <style>
+        html.public-ui-pending{background:#f5f7f6}
+        html.public-ui-pending body{visibility:hidden!important}
+        html.public-ui-pending::before{content:'GMFLEET';position:fixed;inset:0;display:grid;place-items:center;color:#152c3b;font:800 26px system-ui,sans-serif;letter-spacing:-1px;background:#f5f7f6}
+        html.public-ui-failed::before{content:'Chargement interrompu. Actualisez la page pour réessayer.';font:500 16px system-ui,sans-serif;letter-spacing:0;padding:24px;text-align:center}
+    </style>
+    <script>
+        document.documentElement.classList.add('public-ui-pending');
+        window.publicUIFailed = function () { document.documentElement.classList.add('public-ui-failed'); };
+        setTimeout(function () { if (document.documentElement.classList.contains('public-ui-pending')) window.publicUIFailed(); }, 15000);
+    </script>
+    <link rel="preload" href="/public-ui.js?v=20260922b" as="script">
+    <link rel="stylesheet" href="/public-ui.css?v=20260922b">
+
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chauffeur Partenaire - Rejoignez GM Fleet</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -31,7 +47,7 @@
             }
         }
     </script>
-<link rel="stylesheet" href="/public-ui.css?v=20260922">
+
 </head>
 
 <body class="bg-gray-50 text-gray-800 antialiased" id="top">
@@ -377,7 +393,7 @@
     <script src="supabase-config.js"></script>
     <script src="supabaseClient.js"></script>
     <script src="script.js"></script>
-<script src="/public-ui.js?v=20260922"></script>
+<script src="/public-ui.js?v=20260922b" onerror="publicUIFailed()"></script>
 </body>
 
 </html>

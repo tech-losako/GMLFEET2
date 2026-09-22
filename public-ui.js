@@ -78,5 +78,9 @@ function wizard(form){
  for(const file of fields.filter(f=>f.type==='file')){const info=document.createElement('p');info.className='pub-file-info';info.setAttribute('aria-live','polite');file.after(info);file.addEventListener('change',()=>{info.textContent=[...file.files].map(f=>f.name+' · '+(f.size/1024/1024).toFixed(1)+' Mo').join(' / ');});}
  form.addEventListener('gmfleet-error',e=>{error.textContent=e.detail;});show(0,false);
 }
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initialize);else initialize();
+function start(){
+ try{initialize();document.documentElement.classList.remove('public-ui-pending','public-ui-failed');}
+ catch(error){window.publicUIFailed?.();console.error('Public UI initialization failed',error);}
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
