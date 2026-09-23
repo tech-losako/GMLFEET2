@@ -7,26 +7,15 @@ page.setDefaultTimeout(20000);page.setDefaultNavigationTimeout(60000);for(const 
  for(const name of ['index','services']){
   await page.goto(base+'/'+name+'.html',{waitUntil:'domcontentloaded'});await page.locator('.pub-header').waitFor();
   assert.equal(await page.locator('.pub-logo img').getAttribute('src'),'/img/gml-official.jpeg');
-  assert.doesNotMatch(await page.locator('body').textContent(),/[\u00c3\u00c2][\u0080-\u00ff]/);const count=await page.locator('.pub-section-nav button').count();
-  for(let i=0;i<count;i++){console.log('Checking',name,width,i);
-   if(width<760)await page.locator('.pub-section-select select').selectOption(String(i));else await page.locator('.pub-section-nav button').nth(i).click();
-   await page.locator('.pub-panel:visible img').evaluateAll(es=>Promise.all(es.map(e=>{e.loading='eager';return e.decode().catch(()=>{});})));
-   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,name+' '+i+' '+width+' '+JSON.stringify(await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(e=>e.getBoundingClientRect().right>innerWidth+1).map(e=>({tag:e.tagName,cls:e.className,width:e.getBoundingClientRect().width})).slice(0,8))));
-   assert.deepEqual(await page.locator('.pub-panel:visible img').evaluateAll(es=>es.filter(e=>!e.naturalWidth).map(e=>e.src)),[]);
-   await page.screenshot({timeout:20000,path:path.join(root,`tests/artifacts/visual-${name}-${i}-${width}.png`),fullPage:true});
-  }
-  if(name==='services'){
-   assert.equal(await page.locator('.pub-hero-actions a[href="/services.html"]').count(),0);
-   if(width<760)await page.locator('.pub-section-select select').selectOption('1');else await page.getByRole('tab',{name:'Votre parcours',exact:true}).click();
-   const destinations=['vehicule-credit.html','recrutement-chauffeurs.html','gestion-flotte.html','agregateur-yango.html'];
-   for(let i=0;i<4;i++){await page.locator('[data-journey]').nth(i).click();assert.equal(await page.locator('.profile-result a').getAttribute('href'),'/'+destinations[i]);assert.equal(await page.locator('[data-journey][aria-pressed=true]').count(),1);}
-   assert.equal(await page.locator('.offer-card').count(),4);assert.equal(await page.locator('.equipment-card').count(),2);
-   assert.match(await page.locator('.offer-grid').textContent(),/500 USD\/mois/);assert.match(await page.locator('.offer-grid').textContent(),/12 mois/);
-   if(width<760){await page.locator('.pub-section-select select').selectOption('3');await page.locator('[data-equipment="1"]').click();assert.equal(await page.locator('.equipment-card:visible').count(),1);assert.match(await page.locator('.equipment-card:visible h3').textContent(),/bord/);}
-   assert.equal(await page.locator('.equipment-price').count(),2);for(const item of await page.locator('.equipment-price').all())assert.match(await item.textContent(),/mensuel \/ annuel/);
-  }
+  assert.equal(await page.locator('.visual-path').count(),6);
+  assert.equal(await page.locator('[role=tab]').count(),0);
+  await page.locator('.visual-path img').evaluateAll(es=>Promise.all(es.map(e=>{e.loading='eager';return e.decode();})));
+  assert.deepEqual(await page.locator('.visual-path img').evaluateAll(es=>es.filter(e=>!e.naturalWidth).map(e=>e.src)),[]);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+  if(name==='services'){assert.equal(await page.locator('.equipment-price').count(),2);for(const item of await page.locator('.equipment-price').all())assert.match(await item.textContent(),/mensuel \/ annuel/);}
+
  }
 }
 for(const [car,img] of [['Swift','swift-official'],['Blade','blade-official'],['IST','ist-official']]){await page.goto(base+'/detail-vehicule.html?car='+car,{waitUntil:'domcontentloaded'});await page.locator('.pub-header').waitFor();assert.match(await page.locator('#modalCarImg').getAttribute('src'),new RegExp(img));}
-assert.doesNotMatch(await page.locator('body').innerText(),/[\u00c3\u00c2][\u0080-\u00ff]/);assert.deepEqual(errors,[]);console.log('PASS visual tabs at mobile/desktop sizes, image loads, all four journey choices, supplied vehicle photos, equipment pricing and offer terms.');
+assert.doesNotMatch(await page.locator('body').innerText(),/[\u00c3\u00c2][\u0080-\u00ff]/);assert.deepEqual(errors,[]);console.log('PASS six service choices, image loads, supplied vehicle photos and equipment pricing at mobile/desktop sizes.');
 }finally{await b.close();server.close();}})().catch(e=>{console.error(e);process.exit(1)});

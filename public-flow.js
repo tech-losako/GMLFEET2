@@ -15,6 +15,12 @@
    landing.insertAdjacentHTML('beforeend','<div class="service-disclosures"><details id="comment-ca-marche" class="service-disclosure"><summary><span>Le parcours d’acquisition<small>De votre demande à l’exploitation du véhicule</small></span></summary><ol class="service-timeline">'+steps+'</ol></details><details class="service-disclosure"><summary><span>Conditions et documents<small>Les critères à vérifier avant de postuler</small></span></summary><ul class="service-requirements">'+conditions+'</ul></details></div>');
   }else{
    landing.innerHTML='<div class="service-intro"><p class="pub-eyebrow">AVANT DE COMMENCER</p><h2>Les réponses pour avancer.</h2><p>Consultez les informations utiles, puis préparez votre dossier.</p></div>';
+   if(path==='gestion-flotte.html'){
+    const source=info.shift(),returns=document.createElement('section');returns.className='owner-returns';
+    returns.innerHTML='<p class="pub-eyebrow">VOTRE VÉHICULE, VOS REVENUS</p><h2>Revenus cibles par catégorie</h2><p>Estimez le rendement mensuel potentiel de votre véhicule selon son année et son état.</p><div class="return-grid"></div>';
+    source.querySelectorAll('h3').forEach(h=>{const old=h.parentElement,card=document.createElement('article');card.className='return-card';const amount=[...old.querySelectorAll('div')].find(d=>d.textContent.trim().startsWith('Jusqu’à'));card.innerHTML='<h3>'+esc(h.textContent)+'</h3><p>'+esc(old.querySelector('p').textContent)+'</p><p class="return-amount">'+amount.innerHTML+'</p><ul>'+old.querySelector('ul').innerHTML+'</ul>';returns.querySelector('.return-grid').append(card);});
+    const note=[...source.querySelectorAll('p')].find(p=>p.textContent.trim().startsWith('*'));if(note)returns.append(note);landing.prepend(returns);source.remove();
+   }
    for(const section of info){const d=document.createElement('details');d.className='service-disclosure';if(section.id)d.id=section.id;const title=section.querySelector('h2')?.textContent.trim()||'En savoir plus';const summary=document.createElement('summary');summary.textContent=title;const content=document.createElement('div');content.className='service-disclosure-content';content.append(...section.childNodes);d.append(summary,content);landing.append(d);}
   }
   info.forEach(s=>s.remove());
