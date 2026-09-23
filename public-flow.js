@@ -75,6 +75,6 @@
   const update=()=>{const key=select.value;selection.hidden=!key;next.disabled=!key;choice.querySelectorAll('[data-vehicle]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.vehicle===key)));selectedSummary.textContent=key?'Véhicule choisi : '+title.textContent:'';};
   choice.addEventListener('click',e=>{const button=e.target.closest('[data-vehicle]');if(!button)return;select.value=button.dataset.vehicle;select.dispatchEvent(new Event('change',{bubbles:true}));});select.addEventListener('change',update);
   next.onclick=()=>{if(!select.value)return;choice.hidden=true;details.hidden=false;form.querySelector('h3')?.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});};
-  change.onclick=()=>{details.hidden=true;choice.hidden=false;choice.querySelector('[aria-pressed=true]')?.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});};update();
+  change.onclick=()=>{details.hidden=true;choice.hidden=false;choice.querySelector('[aria-pressed=true]')?.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});};const requested=new URLSearchParams(location.search).get('car');if([...select.options].some(o=>o.value===requested)&&requested){select.value=requested;select.dispatchEvent(new Event('change',{bubbles:true}));}update();
  }
 })();
