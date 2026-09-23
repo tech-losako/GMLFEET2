@@ -5,3 +5,9 @@
 - `dashcam.jpg`: Garmin Dash Cam Mini 3 photograph from https://www.garmin.com/en-US/p/1223369/pn/010-02899-00/ (official image https://res.garmin.com/en/products/010-02899-00/v/cf-lg.jpg).
 
 Equipment photos illustrate device categories; they do not identify confirmed GML stock. The page asks visitors to confirm the supplied model and features in their quote. Existing locally stored driver/fleet photos are reused.
+
+## Actual GML equipment (23 September 2026)
+
+- `gml-tracker.png`: tracker image supplied by the owner, copied unchanged.
+- `v7-pro-dashcam.jpg`: original embedded image IM67 extracted unchanged from page 7 of the owner-supplied `V7 PRO Fleet Management Solutions.pdf`; verified against the V7 Pro Dashcam row. Replaces the illustrative Garmin photograph.
+- The Teltonika and Garmin images above are no longer used on the public site.
