@@ -69,7 +69,7 @@ function fixture(){
  try{
   const page=await browser.newPage({viewport:{width:1440,height:1000}});
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.route('https://cdn.jsdelivr.net/**',r=>r.fulfill({contentType:'text/javascript',body:`(${fixture.toString()})();`}));
+  await page.route('**/vendor/supabase-2.57.4.js',r=>r.fulfill({contentType:'text/javascript',body:`(${fixture.toString()})();`}));
   await page.goto(`http://127.0.0.1:${server.address().port}/admin`);
   await page.locator('#workspace').waitFor({state:'visible'});
   await page.screenshot({path:path.join(__dirname,'dashboard-desktop.png'),fullPage:true});
@@ -112,7 +112,7 @@ function fixture(){
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   await page.evaluate(()=>{Object.assign(window.fixtureTables.applications[0],{workflow_stage:'handed_over',lolc_status:'approved'});});
   await page.locator('#refresh').click();
-  await page.getByRole('button',{name:/Contrats & véhicules/}).click();
+  await page.locator('nav').getByRole('button',{name:/Contrats & véhicules/}).click();
   await page.getByRole('button',{name:'＋ Activer un contrat'}).click();
   const day=new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Kinshasa',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
   for(const [k,v] of Object.entries({signed_reference:'UI-CONTRACT-01',model:'Toyota Vitz',plate:'UI 001',vin:'UI-VIN-001',tracker_id:'UI-TRACK-001',end_date:day,daily_lolc:'20',daily_gml:'5'}))await page.locator('#activateForm [name="'+k+'"]').fill(v);

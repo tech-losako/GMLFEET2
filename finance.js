@@ -30,7 +30,7 @@ window.GMFleetFinance = (() => {
  async function render(selected,context){
   view=selected;ctx=context;
   $('content').innerHTML='<section class="card empty">Chargement des opérations financières…</section>';
-  try{await load();paint();}catch(e){if(document.querySelector('nav button.active')?.dataset.view!==view)return;$('content').innerHTML=`<section class="card form-error">${esc(e.message)}</section>`;}
+  try{await load();paint();if(ctx.openContract&&view==='contracts'&&document.querySelector('nav button.active')?.dataset.view==='contracts'){const id=ctx.openContract;ctx.openContract=null;if(store.contracts.some(c=>c.id===id))showContract(id);}}catch(e){if(document.querySelector('nav button.active')?.dataset.view!==view)return;$('content').innerHTML=`<section class="card form-error">${esc(e.message)}</section>`;return false;}
  }
  function paint(){
   if(document.querySelector('nav button.active')?.dataset.view!==view)return;

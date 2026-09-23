@@ -36,7 +36,12 @@
    all.push(...data); if(data.length<500) return all;
   }
  }
- async function reload() {
+ let reloadPending=null;
+ function reload(){if(reloadPending)return reloadPending;reloadPending=refreshData().finally(()=>{reloadPending=null;});return reloadPending;}
+ async function refreshData() {
+  $('refresh').disabled=true;
+  $('syncStatus').textContent='Synchronisation en cours…';
+  try {
   const [apps,appointments,staff] = await Promise.all([
    rows('applications',q=>q.order('created_at',{ascending:false}).order('id')),
    rows('appointments',q=>q.order('starts_at').order('id')),
@@ -44,43 +49,35 @@
   Object.assign(state,{apps,appointments,staff});
   $('usersNav').hidden=!staff.some(s=>s.user_id===state.user.id&&s.role==='super_admin');
   $('navCount').textContent=apps.filter(a=>a.workflow_stage==='new').length;
-  $('syncStatus').textContent='Dernière actualisation : '+date(new Date().toISOString(),true)+' · Heure de Kinshasa';
-  render();
+  const complete=await render();
+  $('today').textContent=new Intl.DateTimeFormat('fr-FR',{dateStyle:'full',timeZone:'Africa/Kinshasa'}).format(new Date());
+  $('syncStatus').textContent=complete===false?'Actualisation partielle — finances à vérifier.':'Dernière actualisation : '+date(new Date().toISOString(),true)+' · Heure de Kinshasa';
+  }catch(error){$('syncStatus').textContent='Synchronisation interrompue — les données affichées peuvent être anciennes.';throw error;}finally{$('refresh').disabled=false;}
  }
  function render() {
+  if(state.view!=='overview')window.GMFleetDashboard.cancel();
   document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===state.view));
   $('newApplication').textContent=state.view==='appointments'?'＋ Programmer un rendez-vous':'＋ Nouvelle candidature';
   $('pageTitle').textContent={overview:'Tableau de bord',applications:'Candidatures',appointments:'Rendez-vous',contracts:'Contrats & véhicules',payments:'Caisse / versements',reconciliation:'Rapprochement LOLC',users:'Utilisateurs'}[state.view];
   document.getElementById('newApplication').hidden=['users','contracts','payments','reconciliation'].includes(state.view);
-  if(['contracts','payments','reconciliation'].includes(state.view)) { window.GMFleetFinance.render(state.view,{db,escape,date,person,notify,rows,staff:state.staff,user:state.user,apps:state.apps}); return; }
+  if(['contracts','payments','reconciliation'].includes(state.view)) { const rendering=window.GMFleetFinance.render(state.view,{db,escape,date,person,notify,rows,staff:state.staff,user:state.user,apps:state.apps,openContract:state.dashboardContract});state.dashboardContract=null; return rendering; }
   if(state.view==='users') {window.GMFleetUsers.render({db,escape,notify,staff:state.staff,user:state.user});return;}
-  if(state.view==='overview') renderOverview();
+  if(state.view==='overview') return renderOverview();
   else if(state.view==='applications') renderApplications();
   else renderAppointments();
  }
- function renderOverview() {
-  const today=todayKey(), pending=state.apps.filter(isOpen), overdue=pending.filter(a=>a.follow_up_on&&a.follow_up_on<today);
-  const appointments=state.appointments.filter(a=>new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Kinshasa',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(a.starts_at))===today&&!['cancelled','rescheduled'].includes(a.status));
-  const waiting=pending.filter(a=>a.lolc_status==='pending');
-  const work=[...overdue,...pending.filter(a=>a.workflow_stage==='new'&&!overdue.includes(a))].slice(0,8);
-  $('content').innerHTML=`<div class="stats">${[
-   ['Nouvelles candidatures',pending.filter(a=>a.workflow_stage==='new').length,'À prendre en charge'],['Rendez-vous aujourd’hui',appointments.length,'Accueil et suivi'],['Relances en retard',overdue.length,'Une action est attendue'],['En attente de LOLC',waiting.length,'Décision de financement']
-  ].map(([l,n,s])=>`<div class="stat"><span>${l}</span><strong>${n}</strong><small>${s}</small></div>`).join('')}</div>
-  <div class="grid-two"><section class="card"><div class="card-heading"><h3>À traiter en priorité</h3><span class="tag">${pending.length} dossiers ouverts</span></div>${work.length?work.map(a=>`<div class="row"><div>${link(a)}<small>${escape(programs[a.program_type])} · ${escape(a.next_action||'Prendre contact avec le candidat')}</small></div><div>${a.follow_up_on&&a.follow_up_on<today?'<span class="tag orange">Relance '+date(a.follow_up_on)+'</span>':tag(a)}</div></div>`).join(''):'<div class="empty">Aucune nouvelle candidature ou relance en retard.</div>'}</section>
-  <section class="card"><h3>Les quatre programmes</h3>${Object.entries(programs).map(([p,l])=>`<div class="program-row"><span>${escape(l)}</span><strong>${pending.filter(a=>a.program_type===p).length}</strong></div>`).join('')}<p class="muted">Dossiers ouverts, toutes origines confondues.</p></section></div>
-  <section class="card"><div class="card-heading"><h3>Les rendez-vous du jour</h3><button class="link-button" data-view="appointments">Voir l’agenda →</button></div>${appointments.length?appointments.map(a=>appointmentRow(a)).join(''):'<div class="empty">Aucun rendez-vous prévu aujourd’hui.</div>'}</section>`;
- }
+ function renderOverview(){return window.GMFleetDashboard.render({db,escape,date,apps:state.apps,appointments:state.appointments,programs,stages,person,isCurrent:()=>state.view==='overview'});}
  function renderApplications() {
   $('content').innerHTML=`<div class="filters"><input id="search" type="search" placeholder="Rechercher un nom, téléphone ou numéro de dossier…" aria-label="Rechercher" value="${escape(state.filters.query)}"><select id="programFilter" aria-label="Programme"><option value="">Tous les programmes</option>${options(programs,state.filters.program)}</select><select id="stageFilter" aria-label="Étape"><option value="">Toutes les étapes</option>${options(stages,state.filters.stage)}</select></div><section class="card"><div id="applicationTable"></div></section>`;
   $('search').addEventListener('input',e=>{state.filters.query=e.target.value;renderTable();});
   $('programFilter').addEventListener('change',e=>{state.filters.program=e.target.value;renderTable();});
-  $('stageFilter').addEventListener('change',e=>{state.filters.stage=e.target.value;renderTable();});
+  $('stageFilter').addEventListener('change',e=>{state.filters.followups=false;state.filters.stage=e.target.value;renderTable();});
   renderTable();
  }
  function renderTable() {
   const q=state.filters.query.toLocaleLowerCase('fr').trim();
-  const apps=state.apps.filter(a=>(!state.filters.program||a.program_type===state.filters.program)&&(!state.filters.stage||a.workflow_stage===state.filters.stage)&&(!q||`${a.id} ${a.name} ${a.phone}`.toLocaleLowerCase('fr').includes(q)));
-  $('applicationTable').innerHTML=`<div class="card-heading"><h3>${apps.length} candidature${apps.length!==1?'s':''}</h3><span class="muted">Cliquez sur un nom pour ouvrir le dossier</span></div>${apps.length?`<div class="table-wrap"><table><thead><tr><th>Candidat</th><th>Programme</th><th>Étape</th><th>Suivi</th><th>Origine</th></tr></thead><tbody>${apps.map(a=>`<tr><td>${link(a)}<small>#${a.id} · ${escape(a.phone)}</small></td><td>${escape(programs[a.program_type])}<small>${date(a.created_on)}</small></td><td>${tag(a)}</td><td>${escape(a.assigned_to?person(a.assigned_to):'Non attribué')}<small>${a.follow_up_on?'Relance : '+date(a.follow_up_on):'Aucune relance planifiée'}</small></td><td>${escape(sources[a.source])}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Aucun dossier ne correspond à ces filtres.</div>'}`;
+  const apps=state.apps.filter(a=>(!state.filters.followups||(isOpen(a)&&a.follow_up_on&&a.follow_up_on<=todayKey()))&&(!state.filters.program||a.program_type===state.filters.program)&&(!state.filters.stage||a.workflow_stage===state.filters.stage)&&(!q||`${a.id} ${a.name} ${a.phone}`.toLocaleLowerCase('fr').includes(q)));
+  $('applicationTable').innerHTML=`<div class="card-heading"><h3>${apps.length} candidature${apps.length!==1?'s':''}</h3><span class="muted">${state.filters.followups?'Relances dues aujourd’hui ou avant · changez le filtre Étape pour tout voir':'Cliquez sur un nom pour ouvrir le dossier'}</span></div>${apps.length?`<div class="table-wrap"><table><thead><tr><th>Candidat</th><th>Programme</th><th>Étape</th><th>Suivi</th><th>Origine</th></tr></thead><tbody>${apps.map(a=>`<tr><td>${link(a)}<small>#${a.id} · ${escape(a.phone)}</small></td><td>${escape(programs[a.program_type])}<small>${date(a.created_on)}</small></td><td>${tag(a)}</td><td>${escape(a.assigned_to?person(a.assigned_to):'Non attribué')}<small>${a.follow_up_on?'Relance : '+date(a.follow_up_on):'Aucune relance planifiée'}</small></td><td>${escape(sources[a.source])}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Aucun dossier ne correspond à ces filtres.</div>'}`;
  }
  function appointmentRow(a) {
   const app=state.apps.find(x=>x.id===a.application_id);
@@ -192,7 +189,14 @@
  }
  document.addEventListener('click',async e=>{
   const b=e.target.closest('button');if(!b) return;
-  if(b.dataset.view) {state.view=b.dataset.view;render();}
+  if(b.hasAttribute('data-dashboard-refresh')){try{await reload();}catch(error){notify(fail(error),true);}return;}
+  if(b.dataset.dashboardContract){state.dashboardContract=b.dataset.dashboardContract;state.view='contracts';render();return;}
+  if(b.dataset.view) {
+   state.filters.followups=b.hasAttribute('data-followups');
+   if(b.dataset.view==='applications')state.filters={query:'',program:'',stage:b.dataset.stageFilter||'',followups:state.filters.followups};
+   state.view=b.dataset.view;
+   if(state.view==='overview'){try{if(reloadPending)await reloadPending;await reload();}catch(error){notify(fail(error),true);}}else render();
+  }
   if(b.dataset.case) await openCase(b.dataset.case);
   if(b.dataset.close) $(b.dataset.close).close();
   if(b.dataset.document) {
@@ -211,7 +215,7 @@
   const data=await check(await db.from('applications').insert(payload).select('id').single());
   $('intake').close();await reload();await openCase(data.id);notify('Candidature créée. Vous pouvez ajouter les pièces et planifier le rendez-vous.');
  });
- $('refresh').addEventListener('click',async()=>{try{await reload();notify('Données actualisées.');}catch(e){notify(fail(e),true);}});
+ $('refresh').addEventListener('click',async()=>{try{await reload();if(!$('syncStatus').textContent.includes('partielle'))notify('Données actualisées.');}catch(e){notify(fail(e),true);}});
  $('logout').addEventListener('click',async()=>{await db.auth.signOut();location.href='/login.html';});
  async function init() {
   try {
@@ -224,7 +228,8 @@
    $('today').textContent=new Intl.DateTimeFormat('fr-FR',{dateStyle:'full',timeZone:'Africa/Kinshasa'}).format(new Date());
    await reload();$('access').hidden=true;$('workspace').hidden=false;
    db.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT')location.replace('/login.html');});
-   setInterval(async()=>{if(document.hidden||document.querySelector('dialog[open]'))return;try{await reload();}catch(e){notify('Actualisation interrompue. '+fail(e),true);}},60000);
+   const refreshVisible=async()=>{if(document.hidden||state.view!=='overview'||document.querySelector('dialog[open]'))return;try{await reload();}catch(e){notify('Actualisation interrompue. '+fail(e),true);}};
+   setInterval(refreshVisible,60000);window.addEventListener('focus',refreshVisible);window.addEventListener('online',refreshVisible);document.addEventListener('visibilitychange',refreshVisible);
   } catch(e) {$('access').innerHTML=`<h1>Connexion indisponible</h1><p>${escape(fail(e))}</p><button class="secondary" id="retry">Réessayer</button>`;$('retry').onclick=()=>location.reload();}
  }
  init();

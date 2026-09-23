@@ -5,7 +5,7 @@ function fixture(){
  const staff={user_id:'11111111-1111-1111-1111-111111111111',display_name:'Équipe de test',active:true};
  const base={phone:'+243000000000',source:'website',created_at:'2026-09-16T08:00:00Z',created_on:'2026-09-16',workflow_stage:'new',lolc_status:'not_submitted',revision:1,preparation:{},service_details:{},status:'En attente'};
  const tables={staff_members:[staff],applications:[{...base,id:1,name:'Patrick Test',program_type:'DRIVE_TO_OWN',vehicle:'Toyota Vitz',address:'Gombe'},{...base,id:2,name:'<img src=x onerror=alert(1)>',program_type:'YANGO',service:'Chauffeur Yango',vehicle:'Toyota IST',service_details:{carPlate:'TEST-123'}}],appointments:[],admin_notes:[],documents:[],audit_logs:[]};
- window.fixtureTables=tables;
+ Object.assign(tables,{contracts:[],drivers:[],vehicles:[],repayment_schedules:[],payments:[],payment_allocations:[],lolc_deposit_items:[],araka_attempts:[]});window.fixtureTables=tables;
  class Query{
   constructor(table){this.table=table;this.filters=[];this.mode='read';this.offset=0;this.end=999;}
   select(){return this;}eq(k,v){this.filters.push(r=>r[k]===v);return this;}order(){return this;}range(a,b){this.offset=a;this.end=b;return this;}single(){this.one=true;return this;}maybeSingle(){this.one=true;return this;}
@@ -36,7 +36,7 @@ function fixture(){
  try{
   const page=await browser.newPage({viewport:{width:1440,height:1000}});
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.route('https://cdn.jsdelivr.net/**',r=>r.fulfill({contentType:'text/javascript',body:`(${fixture.toString()})();`}));
+  await page.route('**/vendor/supabase-2.57.4.js',r=>r.fulfill({contentType:'text/javascript',body:`(${fixture.toString()})();`}));
   await page.goto(`http://127.0.0.1:${server.address().port}/admin`);
   await page.locator('#workspace').waitFor({state:'visible'});
   await page.screenshot({path:path.join(__dirname,'dashboard-desktop.png'),fullPage:true});

@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="fr">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GM Fleet — Opérations</title><link rel="stylesheet" href="/operations.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GM Fleet — Opérations</title><link rel="stylesheet" href="/operations.css?v=20260923-dashboard"></head>
 <body>
 <div id="access" class="access"><div class="brand">GM<span>FLEET</span></div><h1>Connexion aux opérations…</h1><p>Vérification de votre accès.</p></div>
 <div id="workspace" hidden>
@@ -20,5 +20,5 @@
  <label>Nom du co-emprunteur<input name="co_borrower_name" maxlength="200"></label><label>Téléphone du co-emprunteur<input name="co_borrower_phone" maxlength="40"></label><label class="wide">Adresse du co-emprunteur<input name="co_borrower_address" maxlength="500"></label>
  </div><div class="form-error" role="alert"></div><div class="form-footer"><span class="muted">Ajoutez les documents après la création du dossier.</span><button class="primary" type="submit">Créer le dossier</button></div></form></dialog>
 <dialog id="caseDialog" class="case-dialog"><div class="dialog-title"><div><span class="eyebrow" id="caseRef"></span><h2 id="caseName"></h2></div><button type="button" data-close="caseDialog" class="icon" aria-label="Fermer">×</button></div><div id="caseBody"></div></dialog>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.js"></script><script src="/supabase-config.js"></script><script src="/supabaseClient.js"></script><script src="/finance.js"></script><script src="/users.js"></script><script src="/operations.js"></script>
+<script src="/vendor/supabase-2.57.4.js"></script><script src="/supabase-config.js"></script><script src="/supabaseClient.js"></script><script src="/finance.js?v=20260923-dashboard"></script><script src="/users.js"></script><script src="/dashboard.js?v=20260923-dashboard"></script><script src="/operations.js?v=20260923-dashboard"></script>
 </body></html>

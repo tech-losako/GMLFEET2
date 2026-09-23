@@ -24,7 +24,8 @@ function staffFixture(){
  const browser=await chromium.launch({headless:true,channel:'msedge'});
  try{
   const page=await browser.newPage({viewport:{width:1440,height:1000}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:fixture+';fixture();('+staffFixture.toString()+')();'}));
+  await page.route(/supabase-2\.57\.4\.js|supabase-js@/,r=>r.fulfill({contentType:'text/javascript',body:fixture+';fixture();('+staffFixture.toString()+')();'}));
+  await page.route('**/*supabase.co/**',r=>r.abort());
   const url='http://127.0.0.1:'+server.address().port;
   await page.goto(url+'/admin.html');await page.locator('#usersNav').click();await page.locator('#addUser').click();
   await page.locator('[name=display_name]').fill('Cashier Test');await page.locator('#userForm [name=email]').fill('cashier@example.test');await page.locator('[name=role]').selectOption('cashier');await page.locator('#userForm [type=submit]').click();
