@@ -7,7 +7,7 @@
     <style>
         html.public-ui-pending{background:#f5f7f6}
         html.public-ui-pending body{visibility:hidden!important}
-        html.public-ui-pending::before{content:'GMFLEET';position:fixed;inset:0;display:grid;place-items:center;color:#152c3b;font:800 26px system-ui,sans-serif;letter-spacing:-1px;background:#f5f7f6}
+        html.public-ui-pending::before{content:'GM Fleet · GML';position:fixed;inset:0;display:grid;place-items:center;color:#152c3b;font:800 26px system-ui,sans-serif;letter-spacing:-1px;background:#f5f7f6}
         html.public-ui-failed::before{content:'Chargement interrompu. Actualisez la page pour réessayer.';font:500 16px system-ui,sans-serif;letter-spacing:0;padding:24px;text-align:center}
     </style>
     <script>
@@ -15,8 +15,9 @@
         window.publicUIFailed = function () { document.documentElement.classList.add('public-ui-failed'); };
         setTimeout(function () { if (document.documentElement.classList.contains('public-ui-pending')) window.publicUIFailed(); }, 15000);
     </script>
-    <link rel="preload" href="/public-ui.js?v=20260922b" as="script">
-    <link rel="stylesheet" href="/public-ui.css?v=20260922b">
+    <link rel="preload" href="/public-panels.js?v=20260922c" as="script">
+    <link rel="preload" href="/public-ui.js?v=20260922c" as="script">
+    <link rel="stylesheet" href="/public-ui.css?v=20260922c">
 
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -57,7 +58,7 @@
             <div class="flex justify-between h-20 items-center">
                 <div class="flex-shrink-0 flex items-center">
                     <a href="index.html" class="flex items-center">
-                        <img src="img/logogml-Photoroom.png" alt="GMLFLEET Logo" class="h-16 w-auto object-contain">
+                        <img src="img/gml-official.jpeg" alt="George Michael Logistics" class="h-16 w-auto object-contain">
                     </a>
                 </div>
 
@@ -359,7 +360,7 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                 <div class="md:col-span-2">
                     <a href="index.html" class="block mb-6">
-                        <img src="img/logogml-Photoroom.png" alt="GMLFLEET Logo" class="h-20 w-auto object-contain">
+                        <img src="img/gml-official.jpeg" alt="George Michael Logistics" class="h-20 w-auto object-contain">
                     </a>
                     <p class="text-gray-400 max-w-sm mb-6">
                         Une initiative de George Michael Logistics. Nous finançons l'avenir de la mobilité en donnant aux chauffeurs l'accès à la propriété de véhicules.
@@ -397,7 +398,8 @@
     <script src="supabase-config.js"></script>
     <script src="supabaseClient.js"></script>
     <script src="script.js"></script>
-<script src="/public-ui.js?v=20260922b" onerror="publicUIFailed()"></script>
+<script src="/public-panels.js?v=20260922c"></script>
+<script src="/public-ui.js?v=20260922c" onerror="publicUIFailed()"></script>
 </body>
 
 </html>

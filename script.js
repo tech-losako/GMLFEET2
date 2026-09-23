@@ -12,7 +12,7 @@ const showFormBtn = document.getElementById('showFormBtn');
 const carsData = {
     'IST': {
         name: 'Toyota IST',
-        img: './img/ist 1.jpg',
+        img: './img/ist-official.png',
         daily: '32,5 $',
         pricing: {
             "12": { total: "10 536 $", avance: "1 300 $", week: "203 $" },
@@ -22,7 +22,7 @@ const carsData = {
     },
     'Blade': {
         name: 'Toyota Blade',
-        img: './img/blade 1.jpg',
+        img: './img/blade-official.png',
         daily: '38,5 $',
         pricing: {
             "12": { total: "11 160 $", avance: "1 400 $", week: "215 $" },
@@ -32,7 +32,7 @@ const carsData = {
     },
     'Swift': {
         name: 'Suzuki Swift',
-        img: './img/swift 1.jpg',
+        img: './img/swift-official.png',
         daily: '29,5 $',
         pricing: {
             "12": { total: "9 288 $", avance: "1 100 $", week: "179 $" },
