@@ -1,6 +1,13 @@
 /* Focused public entry points: choose a service, then see its own details. */
 (() => {
 window.setupPublicDirectory=(path,hero,sections,main)=>{
+ if(path==='vehicules.html'){
+  hero.classList.add('directory-intro');hero.querySelector('.pub-hero-image').remove();hero.querySelector('.pub-hero-actions').remove();
+  const source=sections.find(s=>s.id==='vehicules'),grid=document.createElement('section');grid.className='vehicle-catalogue';grid.id='vehicules';grid.setAttribute('aria-label','Nos véhicules');
+  source.querySelectorAll('[onclick]').forEach(old=>{const title=old.querySelector('h3'),img=old.querySelector('img');if(!title||!img)return;const key=title.textContent.trim(),a=document.createElement('a');a.className='catalogue-car';a.href='/detail-vehicule.html?car='+encodeURIComponent(key);const photo=img.cloneNode();photo.className='';photo.loading='eager';const copy=document.createElement('div'),h=document.createElement('h2'),p=document.createElement('p'),cta=document.createElement('span');h.textContent=img.alt;p.textContent=old.querySelector('p').textContent.trim();cta.textContent='Découvrir ce véhicule ↗';copy.append(h,p,cta);a.append(photo,copy);grid.append(a);});main.append(grid);
+  const guide=document.createElement('div');guide.className='catalogue-guide';guide.innerHTML='<div><h2>Un modèle vous intéresse ?</h2><p>Consultez sa fiche et son offre, puis préparez votre candidature en quelques étapes.</p></div><a class="pub-button" href="/vehicule-credit.html">Comprendre le parcours ↗</a>';main.append(guide);
+  sections.forEach(s=>s.remove());return true;
+ }
  if(!['index.html','services.html','apropos.html'].includes(path))return false;
  if(path==='apropos.html'){
   hero.hidden=true;

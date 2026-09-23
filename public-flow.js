@@ -2,6 +2,29 @@
 (() => {
  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const names={'vehicule-credit.html':'Drive to Own','recrutement-chauffeurs.html':'Chauffeur partenaire','agregateur-yango.html':'Partenaire Yango','gestion-flotte.html':'Gestion de flotte'};
+ // Rebuild informational content from semantic text, without legacy presentation wrappers.
+ window.buildPublicInformation=section=>{
+  const content=document.createElement('div');content.className='service-information';
+  if(section.id==='app-mockup'){
+   content.innerHTML='<p>Avec GML Mobile, suivez votre véhicule et son exploitation depuis votre téléphone.</p><ul class="information-checklist">'+['Localisation et alertes','Revenus, historique et retraits','Maintenance et réparations','Vidéo embarquée'].map(t=>'<li>'+t+'</li>').join('')+'</ul><a class="pub-button" href="#evaluer-form">Demander un accès à GML Mobile ↗</a>';return content;
+  }
+  let group=content;
+  for(const node of section.querySelectorAll('h3,h4,p,li,a')){
+   if(node.closest('li')&&node.tagName!=='LI')continue;
+   if(node.tagName==='A'&&node.closest('p'))continue;
+   if(!node.textContent.trim())continue;
+   if(/^H[34]$/.test(node.tagName)){
+    if(node.textContent.trim()===section.querySelector('h2,h3')?.textContent.trim())continue;
+    group=document.createElement('article');group.className='information-item';const h=document.createElement('h3');h.textContent=node.textContent.trim();group.append(h);content.append(group);
+   }else{
+    const el=document.createElement(node.tagName==='LI'?'p':node.tagName.toLowerCase());el.textContent=node.textContent.trim();
+    if(node.tagName==='LI')el.className='information-condition';
+    if(node.tagName==='A'){el.href=node.getAttribute('href');el.className='information-link';}
+    group.append(el);
+   }
+  }
+  return content;
+ };
  window.isPublicServicePage=path=>Boolean(names[path]);
  window.setupPublicServiceFlow=(path,hero,sections,explorer)=>{
   const app=sections.find(s=>s.querySelector('form'));
@@ -21,7 +44,7 @@
     source.querySelectorAll('h3').forEach(h=>{const old=h.parentElement,card=document.createElement('article');card.className='return-card';const amount=[...old.querySelectorAll('div')].find(d=>d.textContent.trim().startsWith('Jusqu’à'));card.innerHTML='<h3>'+esc(h.textContent)+'</h3><p>'+esc(old.querySelector('p').textContent)+'</p><p class="return-amount">'+amount.innerHTML+'</p><ul>'+old.querySelector('ul').innerHTML+'</ul>';returns.querySelector('.return-grid').append(card);});
     const note=[...source.querySelectorAll('p')].find(p=>p.textContent.trim().startsWith('*'));if(note)returns.append(note);landing.prepend(returns);source.remove();
    }
-   for(const section of info){const d=document.createElement('details');d.className='service-disclosure';if(section.id)d.id=section.id;const title=section.querySelector('h2')?.textContent.trim()||'En savoir plus';const summary=document.createElement('summary');summary.textContent=title;const content=document.createElement('div');content.className='service-disclosure-content';content.append(...section.childNodes);d.append(summary,content);landing.append(d);}
+   for(const section of info){const d=document.createElement('details');d.className='service-disclosure';if(section.id)d.id=section.id;const title=section.querySelector('h2,h3')?.textContent.trim()||'En savoir plus';const summary=document.createElement('summary');summary.textContent=title;const content=window.buildPublicInformation(section);d.append(summary,content);landing.append(d);}
   }
   info.forEach(s=>s.remove());
   const launch=document.createElement('button');launch.type='button';launch.className='pub-button primary service-apply';launch.textContent=path==='gestion-flotte.html'?'Présenter mon véhicule':'Commencer ma candidature';landing.append(launch);
