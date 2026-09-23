@@ -1,0 +1,25 @@
+{
+  "currency": "USD",
+  "gps": {
+    "title": "Tracker GPS",
+    "headline": "Votre véhicule, toujours sous vos yeux.",
+    "subscriptionNote": "L’abonnement de suivi ne comprend pas l’achat initial du matériel ni son installation.",
+    "terms": "La durée d’engagement et les conditions de suivi seront précisées dans votre devis avant validation.",
+    "offers": {
+      "car": {"label": "Voiture", "hardware": 130, "installation": 20, "monthly": 15},
+      "jeep": {"label": "Jeep", "hardware": 130, "installation": 20, "monthly": 16},
+      "truck": {"label": "Camion", "hardware": 120, "installation": 20, "monthly": 19.5}
+    }
+  },
+  "dashcam": {
+    "title": "Dashcam V7 Pro",
+    "headline": "Une caméra embarquée pour garder une trace de vos trajets.",
+    "subscriptionNote": "L’abonnement est distinct de l’achat du matériel. Les offres autonomes sont distinctes du package de gestion de flotte.",
+    "terms": "Les fonctions activées, la durée d’engagement et les conditions de l’abonnement seront précisées dans votre devis.",
+    "offers": {
+      "car": {"label": "Voiture", "hardware": null, "installation": null, "monthly": null, "note": "Offre autonome sur devis. Le prix du matériel et les conditions d’installation et d’abonnement restent à confirmer."},
+      "jeep": {"label": "Jeep", "hardware": null, "installation": null, "monthly": null, "note": "Offre autonome sur devis. Contactez notre équipe pour confirmer les tarifs adaptés à votre véhicule."},
+      "truck": {"label": "Camion", "hardware": 265, "installation": 0, "monthly": 15, "note": "Aucun frais d’installation supplémentaire dans cette grille commerciale."}
+    }
+  }
+}

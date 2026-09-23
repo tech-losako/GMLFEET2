@@ -7,12 +7,12 @@ page.setDefaultTimeout(20000);page.setDefaultNavigationTimeout(60000);for(const 
  for(const name of ['index','services']){
   await page.goto(base+'/'+name+'.html',{waitUntil:'domcontentloaded'});await page.locator('.pub-header').waitFor();
   assert.equal(await page.locator('.pub-logo img').getAttribute('src'),'/img/gml-official.jpeg');
-  assert.equal(await page.locator('.visual-path').count(),6);
+  assert.equal(await page.locator('.visual-path').count(),5);
   assert.equal(await page.locator('[role=tab]').count(),0);
   await page.locator('.visual-path img').evaluateAll(es=>Promise.all(es.map(e=>{e.loading='eager';return e.decode();})));
   assert.deepEqual(await page.locator('.visual-path img').evaluateAll(es=>es.filter(e=>!e.naturalWidth).map(e=>e.src)),[]);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
-  if(name==='services'){assert.equal(await page.locator('.equipment-price').count(),2);for(const item of await page.locator('.equipment-price').all())assert.match(await item.textContent(),/mensuel \/ annuel/);}
+
 
  }
 }

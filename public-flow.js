@@ -30,24 +30,44 @@
   const app=sections.find(s=>s.querySelector('form'));
   if(!app)return;
   const info=sections.filter(s=>s!==app),landing=document.createElement('div');landing.className='service-story';
+  const briefs={
+   'vehicule-credit.html':{
+    title:'Conduisez aujourd’hui. Devenez propriétaire demain.',intro:'Avec Car na ngai, travaillez au volant de votre véhicule et avancez vers la propriété grâce aux versements prévus dans votre contrat.',
+    steps:[['Choisissez et postulez','Sélectionnez votre voiture et transmettez votre dossier.'],['Faites valider votre dossier','GML examine vos documents et vous contacte pour un rendez-vous si votre dossier est retenu. Le financement reste soumis à l’accord du partenaire financier.'],['Prenez le volant','Après validation et acompte, commencez à conduire. À la fin des paiements contractuels, le véhicule vous appartient.']],
+    needs:['Permis et pièce d’identité valides.','Pièces d’identité et preuves de résidence du client et du co-emprunteur.','Acompte initial, entretien et accord du partenaire financier.','Respect des règles de sécurité et d’exploitation.'],
+    benefits:['Un parcours vers la propriété','Suivi du véhicule et accompagnement','Vous conservez votre surplus après le versement convenu']},
+   'recrutement-chauffeurs.html':{
+    title:'Devenez chauffeur GML. Construisez la suite.',intro:'Vous avez l’expérience, nous avons les véhicules. Rejoignez notre flotte et ouvrez la voie à votre propre voiture : après 12 mois de bonne performance, vous pouvez accéder en priorité au programme Drive to Own.',
+    steps:[['Envoyez votre candidature','Présentez votre expérience et joignez vos documents.'],['Rencontrez notre équipe','Après examen favorable du dossier, GML vous appelle pour organiser un test de conduite et un entretien.'],['Rejoignez la flotte','Si vous êtes approuvé, suivez l’intégration et la formation avant de prendre le volant.']],
+    needs:['Permis de conduire valide.','Au minimum 1 an d’expérience de conduite.','Casier judiciaire vierge et bonne moralité.','Bonne connaissance de Kinshasa.'],benefits:['Un véhicule pour travailler','Formation et accompagnement','Une possibilité d’évoluer vers la propriété']},
+   'gestion-flotte.html':{
+    title:'Votre voiture travaille. Vous restez propriétaire.',intro:'Confiez l’exploitation de votre véhicule à GML et visez jusqu’à 500 USD par mois selon sa catégorie. Nous sélectionnons le chauffeur et suivons l’activité, les équipements et la maintenance.',
+    steps:[['Présentez votre véhicule','Envoyez ses informations, ses photos et sa carte rose.'],['Faites-le évaluer','Notre équipe vous contacte pour organiser l’inspection et préciser la catégorie ainsi que les conditions du contrat.'],['Confiez son exploitation','Après accord, GML organise l’affectation du chauffeur et le suivi de votre véhicule.']],
+    needs:['Votre identité et vos coordonnées.','Carte rose, immatriculation et numéro de châssis.','Photos du véhicule et inspection technique préalable.'],benefits:['Chauffeur sélectionné et réseau Yango','GPS, dashcam et suivi opérationnel','Revenus et historique dans GML Mobile']},
+   'agregateur-yango.html':{
+    title:'Vous roulez sur Yango. Choisissez un partenaire à vos côtés.',intro:'Rejoignez GML avec votre véhicule : accompagnement chauffeur, conditions de retrait selon les offres en vigueur, bonus et promotions. Vous gardez votre voiture et votre activité.',
+    steps:[['Ouvrez votre application Yango','Rendez-vous dans les paramètres de votre compte pour demander un changement de partenaire.'],['Choisissez GM Fleet','Sélectionnez GM Fleet comme partenaire et suivez les étapes de rattachement proposées.'],['Roulez avec notre équipe','Une fois le rattachement confirmé, profitez de l’accompagnement GML. Besoin d’aide ? Remplissez le formulaire : notre équipe vous contacte et vous accompagne.']],
+    needs:['Votre téléphone et vos coordonnées.','Votre permis de conduire.','Les informations de votre véhicule ; sa carte rose si disponible.'],benefits:['Support chauffeur','Bonus et promotions selon les offres','Accompagnement automobile']}
+  };
+  const brief=briefs[path];hero.querySelector('h1').textContent=brief.title;hero.querySelector('p:not(.pub-eyebrow)').textContent=brief.intro;hero.classList.add('service-brief-hero');
+  if(path==='recrutement-chauffeurs.html')hero.querySelector('img').src='/img/fortune-vieyra-o4yi2U-qcf0-unsplash.jpg';
+  if(path==='agregateur-yango.html')hero.querySelector('#pub-start').childNodes[0].textContent='Être accompagné ';
+  const icons=['<rect x="9" y="4" width="22" height="32" rx="4"/><path d="M15 11h10M15 17h10M15 23h6M18 31h4"/>','<path d="M11 4h18v7h6v25H5V11h6zM13 23l5 5 10-12"/>','<path d="M5 24l4-12h22l4 12v9H5zM8 24h24M12 29h1M27 29h1M12 12l3-5h10l3 5"/>'];
+  landing.innerHTML='<div class="service-benefit-strip">'+brief.benefits.map(t=>'<span>'+esc(t)+'</span>').join('')+'</div><section class="brief-process" id="comment-ca-marche"><div class="brief-heading"><p class="pub-eyebrow">COMMENT ÇA MARCHE</p><h2>Trois étapes pour commencer.</h2></div><ol>'+brief.steps.map(([t,d],i)=>'<li><div class="brief-step-art"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">'+icons[i]+'</svg><span>0'+(i+1)+'</span></div><h3>'+esc(t)+'</h3><p>'+esc(d)+'</p></li>').join('')+'</ol></section>';
   if(path==='vehicule-credit.html'){
-   const benefits=[...info[1].querySelectorAll('h3')].map(h=>[h.textContent.trim(),h.parentElement.querySelector('p')?.textContent.trim()||'']);
-   landing.innerHTML='<div class="service-value"><div><p class="pub-eyebrow">VOTRE ACTIVITÉ, ACCOMPAGNÉE</p><h2>Plus qu’un véhicule.<br>Un parcours vers la propriété.</h2><p>Vous conduisez avec un cadre clair et une équipe à vos côtés.</p></div><dl>'+benefits.map(([t,d],i)=>`<div><dt><span>0${i+1}</span>${esc(t)}</dt><dd>${esc(d)}</dd></div>`).join('')+'</dl></div>';
-   const steps=[...info[0].querySelectorAll('h3')].map(h=>`<li><strong>${esc(h.textContent.trim())}</strong><p>${esc(h.parentElement.querySelector('p')?.textContent.trim()||'')}</p></li>`).join('');
-   const conditions=[...info[2].querySelectorAll('li')].map(li=>'<li>'+li.querySelector('span').innerHTML+'</li>').join('');
-   landing.insertAdjacentHTML('beforeend','<div class="service-disclosures"><details id="comment-ca-marche" class="service-disclosure"><summary><span>Le parcours d’acquisition<small>De votre demande à l’exploitation du véhicule</small></span></summary><ol class="service-timeline">'+steps+'</ol></details><details class="service-disclosure"><summary><span>Conditions et documents<small>Les critères à vérifier avant de postuler</small></span></summary><ul class="service-requirements">'+conditions+'</ul></details></div>');
-  }else{
-   landing.innerHTML='<div class="service-intro"><p class="pub-eyebrow">AVANT DE COMMENCER</p><h2>Les réponses pour avancer.</h2><p>Consultez les informations utiles, puis préparez votre dossier.</p></div>';
-   if(path==='gestion-flotte.html'){
-    const source=info.shift(),returns=document.createElement('section');returns.className='owner-returns';
-    returns.innerHTML='<p class="pub-eyebrow">VOTRE VÉHICULE, VOS REVENUS</p><h2>Revenus cibles par catégorie</h2><p>Estimez le rendement mensuel potentiel de votre véhicule selon son année et son état.</p><div class="return-grid"></div>';
-    source.querySelectorAll('h3').forEach(h=>{const old=h.parentElement,card=document.createElement('article');card.className='return-card';const amount=[...old.querySelectorAll('div')].find(d=>d.textContent.trim().startsWith('Jusqu’à'));card.innerHTML='<h3>'+esc(h.textContent)+'</h3><p>'+esc(old.querySelector('p').textContent)+'</p><p class="return-amount">'+amount.innerHTML+'</p><ul>'+old.querySelector('ul').innerHTML+'</ul>';returns.querySelector('.return-grid').append(card);});
-    const note=[...source.querySelectorAll('p')].find(p=>p.textContent.trim().startsWith('*'));if(note)returns.append(note);landing.prepend(returns);source.remove();
-   }
-   for(const section of info){const d=document.createElement('details');d.className='service-disclosure';if(section.id)d.id=section.id;const title=section.querySelector('h2,h3')?.textContent.trim()||'En savoir plus';const summary=document.createElement('summary');summary.textContent=title;const content=window.buildPublicInformation(section);d.append(summary,content);landing.append(d);}
+   const daily=typeof carsData!=='undefined'?carsData.Swift.daily:null;
+   if(daily)hero.querySelector('.pub-hero-actions').insertAdjacentHTML('beforebegin','<p class="brief-price">À partir de <strong>'+esc(daily)+'/jour</strong><small>Selon le modèle et le plan choisi. Acompte initial requis ; consultez l’offre du véhicule avant de postuler.</small></p>');
   }
+  if(path==='gestion-flotte.html'){
+   const source=info[0],returns=document.createElement('section');returns.className='owner-returns';
+   returns.innerHTML='<p class="pub-eyebrow">VOS REVENUS CIBLES</p><h2>À chaque véhicule sa catégorie.</h2><div class="return-grid"></div>';
+   source.querySelectorAll('h3').forEach(h=>{const old=h.parentElement,card=document.createElement('article');card.className='return-card';const amount=[...old.querySelectorAll('div')].find(d=>d.textContent.trim().startsWith('Jusqu’à'));card.innerHTML='<h3>'+esc(h.textContent)+'</h3><p>'+esc(old.querySelector('p').textContent)+'</p><p class="return-amount">'+amount.innerHTML+'</p>';returns.querySelector('.return-grid').append(card);});
+   const note=[...source.querySelectorAll('p')].find(p=>p.textContent.trim().startsWith('*'));if(note)returns.append(note);landing.querySelector('.brief-process').before(returns);
+   landing.insertAdjacentHTML('beforeend','<p class="brief-contract">Contrat initial de 12 mois · Frais de gestion : 64 USD/mois la première année. Au renouvellement, la tarification est revue à la baisse si les équipements installés ne doivent pas être rachetés. Pour les réparations : diagnostic, devis et votre accord avant intervention.</p>');
+  }
+  landing.insertAdjacentHTML('beforeend','<section class="brief-requirements"><h2>À préparer pour votre demande</h2><ul>'+brief.needs.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul></section>');
   info.forEach(s=>s.remove());
-  const launch=document.createElement('button');launch.type='button';launch.className='pub-button primary service-apply';launch.textContent=path==='gestion-flotte.html'?'Présenter mon véhicule':'Commencer ma candidature';landing.append(launch);
+  const launch=document.createElement('button');launch.type='button';launch.className='pub-button primary service-apply';launch.textContent=path==='gestion-flotte.html'?'Présenter mon véhicule':path==='agregateur-yango.html'?'Demander de l’aide pour rejoindre GML':'Commencer ma candidature';landing.append(launch);
   app.className='application-view';app.removeAttribute('role');app.hidden=true;
   const appHeading=document.createElement('div');appHeading.className='application-heading';appHeading.innerHTML=`<button type="button" class="application-back">← Retour à ${esc(names[path])}</button><p class="pub-eyebrow">${esc(names[path])} / CANDIDATURE</p><h1 tabindex="-1">${path==='gestion-flotte.html'?'Présenter mon véhicule':'Votre candidature'}</h1><p>Complétez chaque étape. Vous pourrez vérifier votre dossier avant l’envoi.</p>`;
   const originalIntro=app.querySelector('h2');if(originalIntro){const intro=originalIntro.parentElement;if(!intro.querySelector('form'))intro.remove();}

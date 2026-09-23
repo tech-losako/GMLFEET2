@@ -6,8 +6,7 @@
     {title:'Je souhaite conduire', description:'Mettez votre expérience au volant d’un véhicule de notre flotte.', image:'fortune-vieyra-o4yi2U-qcf0-unsplash.jpg', url:'recrutement-chauffeurs.html', label:'Devenir chauffeur partenaire'},
     {title:'Je possède une voiture', description:'Confiez son exploitation à une équipe qui assure le suivi.', image:'blade-official.png', url:'gestion-flotte.html', label:'Confier ma voiture'},
     {title:'Je suis déjà sur Yango', description:'Gardez votre voiture et rejoignez notre réseau partenaire.', image:'ist-official.png', url:'agregateur-yango.html', label:'Rejoindre le réseau'},
-    {title:'Je veux localiser mon véhicule',description:'Équipez votre voiture d’un traceur GPS et découvrez nos solutions de suivi.',image:'gml-tracker.png',url:'services.html#gps',label:'Découvrir le traceur GPS'},
-    {title:'Je veux une caméra de bord',description:'Découvrez la caméra V7 Pro et son installation sur votre véhicule.',image:'v7-pro-dashcam.jpg',url:'services.html#dashcam',label:'Découvrir la dashcam'}
+    {title:'Équipements & sécurité',description:'Tracker GPS ou dashcam : choisissez votre équipement et son installation.',image:'gml-tracker.png',url:'services.html#equipements',label:'Équiper mon véhicule'}
   ];
   window.publicProfileCards = () => '<div class="visual-paths">'+journeys.map((j,i)=>`<a class="visual-path" href="/${j.url}"><div class="visual-path-photo"><img src="/img/${j.image}" alt="" loading="lazy"><span>0${i+1}</span></div><div class="visual-path-copy"><h3>${j.title}</h3><p>${j.description}</p><span class="visual-link">${j.label} <b aria-hidden="true">↗</b></span></div></a>`).join('')+'</div>';
   const heading = (eyebrow,title,description='') => `<div class="editorial-heading"><p class="pub-eyebrow">${eyebrow}</p><h2>${title}</h2>${description?`<p>${description}</p>`:''}</div>`;
