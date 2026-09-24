@@ -34,7 +34,7 @@
    'vehicule-credit.html':{
     title:'Conduisez aujourd’hui. Devenez propriétaire demain.',intro:'Avec Car na ngai, travaillez au volant de votre véhicule et avancez vers la propriété grâce aux versements prévus dans votre contrat.',
     steps:[['Choisissez et postulez','Sélectionnez votre voiture et transmettez votre dossier.'],['Faites valider votre dossier','GML examine vos documents et vous contacte pour un rendez-vous si votre dossier est retenu. Le financement reste soumis à l’accord du partenaire financier.'],['Prenez le volant','Après validation et acompte, commencez à conduire. À la fin des paiements contractuels, le véhicule vous appartient.']],
-    needs:['Permis et pièce d’identité valides.','Pièces d’identité et preuves de résidence du client et du co-emprunteur.','Acompte initial, entretien et accord du partenaire financier.','Respect des règles de sécurité et d’exploitation.'],
+    needs:['Pièce d’identité valide.','Nationalité congolaise.','Justificatif de domicile.','Preuve d’expérience sur Yango.'],
     benefits:['Un parcours vers la propriété','Suivi du véhicule et accompagnement','Vous conservez votre surplus après le versement convenu']},
    'recrutement-chauffeurs.html':{
     title:'Devenez chauffeur GML. Construisez la suite.',intro:'Vous avez l’expérience, nous avons les véhicules. Rejoignez notre flotte et ouvrez la voie à votre propre voiture : après 12 mois de bonne performance, vous pouvez accéder en priorité au programme Drive to Own.',
