@@ -1,0 +1,9 @@
+{
+  "note": "Les caractéristiques exactes dépendent du véhicule proposé. Les valeurs non renseignées doivent être confirmées par GML avant validation du choix.",
+  "models": [
+    {"key":"Swift","name":"Suzuki Swift","brand":"Suzuki","image":"/img/swift-official.png","profile":"Agilité en ville","description":"Un format compact pour vos déplacements urbains.","body":"Compacte à hayon","year":null,"engine":null,"transmission":null,"seats":null},
+    {"key":"IST","name":"Toyota IST","brand":"Toyota","image":"/img/ist-official.png","profile":"Polyvalence au quotidien","description":"Une compacte pour les trajets du quotidien.","body":"Compacte à hayon","year":null,"engine":null,"transmission":null,"seats":null},
+    {"key":"Blade","name":"Toyota Blade","brand":"Toyota","image":"/img/blade-official.png","profile":"Confort sur la route","description":"Le modèle à explorer si le confort est votre priorité.","body":"Compacte à hayon","year":null,"engine":null,"transmission":null,"seats":null},
+    {"key":"Vitz","name":"Toyota Vitz","brand":"Toyota","image":"/img/vitz 1.jpg","profile":"Simplicité au quotidien","description":"Une citadine à considérer pour votre activité en ville.","body":"Compacte à hayon","year":null,"engine":null,"transmission":null,"seats":null}
+  ]
+}

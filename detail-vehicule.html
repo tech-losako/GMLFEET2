@@ -6,7 +6,7 @@
     (() => {
       const car = new URLSearchParams(location.search).get('car');
       const valid = ['Swift', 'IST', 'Blade', 'Vitz'].includes(car);
-      location.replace('/vehicule-credit.html' + (valid ? '?car=' + encodeURIComponent(car) : '') + '#candidature');
+      location.replace('/vehicules.html' + (valid ? '?car=' + encodeURIComponent(car) : ''));
     })();
     </script>
     <meta charset="UTF-8">
@@ -57,6 +57,7 @@
 
     
 
+<link rel="stylesheet" href="/public-discovery.css?v=20260924-discovery">
 </head>
 
 <body class="bg-gray-50 text-gray-800 antialiased" id="accueil">
@@ -474,7 +475,7 @@
 <script src="/public-panels.js?v=20260923e"></script>
 <script src="/public-flow.js?v=20260924-lifecycle"></script>
 <script src="/public-equipment.js?v=20260923e"></script>
-<script src="/public-directory.js?v=20260923e"></script>
+<script src="/public-catalogue.js?v=20260924-discovery"></script><script src="/public-directory.js?v=20260924-discovery"></script>
 <script src="/public-ui.js?v=20260923e" onerror="publicUIFailed()"></script>
 </body>
 
