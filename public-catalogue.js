@@ -1,7 +1,7 @@
 /* Browse and compare vehicle information before choosing an application path. */
 (() => {
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const fields=[['brand','Marque'],['body','Carrosserie'],['year','Année'],['engine','Motorisation'],['transmission','Boîte de vitesses'],['seats','Places']];
+
  window.setupVehicleCatalogue=(hero,sections,main)=>{
   hero.classList.add('directory-intro','catalogue-intro');hero.querySelector('.pub-hero-image').remove();hero.querySelector('.pub-hero-actions').remove();
   hero.querySelector('h1').textContent='Le bon modèle commence par le bon choix.';
@@ -11,20 +11,20 @@
   const grid=main.querySelector('.vehicle-catalogue'),compare=main.querySelector('#compare-vehicles'),selected=new Set();
   const dialog=document.createElement('dialog');dialog.className='vehicle-sheet';dialog.setAttribute('aria-labelledby','vehicle-sheet-title');document.body.append(dialog);
   let models=[],note='';
-  const value=(m,key)=>m[key]===null||m[key]===undefined?'À confirmer':esc(m[key]);
+
   const close=()=>{dialog.close();const url=new URL(location.href);url.searchParams.delete('car');url.searchParams.delete('compare');history.replaceState({},'',url);};
   dialog.addEventListener('cancel',ev=>{ev.preventDefault();close();});
   const launch=(keys,writeHistory=true)=>{
    const cars=keys.map(k=>models.find(m=>m.key===k)).filter(Boolean);if(!cars.length)return;
    const comparing=cars.length===2;
-   dialog.innerHTML=`<div class="vehicle-sheet-top"><span class="pub-eyebrow">${comparing?'COMPARAISON':'FICHE VÉHICULE'}</span><button type="button" class="sheet-close" aria-label="Fermer la fiche">×</button></div><h2 id="vehicle-sheet-title" tabindex="-1">${comparing?'Deux modèles, un choix éclairé.':esc(cars[0].name)}</h2><div class="sheet-models ${comparing?'is-comparison':''}">${cars.map(m=>`<article><img src="${esc(m.image)}" alt="${esc(m.name)}"><div class="sheet-model-copy">${comparing?`<h3>${esc(m.name)}</h3>`:''}<p>${esc(m.profile)}</p><dl>${fields.map(([key,label])=>`<div><dt>${label}</dt><dd class="${m[key]==null?'unconfirmed':''}">${value(m,key)}</dd></div>`).join('')}</dl><a class="pub-button primary" href="/vehicule-credit.html?car=${encodeURIComponent(m.key)}#candidature">Choisir ce modèle pour Car na ngai ↗</a><a class="sheet-question" href="/apropos.html?service=${encodeURIComponent('Fiche technique — '+m.name)}#contact">Vérifier les caractéristiques avec GML →</a></div></article>`).join('')}</div><p class="sheet-note">${esc(note)}</p>`;
+   dialog.innerHTML=`<div class="vehicle-sheet-top"><span class="pub-eyebrow">${comparing?'COMPARAISON':'FICHE VÉHICULE'}</span><button type="button" class="sheet-close" aria-label="Fermer la fiche">×</button></div><h2 id="vehicle-sheet-title" tabindex="-1">${comparing?'Deux modèles, un choix éclairé.':esc(cars[0].name)}</h2><div class="sheet-models ${comparing?'is-comparison':''}">${cars.map(m=>`<article><img src="${esc(m.image)}" alt="${esc(m.name)}"><div class="sheet-model-copy">${comparing?`<h3>${esc(m.name)}</h3>`:''}<p>${esc(m.profile)}</p>${window.GMFleetSpecs.section(m)}<a class="pub-button primary" href="/vehicule-credit.html?car=${encodeURIComponent(m.key)}#candidature">Choisir ce modèle pour Car na ngai ↗</a><a class="sheet-question" href="/apropos.html?service=${encodeURIComponent('Fiche technique — '+m.name)}#contact">Vérifier les caractéristiques avec GML →</a></div></article>`).join('')}</div><p class="sheet-note">${esc(note)}</p>`;
    dialog.querySelector('.sheet-close').onclick=close;
    if(writeHistory){const url=new URL(location.href);url.searchParams.delete('car');url.searchParams.delete('compare');url.searchParams.set(comparing?'compare':'car',keys.join(','));history.pushState({},'',url);}
    if(!dialog.open)dialog.showModal();dialog.querySelector('h2').focus({preventScroll:true});dialog.scrollTop=0;
   };
   const sync=()=>{const q=new URLSearchParams(location.search),keys=(q.get('compare')||q.get('car')||'').split(',').slice(0,2);if(keys[0])launch(keys,false);else dialog.close();};
   window.addEventListener('popstate',sync);
-  fetch('/config/vehicles.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();return r.json();}).then(data=>{
+  window.GMFleetSpecs.load().then(data=>{
    if(!Array.isArray(data.models)||data.models.length===0||data.models.some(m=>!['Swift','IST','Blade','Vitz'].includes(m.key)||!m.name||!String(m.image).startsWith('/img/')))throw Error();
    models=data.models;note=data.note;
    grid.innerHTML=models.map(m=>`<article class="spec-car"><a class="spec-car-photo" href="/vehicules.html?car=${encodeURIComponent(m.key)}" data-car-sheet="${esc(m.key)}"><img src="${esc(m.image)}" alt="${esc(m.name)}" loading="eager"></a><div class="spec-car-copy"><p class="pub-eyebrow">${esc(m.brand)} · ${esc(m.body)}</p><h2><a href="/vehicules.html?car=${encodeURIComponent(m.key)}" data-car-sheet="${esc(m.key)}">${esc(m.name)}</a></h2><p>${esc(m.description)}</p><div class="spec-car-actions"><a href="/vehicules.html?car=${encodeURIComponent(m.key)}" data-car-sheet="${esc(m.key)}">Voir la fiche ↗</a><label><input type="checkbox" data-compare-car="${esc(m.key)}"> Comparer</label></div></div></article>`).join('');

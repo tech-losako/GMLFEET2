@@ -1,0 +1,20 @@
+const {PGlite}=require(process.env.PGLITE_MODULE||'../work/dbtest/node_modules/@electric-sql/pglite');
+const fs=require('node:fs'),assert=require('node:assert/strict');
+(async()=>{const db=new PGlite();try{
+ await db.exec(`create role anon;create role authenticated;create schema private;create schema auth;create table auth.users(id uuid primary key);insert into auth.users values('11111111-1111-1111-1111-111111111111'),('22222222-2222-2222-2222-222222222222');create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to anon,authenticated;create table public.staff_members(user_id uuid,role text,active boolean);insert into public.staff_members values('11111111-1111-1111-1111-111111111111','admin',true),('22222222-2222-2222-2222-222222222222','agent',true);grant select on public.staff_members to authenticated;`);
+ await db.exec(fs.readFileSync('supabase/migrations/20260924110206_vehicle_model_specs.sql','utf8'));
+ await db.exec(`set role anon;`);const rows=(await db.query('select model_key,specs from vehicle_model_specs order by model_key')).rows;assert.equal(rows.length,4);assert.ok(rows.every(r=>r.specs.year==='?'&&r.specs.color==='Selon disponibilité'&&r.specs.mileage==='Selon le véhicule'));
+ assert.equal(rows.find(r=>r.model_key==='IST').specs.doors,'4');assert.equal(rows.find(r=>r.model_key==='Blade').specs.engine,'3,5 L (3 500 cc)');assert.equal(rows.find(r=>r.model_key==='Vitz').specs.transmission,'Automatique (CVT)');
+ await assert.rejects(db.exec(`update vehicle_model_specs set specs=specs where model_key='Swift'`),/permission denied/);await assert.rejects(db.exec('select * from vehicle_model_spec_history'),/permission denied/);
+ await db.exec(`reset role;select set_config('request.jwt.claim.sub','22222222-2222-2222-2222-222222222222',false);set role authenticated;`);assert.equal((await db.query(`update vehicle_model_specs set specs=specs where model_key='Swift' returning *`)).rows.length,0,'agent cannot edit');
+ await db.exec(`reset role;select set_config('request.jwt.claim.sub','11111111-1111-1111-1111-111111111111',false);set role authenticated;`);
+ await assert.rejects(db.exec(`update vehicle_model_specs set specs=specs||'\{"year":"2017"\}'::jsonb where model_key='Swift'`),/fiche générale/);
+ await assert.rejects(db.exec(`update vehicle_model_specs set specs=specs||'\{"vin":"PRIVATE"\}'::jsonb where model_key='Swift'`),/Champs de fiche invalides/);
+ await assert.rejects(db.exec(`update vehicle_model_specs set specs=specs||'\{"name":"Toyota Blade"\}'::jsonb where model_key='Swift'`),/correspondre/);
+ await assert.rejects(db.exec(`update vehicle_model_specs set specs=specs||'\{"mode":"confirmed"\}'::jsonb where model_key='Swift'`),/kilométrage réel/);
+ const changed=await db.query(`update vehicle_model_specs set specs=specs||'{"mode":"confirmed","year":"2016","color":"Blanc","mileage":"85000 km","engine":"1,3 L"}' where model_key='Swift' and revision=1 returning revision`);assert.equal(changed.rows[0].revision,2);
+ assert.equal((await db.query(`update vehicle_model_specs set specs=specs where model_key='Swift' and revision=1 returning *`)).rows.length,0,'stale editor cannot overwrite');
+ assert.equal((await db.query(`select * from vehicle_model_spec_history`)).rows.length,1,'edit audited');
+ await db.exec('reset role;set role anon;');assert.equal((await db.query(`select specs from vehicle_model_specs where model_key='Swift'`)).rows[0].specs.year,'2016','public reads confirmed version');
+ console.log('PASS model specs: supplied values, public read only, admin-only edits, generic/confirmed validation, immutable model identity, no private identifiers, stale-edit protection and audit trail.');
+}finally{await db.close();}})().catch(e=>{console.error(e.message,e.where,e.position,e.query?.slice(Math.max(0,Number(e.position)-200),Number(e.position)+150));process.exitCode=1;});

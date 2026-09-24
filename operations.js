@@ -49,6 +49,7 @@
    rows('staff_members',q=>q.eq('active',true).order('display_name').order('user_id')),rows('operations_notifications',q=>q.order('created_at',{ascending:false}).order('id'))]);
   Object.assign(state,{apps,appointments,staff,notifications});
   $('usersNav').hidden=!staff.some(s=>s.user_id===state.user.id&&s.role==='super_admin');
+  $('modelSpecsNav').hidden=!staff.some(s=>s.user_id===state.user.id&&['admin','super_admin'].includes(s.role));
   $('navCount').textContent=apps.filter(a=>workflow.review(a)==='pending').length;
   const complete=await render();
   $('today').textContent=new Intl.DateTimeFormat('fr-FR',{dateStyle:'full',timeZone:'Africa/Kinshasa'}).format(new Date());
@@ -59,9 +60,10 @@
   if(state.view!=='overview')window.GMFleetDashboard.cancel();
   document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===state.view));
   $('newApplication').textContent=state.view==='appointments'?'＋ Programmer un rendez-vous':'＋ Nouvelle candidature';
-  $('pageTitle').textContent={overview:'Tableau de bord',applications:'Candidatures',appointments:'Rendez-vous',contracts:'Contrats & véhicules',payments:'Caisse / versements',reconciliation:'Rapprochement LOLC',users:'Utilisateurs',preparation:'Préparation & remises',fleet:'Flotte & partenaires'}[state.view];
-  document.getElementById('newApplication').hidden=['users','contracts','payments','reconciliation','preparation','fleet'].includes(state.view);
+  $('pageTitle').textContent={overview:'Tableau de bord',applications:'Candidatures',appointments:'Rendez-vous',contracts:'Contrats & véhicules',payments:'Caisse / versements',reconciliation:'Rapprochement LOLC',users:'Utilisateurs',preparation:'Préparation & remises',fleet:'Flotte & partenaires',modelSpecs:'Fiches véhicules'}[state.view];
+  document.getElementById('newApplication').hidden=['users','contracts','payments','reconciliation','preparation','fleet','modelSpecs'].includes(state.view);
   if(['contracts','payments','reconciliation'].includes(state.view)) { const rendering=window.GMFleetFinance.render(state.view,{db,escape,date,person,notify,rows,staff:state.staff,user:state.user,apps:state.apps,openContract:state.dashboardContract});state.dashboardContract=null; return rendering; }
+  if(state.view==='modelSpecs')return window.GMFleetModelAdmin.render({db,escape,notify,user:state.user,staff:state.staff,isCurrent:()=>state.view==='modelSpecs'});
   if(state.view==='users') {window.GMFleetUsers.render({db,escape,notify,staff:state.staff,user:state.user});return;}
   if(state.view==='overview') return renderOverview();
   else if(state.view==='applications') renderApplications();
