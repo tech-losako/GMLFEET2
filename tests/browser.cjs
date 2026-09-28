@@ -4,7 +4,7 @@ const root=path.resolve(__dirname,'..');
 function fixture(){
  const staff={user_id:'11111111-1111-1111-1111-111111111111',display_name:'Équipe de test',active:true};
  const base={phone:'+243000000000',source:'website',created_at:'2026-09-16T08:00:00Z',created_on:'2026-09-16',workflow_stage:'new',lolc_status:'not_submitted',revision:1,preparation:{},service_details:{},status:'En attente'};
- const tables={staff_members:[staff],applications:[{...base,id:1,name:'Patrick Test',program_type:'DRIVE_TO_OWN',vehicle:'Toyota Vitz',address:'Gombe'},{...base,id:2,name:'<img src=x onerror=alert(1)>',program_type:'YANGO',service:'Chauffeur Yango',vehicle:'Toyota IST',service_details:{carPlate:'TEST-123'}}],appointments:[],admin_notes:[],documents:[],audit_logs:[],operations_notifications:[]};
+ const tables={staff_members:[staff],applications:[{...base,id:1,name:'Patrick Test',program_type:'DRIVE_TO_OWN',vehicle:'Toyota Vitz',address:'Gombe'},{...base,id:2,name:'<img src=x onerror=alert(1)>',program_type:'YANGO',service:'Chauffeur Yango',vehicle:'Toyota IST',service_details:{carPlate:'TEST-123'}}],appointments:[],admin_notes:[],documents:[],audit_logs:[],operations_notifications:[],equipment_quotes:[]};
  Object.assign(tables,{contracts:[],drivers:[],vehicles:[],repayment_schedules:[],payments:[],payment_allocations:[],lolc_deposit_items:[],araka_attempts:[]});window.fixtureTables=tables;
  class Query{
   constructor(table){this.table=table;this.filters=[];this.mode='read';this.offset=0;this.end=999;}

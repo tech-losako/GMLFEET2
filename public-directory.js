@@ -15,13 +15,13 @@ window.setupPublicDirectory=(path,hero,sections,main)=>{
   sections.forEach(s=>s.remove());return true;
  }
  if(path==='index.html'){
-  hero.classList.add('home-welcome');hero.querySelector('.pub-eyebrow').textContent='GM FLEET · GEORGE MICHAEL LOGISTICS';
-  hero.querySelector('h1').textContent='À Kinshasa, votre ambition prend la route.';
-  hero.querySelector('p:not(.pub-eyebrow)').textContent='Chauffeur ou propriétaire, avancez avec une équipe qui connaît votre quotidien. Un véhicule, une activité, un projet : nous vous aidons à trouver votre place.';
+  hero.classList.add('home-welcome');hero.querySelector('.pub-eyebrow').textContent='GM FLEET · KINSHASA';
+  hero.querySelector('h1').textContent='Votre prochain départ.';
+  hero.querySelector('p:not(.pub-eyebrow)').textContent='Une voiture. Une activité. Une équipe à vos côtés.';
   const image=hero.querySelector('.pub-hero-image');image.src='/img/blade-official.png';image.alt='Toyota Blade proposée par GM Fleet';
   hero.querySelector('#pub-start').innerHTML='Trouver mon parcours <span aria-hidden="true">↘</span>';
   const second=hero.querySelector('.pub-hero-actions a');second.href='/vehicules.html';second.textContent='Explorer les véhicules';
-  main.innerHTML='<section class="home-directions" id="mon-parcours"><div><p class="pub-eyebrow">VOTRE POINT DE DÉPART</p><h2>Et vous, où voulez-vous aller ?</h2><p>Choisissez votre situation. Les conditions et les étapes vous attendent dans votre parcours.</p></div><div class="home-intents"><a href="/vehicule-credit.html">Devenir propriétaire <span>↗</span></a><a href="/recrutement-chauffeurs.html">Conduire pour GML <span>↗</span></a><a href="/gestion-flotte.html">Confier ma voiture <span>↗</span></a><a href="/agregateur-yango.html">Rejoindre GML sur Yango <span>↗</span></a><a href="/services.html#equipements">Équiper mon véhicule <span>↗</span></a><a href="/services.html">Comprendre nos offres <span>→</span></a></div></section><div class="home-local"><span>Une équipe locale · Kinshasa, Gombe</span><a href="/payer.html">Déjà chauffeur GML ? Mon espace →</a></div>';
+  main.innerHTML='<section class="home-directions" id="mon-parcours"><div><p class="pub-eyebrow">CHOISISSEZ VOTRE PARCOURS</p><h2>Quel est votre projet ?</h2><p></p></div><div class="home-intents"><a href="/vehicule-credit.html">Devenir propriétaire <span>↗</span></a><a href="/recrutement-chauffeurs.html">Conduire pour GML <span>↗</span></a><a href="/gestion-flotte.html">Confier ma voiture <span>↗</span></a><a href="/agregateur-yango.html">Rejoindre GML sur Yango <span>↗</span></a><a href="/services.html#equipements">Équiper mon véhicule <span>↗</span></a><a href="/services.html">Comprendre nos offres <span>→</span></a></div></section><div class="home-local"><span>Une équipe locale · Kinshasa, Gombe</span><a href="/payer.html">Déjà chauffeur GML ? Mon espace →</a></div>';
   hero.querySelector('#pub-start').onclick=()=>main.querySelector('.home-directions').scrollIntoView({behavior:'smooth',block:'start'});
  }else{
   hero.classList.add('directory-intro');hero.querySelector('h1').textContent='Des solutions concrètes pour avancer.';hero.querySelector('p:not(.pub-eyebrow)').textContent='Découvrez ce que chaque offre vous apporte, à qui elle s’adresse et comment la rejoindre.';hero.querySelector('.pub-hero-image').remove();hero.querySelector('.pub-hero-actions').remove();
