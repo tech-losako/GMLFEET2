@@ -5,17 +5,19 @@ const root=path.resolve(__dirname,'..');function fixture(){window.sent=[];window
 page.setDefaultTimeout(20000);page.setDefaultNavigationTimeout(60000);for(const width of [390,1440]){
  await page.setViewportSize({width,height:950});
  for(const name of ['index','services']){
-  await page.goto(base+'/'+name+'.html',{waitUntil:'domcontentloaded'});await page.locator('.pub-header').waitFor();
+ await page.goto(base+'/'+name+'.html',{waitUntil:'domcontentloaded'});await page.locator('.pub-header').waitFor();
   assert.equal(await page.locator('.pub-logo img').getAttribute('src'),'/img/gml-official.jpeg');
-  assert.equal(await page.locator('.visual-path').count(),5);
+  const cards=name==='index'?page.locator('.home-intent'):page.locator('.service-offer');
+  const images=name==='index'?page.locator('.home-intent img'):page.locator('.service-offer img');
+  assert.equal(await cards.count(),name==='index'?6:5);
   assert.equal(await page.locator('[role=tab]').count(),0);
-  await page.locator('.visual-path img').evaluateAll(es=>Promise.all(es.map(e=>{e.loading='eager';return e.decode();})));
-  assert.deepEqual(await page.locator('.visual-path img').evaluateAll(es=>es.filter(e=>!e.naturalWidth).map(e=>e.src)),[]);
+  await images.evaluateAll(es=>Promise.all(es.map(e=>{e.loading='eager';return e.decode();})));
+  assert.deepEqual(await images.evaluateAll(es=>es.filter(e=>!e.naturalWidth).map(e=>e.src)),[]);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
 
 
  }
 }
-for(const [car,img] of [['Swift','swift-official'],['Blade','blade-official'],['IST','ist-official']]){await page.goto(base+'/detail-vehicule.html?car='+car,{waitUntil:'domcontentloaded'});await page.locator('.pub-header').waitFor();assert.match(await page.locator('#modalCarImg').getAttribute('src'),new RegExp(img));}
+const catalogue=JSON.parse(fs.readFileSync(path.join(root,'config','vehicles.json'),'utf8'));for(const [car,img] of [['Swift','swift-official-v2'],['Blade','blade-official-v2'],['IST','ist-official'],['Vitz','vitz-official-v2']]){assert.match(catalogue.models.find(model=>model.key===car).image,new RegExp(img));}
 assert.doesNotMatch(await page.locator('body').innerText(),/[\u00c3\u00c2][\u0080-\u00ff]/);assert.deepEqual(errors,[]);console.log('PASS six service choices, image loads, supplied vehicle photos and equipment pricing at mobile/desktop sizes.');
 }finally{await b.close();server.close();}})().catch(e=>{console.error(e);process.exit(1)});

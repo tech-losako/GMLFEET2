@@ -2,9 +2,9 @@
 (() => {
   const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const journeys = [
-    {title:'Je cherche un véhicule', description:'Conduisez et avancez vers la propriété avec Drive to Own.', image:'swift-official.png', url:'vehicule-credit.html', label:'Acquérir un véhicule'},
+    {title:'Car na ngai', description:'Conduisez et avancez vers la propriété avec le programme GM Fleet.', image:'swift-official-v2.png', url:'vehicule-credit.html', label:'Devenir propriétaire'},
     {title:'Je souhaite conduire', description:'Mettez votre expérience au volant d’un véhicule de notre flotte.', image:'fortune-vieyra-o4yi2U-qcf0-unsplash.jpg', url:'recrutement-chauffeurs.html', label:'Devenir chauffeur partenaire'},
-    {title:'Je possède une voiture', description:'Confiez son exploitation à une équipe qui assure le suivi.', image:'blade-official.png', url:'gestion-flotte.html', label:'Confier ma voiture'},
+    {title:'Je possède une voiture', description:'Confiez son exploitation à une équipe qui assure le suivi.', image:'blade-official-v2.png', url:'gestion-flotte.html', label:'Confier ma voiture'},
     {title:'Je suis déjà sur Yango', description:'Gardez votre voiture et rejoignez notre réseau partenaire.', image:'ist-official.png', url:'agregateur-yango.html', label:'Rejoindre le réseau'},
     {title:'Équipements & sécurité',description:'Tracker GPS ou dashcam : choisissez votre équipement et son installation.',image:'gml-tracker.png',url:'services.html#equipements',label:'Équiper mon véhicule'}
   ];
@@ -16,13 +16,13 @@
     const sections = [...document.querySelectorAll('body>section')];
     if(page==='index.html') {
       sections.slice(1).forEach(s=>s.className='editorial-panel');
-      sections[1].innerHTML=heading('DRIVE TO OWN','De la candidature aux clés de votre voiture.','Découvrez les trois étapes de votre parcours.')+`<div class="journey-steps">${[
+      sections[1].innerHTML=heading('CAR NA NGAI','De la candidature aux clés de votre voiture.','Découvrez les trois étapes de votre parcours vers la propriété.')+`<div class="journey-steps">${[
         ['01','Postulez','Choisissez votre modèle et envoyez votre candidature. Notre équipe vérifie votre profil.'],
         ['02','Prenez le volant','Après validation et remise des clés, vous commencez à conduire et à générer des revenus.'],
         ['03','Devenez propriétaire','Effectuez vos versements réguliers. À la fin du terme de paiement, la voiture vous appartient.']
       ].map(([n,t,d])=>`<article><span class="step-number">${n}</span><h3>${t}</h3><p>${d}</p></article>`).join('')}</div><div class="editorial-action">${link('/vehicule-credit.html','Découvrir le parcours')}</div>`;
       sections[2].innerHTML=heading('NOS SERVICES','Une solution pour votre situation.','Acquérir, conduire, confier ou rejoindre notre réseau : choisissez votre point de départ.')+window.publicProfileCards();
-      sections[3].innerHTML=heading('LES VÉHICULES','Votre prochain outil de travail.','Explorez les modèles et retrouvez leurs offres dans la fiche de chaque véhicule.')+`<div class="mini-fleet">${[['Swift','Suzuki Swift','swift-official.png'],['Blade','Toyota Blade','blade-official.png'],['IST','Toyota IST','ist-official.png']].map(([key,name,image])=>`<a href="/detail-vehicule.html?car=${key}"><img src="/img/${image}" alt="${name}" loading="lazy"><div><h3>${name}</h3><span>Voir le véhicule ↗</span></div></a>`).join('')}</div><div class="editorial-action">${link('/vehicules.html','Voir toute la flotte')}</div>`;
+      sections[3].innerHTML=heading('LES VÉHICULES','Votre prochain outil de travail.','Explorez les modèles et retrouvez leurs offres dans la fiche de chaque véhicule.')+`<div class="mini-fleet">${[['Swift','Suzuki Swift','swift-official-v2.png'],['Blade','Toyota Blade','blade-official-v2.png'],['IST','Toyota IST','ist-official.png']].map(([key,name,image])=>`<a href="/detail-vehicule.html?car=${key}"><img src="/img/${image}" alt="${name}" loading="lazy"><div><h3>${name}</h3><span>Voir le véhicule ↗</span></div></a>`).join('')}</div><div class="editorial-action">${link('/vehicules.html','Voir toute la flotte')}</div>`;
       sections[4].innerHTML=split('fortune-vieyra-o4yi2U-qcf0-unsplash.jpg','Un chauffeur au volant',heading('UNE MARQUE DE GEORGE MICHAEL LOGISTICS','Le travail d’aujourd’hui. La propriété de demain.','GM Fleet accompagne les chauffeurs au Congo avec « Car na ngai » : conduisez et devenez propriétaire.')+'<ul class="editorial-list"><li><strong>Véhicules vérifiés</strong><span>Des voitures robustes, prêtes à travailler.</span></li><li><strong>Sans dépôt bloquant</strong><span>Un système de crédit qui permet de payer en travaillant.</span></li><li><strong>Un objectif concret</strong><span>À la fin du terme de paiement, le véhicule vous appartient légalement.</span></li></ul>'+link('/apropos.html','Découvrir GML'));
       sections[5].classList.add('text-white');
       sections[5].innerHTML='<div class="vision-story"><img src="/img/gml-official.jpeg" alt="George Michael Logistics"><div>'+heading('NOTRE VISION','Chaque chauffeur, un entrepreneur.')+'<p>Redéfinir la mobilité en Afrique en donnant aux chauffeurs les moyens de devenir indépendants et propriétaires de leur outil de travail.</p><span>GM Fleet · Une marque de George Michael Logistics</span></div></div>';
@@ -40,7 +40,7 @@
         const benefits=[...card.querySelectorAll('li span')];
         const highlights=benefits.filter(li=>/USD|\$|%/.test(li.textContent)).map(li=>'<p class="offer-highlight">'+li.innerHTML+'</p>').join('');
         const items=benefits.filter(li=>!/USD|\$|%/.test(li.textContent)).map(li=>'<li>'+li.innerHTML+'</li>').join('');
-        const a=card.querySelector('a'),image=['swift-official.png','ist-official.png','blade-official.png','fortune-vieyra-o4yi2U-qcf0-unsplash.jpg'][i];
+        const a=card.querySelector('a'),image=['swift-official-v2.png','ist-official.png','blade-official-v2.png','fortune-vieyra-o4yi2U-qcf0-unsplash.jpg'][i];
         return `<article class="offer-card"><img src="/img/${image}" alt="" loading="lazy"><div><h3>${escape(title)}</h3>${paragraphs}${highlights}<details><summary>Les points clés</summary><ul>${items}</ul></details>${link(a.getAttribute('href'),a.textContent.trim())}</div></article>`;
       });
       sections[2].className='editorial-panel';sections[2].innerHTML=heading('NOS OFFRES','Quatre façons d’avancer avec GM Fleet.','Consultez les points clés de chaque programme, puis découvrez ses conditions.')+'<div class="offer-grid">'+offers.join('')+'</div>';

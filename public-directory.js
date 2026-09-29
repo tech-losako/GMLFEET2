@@ -21,17 +21,25 @@ window.setupPublicDirectory=(path,hero,sections,main)=>{
   hero.classList.add('home-welcome');hero.querySelector('.pub-eyebrow').textContent='GM FLEET · KINSHASA';
   hero.querySelector('h1').textContent='Votre prochain départ.';
   hero.querySelector('p:not(.pub-eyebrow)').textContent='Une voiture. Une activité. Une équipe à vos côtés.';
-  const image=hero.querySelector('.pub-hero-image');image.src='/img/blade-official.png';image.alt='Toyota Blade proposée par GM Fleet';
+  const image=hero.querySelector('.pub-hero-image');image.src='/img/blade-official-v2.png';image.alt='Toyota Blade proposée par GM Fleet';
   hero.querySelector('#pub-start').innerHTML='Trouver mon parcours <span aria-hidden="true">↘</span>';
   const second=hero.querySelector('.pub-hero-actions a');second.href='/vehicules.html';second.textContent='Explorer les véhicules';
-  main.innerHTML='<section class="home-directions" id="mon-parcours"><div><p class="pub-eyebrow">CHOISISSEZ VOTRE PARCOURS</p><h2>Quel est votre projet ?</h2><p></p></div><div class="home-intents"><a href="/vehicule-credit.html">Devenir propriétaire <span>↗</span></a><a href="/recrutement-chauffeurs.html">Conduire pour GML <span>↗</span></a><a href="/gestion-flotte.html">Confier ma voiture <span>↗</span></a><a href="/agregateur-yango.html">Rejoindre GML sur Yango <span>↗</span></a><a href="/services.html#equipements">Équiper mon véhicule <span>↗</span></a><a href="/services.html">Comprendre nos offres <span>→</span></a></div></section>';
+  const intents=[
+   ['/vehicule-credit.html','Car na ngai','Devenir propriétaire','swift-official-v2.png','fa-key','ownership'],
+   ['/recrutement-chauffeurs.html','Chauffeur GML','Conduire notre flotte','fortune-vieyra-o4yi2U-qcf0-unsplash.jpg','fa-id-card','driver'],
+   ['/gestion-flotte.html','Gestion de flotte','Confier ma voiture','blade-official-v2.png','fa-handshake','fleet'],
+   ['/agregateur-yango.html','Partenaire Yango','Rejoindre le réseau','ist-official.png','fa-taxi','yango'],
+   ['/services.html#equipements','GPS & dashcam','Équiper mon véhicule','gml-tracker.png','fa-location-dot','equipment'],
+   ['/services.html','Toutes les offres','Comprendre nos services','fleet_white_bg.png','fa-compass','services']
+  ];
+  main.innerHTML='<section class="home-directions" id="mon-parcours"><div><p class="pub-eyebrow">CHOISISSEZ VOTRE PARCOURS</p><h2>Quel est votre projet ?</h2><p>Choisissez l’image qui correspond à votre situation.</p></div><div class="home-intents">'+intents.map(([url,title,subtitle,img,icon,tone])=>`<a class="home-intent home-intent-${tone}" href="${url}"><span class="home-intent-visual"><img src="/img/${img}" alt="" loading="lazy"><span class="home-intent-icon" aria-hidden="true"><i class="fas ${icon}"></i></span></span><span class="home-intent-copy"><strong>${title}</strong><small>${subtitle}</small></span><span class="home-intent-arrow" aria-hidden="true">↗</span></a>`).join('')+'</div></section>';
   hero.querySelector('#pub-start').onclick=()=>main.querySelector('.home-directions').scrollIntoView({behavior:'smooth',block:'start'});
  }else{
   hero.classList.add('directory-intro');hero.querySelector('h1').textContent='Des solutions concrètes pour avancer.';hero.querySelector('p:not(.pub-eyebrow)').textContent='Découvrez ce que chaque offre vous apporte, à qui elle s’adresse et comment la rejoindre.';hero.querySelector('.pub-hero-image').remove();hero.querySelector('.pub-hero-actions').remove();
   const offers=[
-   ['POUR ACQUÉRIR UN VÉHICULE','Car na ngai · Drive to Own','Un parcours de conduite vers la propriété.','swift-official.png','vehicule-credit.html',['Choix du modèle et du plan','Dossier et validation LOLC'],'Voir le parcours'],
+   ['POUR ACQUÉRIR UN VÉHICULE','Car na ngai','Conduisez aujourd’hui et avancez vers la propriété.','swift-official-v2.png','vehicule-credit.html',['Choix du modèle et du plan','Dossier et validation LOLC'],'Voir le parcours'],
    ['POUR TRAVAILLER AU VOLANT','Chauffeur GML','Rejoignez notre équipe et conduisez un véhicule de la flotte.','fortune-vieyra-o4yi2U-qcf0-unsplash.jpg','recrutement-chauffeurs.html',['Candidature, entretien et test','Affectation après validation'],'Découvrir le métier'],
-   ['POUR LES PROPRIÉTAIRES','Gestion de votre véhicule','Confiez son exploitation à GML et gardez la propriété.','blade-official.png','gestion-flotte.html',['Inspection et équipements','Suivi et revenus par catégorie'],'Découvrir la gestion'],
+   ['POUR LES PROPRIÉTAIRES','Gestion de votre véhicule','Confiez son exploitation à GML et gardez la propriété.','blade-official-v2.png','gestion-flotte.html',['Inspection et équipements','Suivi et revenus par catégorie'],'Découvrir la gestion'],
    ['POUR LES CHAUFFEURS YANGO','Partenaire Yango','Votre voiture, votre activité, avec l’accompagnement GML.','ist-official.png','agregateur-yango.html',['Examen préalable de votre dossier','Rattachement après accord GML'],'Rejoindre le réseau'],
    ['POUR PROTÉGER UN VÉHICULE','Tracker GPS & dashcam','Choisissez le suivi GPS, la vidéo embarquée ou les deux.','gml-tracker.png','services.html#equipements',['Matériel, installation et abonnement','Tarifs selon votre véhicule'],'Choisir l’équipement']
   ];

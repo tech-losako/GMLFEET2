@@ -15,10 +15,10 @@
         window.publicUIFailed = function () { document.documentElement.classList.add('public-ui-failed'); };
         setTimeout(function () { if (document.documentElement.classList.contains('public-ui-pending')) window.publicUIFailed(); }, 15000);
     </script>
-    <link rel="preload" href="/public-panels.js?v=20260923e" as="script">
-    <link rel="preload" href="/public-ui.js?v=20260928-about" as="script">
+    <link rel="preload" href="/public-panels.js?v=20260929-public" as="script">
+    <link rel="preload" href="/public-ui.js?v=20260929-public" as="script">
     <link rel="stylesheet" href="/vendor/public-utilities.css?v=20260923">
-    <link rel="stylesheet" href="/public-ui.css?v=20260924-benefits">
+    <link rel="stylesheet" href="/public-ui.css?v=20260929-public">
 
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,7 +36,7 @@
 
     
 
-<link rel="stylesheet" href="/public-discovery.css?v=20260928-about">
+<link rel="stylesheet" href="/public-discovery.css?v=20260929-public">
 <link rel="stylesheet" href="/vehicle-specs.css?v=20260924-specs">
 </head>
 
@@ -68,7 +68,7 @@
                         <div class="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right z-50 overflow-hidden border border-gray-100 p-2">
                             <a href="vehicule-credit.html" class="block px-4 py-3 rounded-xl hover:bg-red-50 text-gray-800 hover:text-gmfRed transition">
                                 <div class="font-bold text-sm flex items-center"><i class="fas fa-car mr-2.5 text-gmfRed"></i>Je veux un véhicule</div>
-                                <div class="text-xs text-gray-500 pl-6">Drive to Own / Véhicule à crédit</div>
+                                <div class="text-xs text-gray-500 pl-6">Car na ngai / Véhicule à crédit</div>
                             </a>
                             <a href="agregateur-yango.html" class="block px-4 py-3 rounded-xl hover:bg-blue-50 text-gray-800 hover:text-gmfBlue transition">
                                 <div class="font-bold text-sm flex items-center"><i class="fas fa-taxi mr-2.5 text-gmfBlue"></i>Je conduis déjà sur Yango</div>
@@ -565,11 +565,11 @@
     <script src="supabase-config.js"></script>
     <script src="supabaseClient.js"></script>
     <script src="script.js"></script>
-<script src="/public-panels.js?v=20260923e"></script>
-<script src="/public-flow.js?v=20260924-benefits"></script>
+<script src="/public-panels.js?v=20260929-public"></script>
+<script src="/public-flow.js?v=20260929-public"></script>
 <script src="/equipment-quote.js?v=20260925-equipment"></script><script src="/public-equipment.js?v=20260925-equipment"></script>
-<script src="/vehicle-specs.js?v=20260924-specs"></script><script src="/public-catalogue.js?v=20260924-specs"></script><script src="/public-directory.js?v=20260928-about"></script>
-<script src="/public-ui.js?v=20260928-about" onerror="publicUIFailed()"></script>
+<script src="/vehicle-specs.js?v=20260924-specs"></script><script src="/public-catalogue.js?v=20260929-public"></script><script src="/public-directory.js?v=20260929-public"></script>
+<script src="/public-ui.js?v=20260929-public" onerror="publicUIFailed()"></script>
 </body>
 
 </html>

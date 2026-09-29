@@ -5,11 +5,11 @@ const path=location.pathname.split('/').pop()||'index.html';
 const routes={
  'index.html':['LA MOBILITÉ, À VOTRE PORTÉE','Votre prochain départ commence ici.','Un véhicule à acquérir, un emploi de chauffeur ou une voiture à confier : trouvez le parcours GM Fleet qui vous correspond.','img/fleet_white_bg.png','Choisir mon parcours'],
  'services.html':['NOS SOLUTIONS','Un parcours pour chaque ambition.','Choisissez votre situation. Nous vous guidons vers le service qui vous correspond.','img/fleet_white_bg.png','Choisir mon parcours'],
- 'vehicules.html':['NOTRE FLOTTE','Trouvez votre prochain véhicule.','Découvrez les modèles proposés et consultez les conditions de candidature.','img/swift-official.png','Voir les véhicules'],
- 'vehicule-credit.html':['VÉHICULE À CRÉDIT','Prenez le volant. Avancez vers la propriété.','Découvrez le parcours Drive to Own, les conditions et les véhicules. Préparez votre candidature à votre rythme.','img/swift-official.png','Commencer ma candidature'],
+ 'vehicules.html':['NOTRE FLOTTE','Trouvez votre prochain véhicule.','Découvrez les modèles proposés et consultez les conditions de candidature.','img/swift-official-v2.png','Voir les véhicules'],
+ 'vehicule-credit.html':['CAR NA NGAI','Prenez le volant. Avancez vers la propriété.','Découvrez le programme Car na ngai, ses conditions et ses véhicules. Préparez votre candidature à votre rythme.','img/swift-official-v2.png','Commencer ma candidature'],
  'agregateur-yango.html':['PARTENAIRE YANGO','Vous conduisez. Nous vous accompagnons.','Rejoignez GM Fleet avec votre véhicule et votre compte Yango. Vous conservez votre voiture et votre activité.','img/ist-official.png','Rejoindre GM Fleet'],
- 'gestion-flotte.html':['PROPRIÉTAIRES','Votre voiture, entre de bonnes mains.','Confiez l’exploitation de votre véhicule à GM Fleet. Vous restez propriétaire, nous assurons le suivi opérationnel.','img/blade-official.png','Faire évaluer ma voiture'],
- 'recrutement-chauffeurs.html':['CHAUFFEURS PARTENAIRES','Votre expérience mérite une nouvelle route.','Conduisez les véhicules de notre flotte et développez votre activité. Commencez par une candidature simple.','img/swift-official.png','Postuler maintenant'],
+ 'gestion-flotte.html':['PROPRIÉTAIRES','Votre voiture, entre de bonnes mains.','Confiez l’exploitation de votre véhicule à GM Fleet. Vous restez propriétaire, nous assurons le suivi opérationnel.','img/blade-official-v2.png','Faire évaluer ma voiture'],
+ 'recrutement-chauffeurs.html':['CHAUFFEURS PARTENAIRES','Votre expérience mérite une nouvelle route.','Conduisez les véhicules de notre flotte et développez votre activité. Commencez par une candidature simple.','img/swift-official-v2.png','Postuler maintenant'],
  'apropos.html':['GEORGE MICHAEL LOGISTICS','Des personnes derrière chaque parcours.','Découvrez GM Fleet, notre activité à Kinshasa et les moyens de contacter notre équipe.','img/fleet_white_bg.png','Contacter l’équipe']
 };
 const labels={

@@ -15,10 +15,10 @@
         window.publicUIFailed = function () { document.documentElement.classList.add('public-ui-failed'); };
         setTimeout(function () { if (document.documentElement.classList.contains('public-ui-pending')) window.publicUIFailed(); }, 15000);
     </script>
-    <link rel="preload" href="/public-panels.js?v=20260923e" as="script">
-    <link rel="preload" href="/public-ui.js?v=20260928-about" as="script">
+    <link rel="preload" href="/public-panels.js?v=20260929-public" as="script">
+    <link rel="preload" href="/public-ui.js?v=20260929-public" as="script">
     <link rel="stylesheet" href="/vendor/public-utilities.css?v=20260923">
-    <link rel="stylesheet" href="/public-ui.css?v=20260924-benefits">
+    <link rel="stylesheet" href="/public-ui.css?v=20260929-public">
 
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -45,7 +45,7 @@
 
     
 
-<link rel="stylesheet" href="/public-discovery.css?v=20260928-about">
+<link rel="stylesheet" href="/public-discovery.css?v=20260929-public">
 <link rel="stylesheet" href="/vehicle-specs.css?v=20260924-specs">
 </head>
 
@@ -80,7 +80,7 @@
                         <div class="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right z-50 overflow-hidden border border-gray-100 p-2">
                             <a href="vehicule-credit.html" class="block px-4 py-3 rounded-xl hover:bg-red-50 text-gray-800 hover:text-gmfRed transition">
                                 <div class="font-bold text-sm flex items-center"><i class="fas fa-car mr-2.5 text-gmfRed"></i>Je veux un véhicule</div>
-                                <div class="text-xs text-gray-500 pl-6">Drive to Own / Véhicule à crédit</div>
+                                <div class="text-xs text-gray-500 pl-6">Car na ngai / Véhicule à crédit</div>
                             </a>
                             <a href="agregateur-yango.html" class="block px-4 py-3 rounded-xl hover:bg-blue-50 text-gray-800 hover:text-gmfBlue transition">
                                 <div class="font-bold text-sm flex items-center"><i class="fas fa-taxi mr-2.5 text-gmfBlue"></i>Je conduis déjà sur Yango</div>
@@ -174,7 +174,7 @@
                                 <i class="fas fa-car"></i>
                             </div>
                             <h3 class="font-bold text-lg mb-1 text-white">Je veux un véhicule</h3>
-                            <p class="text-xs text-gray-300 mb-4">Drive to Own · Devenez propriétaire</p>
+                            <p class="text-xs text-gray-300 mb-4">Car na ngai · Devenez propriétaire</p>
                         </div>
                         <span class="text-xs font-bold text-gmfRed bg-white px-3 py-2 rounded-xl text-center flex items-center justify-center group-hover:bg-red-50 transition-colors">
                             Découvrir <i class="fas fa-arrow-right ml-1.5 text-[10px]"></i>
@@ -256,7 +256,7 @@
                         </li>
                         <li class="flex items-center text-sm text-gray-700">
                             <i class="fas fa-check-circle text-gmfRed mr-2.5 text-base"></i>
-                            <span>Programme Drive to Own</span>
+                            <span>Programme Car na ngai</span>
                         </li>
                     </ul>
                     <a href="vehicule-credit.html" class="block w-full bg-gmfRed text-white text-center font-bold py-3.5 rounded-xl transition-all hover:bg-red-700 shadow-md mt-auto">
@@ -336,7 +336,7 @@
                         <h3 class="text-2xl font-bold text-gray-900">Chauffeurs partenaires</h3>
                     </div>
                     <p class="text-purple-600 font-bold text-sm mb-4">Pas de voiture ? Commencez avec la nôtre.</p>
-                    <p class="text-gray-600 text-sm mb-6 flex-grow">Conduisez un véhicule GM Fleet. Après 12 mois, les meilleurs profils peuvent progresser vers Drive to Own avec un apport boosté.</p>
+                    <p class="text-gray-600 text-sm mb-6 flex-grow">Conduisez un véhicule GM Fleet. Après 12 mois, les meilleurs profils peuvent progresser vers Car na ngai avec un apport boosté.</p>
                     
                     <ul class="space-y-3 mb-8">
                         <li class="flex items-start text-sm text-gray-700">
@@ -345,7 +345,7 @@
                         </li>
                         <li class="flex items-start text-sm text-gray-700">
                             <i class="fas fa-check-circle text-purple-500 mt-0.5 mr-2.5 text-base flex-shrink-0"></i>
-                            <span>Après 12 mois, les meilleurs profils peuvent progresser vers Drive to Own.</span>
+                            <span>Après 12 mois, les meilleurs profils peuvent progresser vers Car na ngai.</span>
                         </li>
                     </ul>
                     <a href="recrutement-chauffeurs.html" class="block w-full bg-purple-600 text-white text-center font-bold py-3.5 rounded-xl transition-all hover:bg-purple-700 shadow-md mt-auto">
@@ -545,11 +545,11 @@
     <script src="supabase-config.js"></script>
     <script src="supabaseClient.js"></script>
     <script src="script.js"></script>
-<script src="/public-panels.js?v=20260923e"></script>
-<script src="/public-flow.js?v=20260924-benefits"></script>
+<script src="/public-panels.js?v=20260929-public"></script>
+<script src="/public-flow.js?v=20260929-public"></script>
 <script src="/equipment-quote.js?v=20260925-equipment"></script><script src="/public-equipment.js?v=20260925-equipment"></script>
-<script src="/vehicle-specs.js?v=20260924-specs"></script><script src="/public-catalogue.js?v=20260924-specs"></script><script src="/public-directory.js?v=20260928-about"></script>
-<script src="/public-ui.js?v=20260928-about" onerror="publicUIFailed()"></script>
+<script src="/vehicle-specs.js?v=20260924-specs"></script><script src="/public-catalogue.js?v=20260929-public"></script><script src="/public-directory.js?v=20260929-public"></script>
+<script src="/public-ui.js?v=20260929-public" onerror="publicUIFailed()"></script>
 </body>
 
 </html>

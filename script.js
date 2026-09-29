@@ -22,7 +22,7 @@ const carsData = {
     },
     'Blade': {
         name: 'Toyota Blade',
-        img: './img/blade-official.png',
+        img: './img/blade-official-v2.png',
         daily: '38,5 $',
         pricing: {
             "12": { total: "11 160 $", avance: "1 400 $", week: "215 $" },
@@ -32,7 +32,7 @@ const carsData = {
     },
     'Swift': {
         name: 'Suzuki Swift',
-        img: './img/swift-official.png',
+        img: './img/swift-official-v2.png',
         daily: '29,5 $',
         pricing: {
             "12": { total: "9 288 $", avance: "1 100 $", week: "179 $" },
@@ -42,7 +42,7 @@ const carsData = {
     },
     'Vitz': {
         name: 'Toyota Vitz',
-        img: './img/vitz 1.jpg',
+        img: './img/vitz-official-v2.png',
         daily: '29,5 $',
         pricing: {
             "12": { total: "9 288 $", avance: "1 100 $", week: "179 $" },
@@ -242,14 +242,14 @@ function openDriverModal() {
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Situation 1: Drive to Own -->
+                    <!-- Situation 1: Car na ngai -->
                     <div class="bg-gray-50 hover:bg-red-50/60 p-5 rounded-2xl border border-gray-200 hover:border-gmfRed transition-all flex flex-col justify-between group">
                         <div>
                             <div class="w-10 h-10 rounded-xl bg-red-100 text-gmfRed flex items-center justify-center text-lg font-bold mb-3 group-hover:scale-110 transition-transform">
                                 <i class="fas fa-car"></i>
                             </div>
                             <h4 class="text-lg font-bold text-gray-900 mb-1">Je veux un véhicule</h4>
-                            <span class="inline-block text-xs font-bold text-gmfRed mb-2">Drive to Own</span>
+                            <span class="inline-block text-xs font-bold text-gmfRed mb-2">Car na ngai</span>
                             <p class="text-gray-600 text-xs mb-3 leading-relaxed">
                                 Conduisez aujourd'hui et devenez propriétaire à 100% au terme du financement.
                             </p>
