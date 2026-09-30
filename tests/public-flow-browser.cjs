@@ -2,11 +2,23 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright'),fs=require
 const root=path.resolve(__dirname,'..');function fixture(){window.sent=[];window.supabase={createClient:()=>({functions:{invoke:async(name,{body})=>{window.sent.push({name,request:body.get('request_id'),app:JSON.parse(body.get('application')),files:body.getAll('files').map(f=>({name:f.name,size:f.size}))});if(window.failOnce){window.failOnce=false;return {error:{context:{json:async()=>({error:'Connexion interrompue. Réessayez.'})}}};}return {data:{success:true}};}}})};}
 (async()=>{const server=http.createServer((req,res)=>{try{const file=path.join(root,decodeURIComponent(new URL(req.url,'http://local').pathname));res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':'text/html');res.end(fs.readFileSync(file));}catch{res.writeHead(404);res.end();}});await new Promise(r=>server.listen(0,'127.0.0.1',r));const b=await chromium.launch({headless:true,channel:'msedge'});try{const page=await b.newPage({viewport:{width:390,height:844}}),base='http://127.0.0.1:'+server.address().port,errors=[];page.on('pageerror',e=>errors.push(e.message));await page.route('**/vendor/supabase-2.57.4.js',r=>r.fulfill({contentType:'text/javascript',body:'('+fixture.toString()+')();'}));await page.route('**/*supabase.co/**',r=>r.abort());
 
+const expected={
+ 'vehicule-credit':{benefits:4,needs:4,copy:/4 entretiens par an|Géolocalisation 24 h\/24/},
+ 'recrutement-chauffeurs':{benefits:3,needs:2,copy:/6e jour vous revient|40 % pour votre apport/},
+ 'agregateur-yango':{benefits:3,needs:2,copy:/Carburant selon vos objectifs|Tracker et Dashcam à prix réduit/},
+ 'gestion-flotte':{benefits:4,needs:3,copy:/Contrôles du dimanche|5 ans maximum/}
+};
+
 for(const width of [390,1440]){
  await page.setViewportSize({width,height:900});
  for(const name of ['vehicule-credit','recrutement-chauffeurs','agregateur-yango','gestion-flotte']){
   await page.goto(base+'/'+name+'.html',{waitUntil:'domcontentloaded'});await page.locator('.pub-header').waitFor();
   assert.equal(await page.locator('.pub-section-nav').count(),0);assert.equal(await page.locator('.service-story:visible').count(),1);
+  assert.equal(await page.locator('.service-benefit-grid article').count(),expected[name].benefits);
+  assert.equal(await page.locator('.service-requirement-list li').count(),expected[name].needs);
+  assert.equal(await page.locator('.service-readiness input').count(),0);
+  assert.equal(await page.locator('.ownership-checklist,.brief-requirements,.service-benefit-strip').count(),0);
+  assert.match(await page.locator('.service-story').innerText(),expected[name].copy);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
   await page.screenshot({path:path.join(root,`tests/artifacts/flow-${name}-landing-${width}.png`),fullPage:true,timeout:15000});
   await page.locator('#pub-start').click();assert.ok(page.url().endsWith('#candidature'));assert.equal(await page.locator('.pub-hero:visible').count(),0);
