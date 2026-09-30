@@ -29,8 +29,8 @@ Deno.serve(async req=>{
   const service=input.service||null;if(service&&!['Chauffeur Yango','Gestion de flotte','Recrutement Chauffeur','Recrutement'].includes(service))throw new Error('Service invalide');
   app.service=service==='Recrutement'?'Recrutement Chauffeur':service;app.application_type=service?'service':'vehicle';
   const months=input.plan_duration_months==null?null:Number(input.plan_duration_months);if(months!==null&&![12,15,18].includes(months))throw new Error('Durée invalide');app.plan_duration_months=months;
-  const details:Record<string,unknown>={};for(const key of ['email','idNumber','carBrand','carModel','carPlate','carYear','carChassis','permisFileName','carteRoseFileName','photosCount','cvFileName']){const value=input.service_details?.[key];if(value!==undefined){if(!['string','number'].includes(typeof value)||String(value).length>500)throw new Error('Détail de formulaire invalide');details[key]=value;}}app.service_details=details;
-  const files=form.getAll('files');if(files.length>8)throw new Error('Maximum 8 fichiers par demande');
+  const details:Record<string,unknown>={};for(const key of ['email','idNumber','carBrand','carModel','carPlate','carYear','carChassis','permisFileName','carteRoseFileName','transportAuthorizationFileName','vignetteFileName','insuranceFileName','technicalInspectionFileName','frontPhotoFileName','rearPhotoFileName','leftPhotoFileName','rightPhotoFileName','interiorPhotoFileName','photosCount','cvFileName']){const value=input.service_details?.[key];if(value!==undefined){if(!['string','number'].includes(typeof value)||String(value).length>500)throw new Error('Détail de formulaire invalide');details[key]=value;}}app.service_details=details;
+  const files=form.getAll('files');if(files.length>10)throw new Error('Maximum 10 fichiers par demande');
   const manifest=[];const contents=[];let bytes=0;
   for(const [i,file] of files.entries()){
    if(!(file instanceof File)||file.size===0||file.size>10*1024*1024)throw new Error('Chaque fichier doit contenir entre 1 octet et 10 Mo');

@@ -387,7 +387,11 @@ function closeContactModal() {
 document.addEventListener('input',event=>{if(event.target.form)delete event.target.form.dataset.submissionId;});
 document.addEventListener('change',event=>{if(event.target.form)delete event.target.form.dataset.submissionId;});
 function applicationFiles(service){
- const ids=service==='Chauffeur Yango'?['yangoPermis','yangoCarteRose']:service==='Gestion de flotte'?['flotteCarteRose','flottePhotos']:service?['recrutementPermis','recrutementCV','applicantDocument']:['clientPermisUpload'];
+ if(service==='Gestion de flotte'){
+  const ordered=[['flotteCarteRose','01-carte-rose'],['flotteAutorisationTransport','02-autorisation-transport'],['flotteVignette','03-vignette'],['flotteAssurance','04-assurance'],['flotteControleTechnique','05-controle-technique'],['flottePhotoAvant','06-photo-avant'],['flottePhotoArriere','07-photo-arriere'],['flottePhotoGauche','08-photo-gauche'],['flottePhotoDroite','09-photo-droite'],['flottePhotoInterieur','10-photo-interieur']];
+  return ordered.flatMap(([id,prefix])=>Array.from(document.getElementById(id)?.files||[]).map(file=>new File([file],prefix+'-'+file.name.replace(/[^a-zA-Z0-9._-]+/g,'-'),{type:file.type,lastModified:file.lastModified})));
+ }
+ const ids=service==='Chauffeur Yango'?['yangoPermis','yangoCarteRose']:service?['recrutementPermis','recrutementCV','applicantDocument']:['clientPermisUpload'];
  return ids.flatMap(id=>Array.from(document.getElementById(id)?.files||[]));
 }
 async function sendPublicApplication(app,form){
@@ -482,8 +486,18 @@ async function submitServiceForm(e) {
         specificData.carPlate = document.getElementById('flotteCarPlate')?.value || '';
         specificData.carYear = document.getElementById('flotteCarYear')?.value || '';
         specificData.carChassis = document.getElementById('flotteCarChassis')?.value || '';
-        specificData.carteRoseFileName = document.getElementById('flotteCarteRose')?.files[0]?.name || '';
-        specificData.photosCount = document.getElementById('flottePhotos')?.files?.length || 0;
+        const fleetFileName = id => document.getElementById(id)?.files[0]?.name || '';
+        specificData.carteRoseFileName = fleetFileName('flotteCarteRose');
+        specificData.transportAuthorizationFileName = fleetFileName('flotteAutorisationTransport');
+        specificData.vignetteFileName = fleetFileName('flotteVignette');
+        specificData.insuranceFileName = fleetFileName('flotteAssurance');
+        specificData.technicalInspectionFileName = fleetFileName('flotteControleTechnique');
+        specificData.frontPhotoFileName = fleetFileName('flottePhotoAvant');
+        specificData.rearPhotoFileName = fleetFileName('flottePhotoArriere');
+        specificData.leftPhotoFileName = fleetFileName('flottePhotoGauche');
+        specificData.rightPhotoFileName = fleetFileName('flottePhotoDroite');
+        specificData.interiorPhotoFileName = fleetFileName('flottePhotoInterieur');
+        specificData.photosCount = ['flottePhotoAvant','flottePhotoArriere','flottePhotoGauche','flottePhotoDroite','flottePhotoInterieur'].filter(id=>fleetFileName(id)).length;
     } else if (serviceName === 'Recrutement' || serviceName === 'Recrutement Chauffeur') {
         specificData.experience = document.getElementById('recrutementExperience')?.value || document.getElementById('applicantExperience')?.value || '';
         specificData.permisFileName = document.getElementById('recrutementPermis')?.files[0]?.name || document.getElementById('applicantDocument')?.files[0]?.name || '';

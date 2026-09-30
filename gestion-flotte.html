@@ -16,7 +16,7 @@
         setTimeout(function () { if (document.documentElement.classList.contains('public-ui-pending')) window.publicUIFailed(); }, 15000);
     </script>
     <link rel="preload" href="/public-panels.js?v=20260929-public" as="script">
-    <link rel="preload" href="/public-ui.js?v=20260930-services" as="script">
+    <link rel="preload" href="/public-ui.js?v=20260930-fleet-upload" as="script">
     <link rel="stylesheet" href="/vendor/public-utilities.css?v=20260923">
     <link rel="stylesheet" href="/public-ui.css?v=20260930-services">
 
@@ -480,16 +480,57 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Carte Rose / Document véhicule *</label>
-                            <input type="file" id="flotteCarteRose" accept="image/jpeg,image/png,image/webp,application/pdf" required class="w-full px-4 py-2 rounded-xl border border-gray-300 bg-white file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-gmfGreen"><p class="text-xs text-gray-500 mt-1">JPG, PNG, WebP ou PDF · 10 Mo par fichier · 8 fichiers et 20 Mo maximum au total.</p>
+                    <fieldset>
+                        <legend class="font-bold text-gmfBlue">Documents du véhicule</legend>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                            <div>
+                                <label for="flotteCarteRose" class="block text-sm font-semibold text-gray-700 mb-1">01 · Carte rose *</label>
+                                <input type="file" id="flotteCarteRose" accept="image/jpeg,image/png,image/webp,application/pdf" required class="w-full px-4 py-2 rounded-xl border border-gray-300 bg-white file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-gmfGreen">
+                            </div>
+                            <div>
+                                <label for="flotteAutorisationTransport" class="block text-sm font-semibold text-gray-700 mb-1">02 · Autorisation de transport *</label>
+                                <input type="file" id="flotteAutorisationTransport" accept="image/jpeg,image/png,image/webp,application/pdf" required class="w-full px-4 py-2 rounded-xl border border-gray-300 bg-white file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-gmfGreen">
+                            </div>
+                            <div>
+                                <label for="flotteVignette" class="block text-sm font-semibold text-gray-700 mb-1">03 · Vignette *</label>
+                                <input type="file" id="flotteVignette" accept="image/jpeg,image/png,image/webp,application/pdf" required class="w-full px-4 py-2 rounded-xl border border-gray-300 bg-white file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-gmfGreen">
+                            </div>
+                            <div>
+                                <label for="flotteAssurance" class="block text-sm font-semibold text-gray-700 mb-1">04 · Assurance *</label>
+                                <input type="file" id="flotteAssurance" accept="image/jpeg,image/png,image/webp,application/pdf" required class="w-full px-4 py-2 rounded-xl border border-gray-300 bg-white file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-gmfGreen">
+                            </div>
+                            <div>
+                                <label for="flotteControleTechnique" class="block text-sm font-semibold text-gray-700 mb-1">05 · Contrôle technique *</label>
+                                <input type="file" id="flotteControleTechnique" accept="image/jpeg,image/png,image/webp,application/pdf" required class="w-full px-4 py-2 rounded-xl border border-gray-300 bg-white file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-gmfGreen">
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Photos du véhicule</label>
-                            <input type="file" id="flottePhotos" accept="image/jpeg,image/png,image/webp,application/pdf" multiple class="w-full px-4 py-2 rounded-xl border border-gray-300 bg-white file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-gmfGreen"><p class="text-xs text-gray-500 mt-1">JPG, PNG, WebP ou PDF · 10 Mo par fichier · 8 fichiers et 20 Mo maximum au total.</p>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend class="font-bold text-gmfBlue">Photos du véhicule</legend>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                            <div>
+                                <label for="flottePhotoAvant" class="block text-sm font-semibold text-gray-700 mb-1">01 · Vue avant *</label>
+                                <input type="file" id="flottePhotoAvant" accept="image/jpeg,image/png,image/webp" required class="w-full px-4 py-2 rounded-xl border border-gray-300 bg-white file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-gmfGreen">
+                            </div>
+                            <div>
+                                <label for="flottePhotoArriere" class="block text-sm font-semibold text-gray-700 mb-1">02 · Vue arrière *</label>
+                                <input type="file" id="flottePhotoArriere" accept="image/jpeg,image/png,image/webp" required class="w-full px-4 py-2 rounded-xl border border-gray-300 bg-white file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-gmfGreen">
+                            </div>
+                            <div>
+                                <label for="flottePhotoGauche" class="block text-sm font-semibold text-gray-700 mb-1">03 · Côté gauche *</label>
+                                <input type="file" id="flottePhotoGauche" accept="image/jpeg,image/png,image/webp" required class="w-full px-4 py-2 rounded-xl border border-gray-300 bg-white file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-gmfGreen">
+                            </div>
+                            <div>
+                                <label for="flottePhotoDroite" class="block text-sm font-semibold text-gray-700 mb-1">04 · Côté droit *</label>
+                                <input type="file" id="flottePhotoDroite" accept="image/jpeg,image/png,image/webp" required class="w-full px-4 py-2 rounded-xl border border-gray-300 bg-white file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-gmfGreen">
+                            </div>
+                            <div>
+                                <label for="flottePhotoInterieur" class="block text-sm font-semibold text-gray-700 mb-1">05 · Intérieur *</label>
+                                <input type="file" id="flottePhotoInterieur" accept="image/jpeg,image/png,image/webp" required class="w-full px-4 py-2 rounded-xl border border-gray-300 bg-white file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-gmfGreen">
+                            </div>
                         </div>
-                    </div>
+                    </fieldset>
 
                     <div class="flex flex-col sm:flex-row gap-4 pt-4">
                         <button type="submit" class="flex-1 bg-gmfGreen hover:bg-green-700 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all text-base flex items-center justify-center">
@@ -563,13 +604,13 @@
     
     <script src="/vendor/supabase-2.57.4.js"></script>
     <script src="supabase-config.js"></script>
-    <script src="supabaseClient.js"></script>
-    <script src="script.js"></script>
+    <script src="supabaseClient.js?v=20260930-fleet-upload"></script>
+    <script src="script.js?v=20260930-fleet-upload"></script>
 <script src="/public-panels.js?v=20260929-public"></script>
 <script src="/public-flow.js?v=20260930-services"></script>
 <script src="/equipment-quote.js?v=20260925-equipment"></script><script src="/public-equipment.js?v=20260925-equipment"></script>
 <script src="/vehicle-specs.js?v=20260924-specs"></script><script src="/public-catalogue.js?v=20260929-public"></script><script src="/public-directory.js?v=20260929-public"></script>
-<script src="/public-ui.js?v=20260930-services" onerror="publicUIFailed()"></script>
+<script src="/public-ui.js?v=20260930-fleet-upload" onerror="publicUIFailed()"></script>
 </body>
 
 </html>

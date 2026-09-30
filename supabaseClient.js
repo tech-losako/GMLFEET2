@@ -29,7 +29,11 @@
     };
 
     const serviceFields = ['email', 'idNumber', 'carBrand', 'carModel', 'carPlate',
-        'carYear', 'carChassis', 'permisFileName', 'carteRoseFileName', 'photosCount', 'cvFileName'];
+        'carYear', 'carChassis', 'permisFileName', 'carteRoseFileName',
+        'transportAuthorizationFileName', 'vignetteFileName', 'insuranceFileName',
+        'technicalInspectionFileName', 'frontPhotoFileName', 'rearPhotoFileName',
+        'leftPhotoFileName', 'rightPhotoFileName', 'interiorPhotoFileName',
+        'photosCount', 'cvFileName'];
 
     const appFromDb = (row) => ({
         ...Object.fromEntries(serviceFields.filter(key => row.service_details?.[key] !== undefined)
@@ -159,7 +163,7 @@
 
         async createApplication(app, files = [], requestId = crypto.randomUUID()) {
             if (!client) throw new Error('Le service est indisponible. Réessayez plus tard.');
-            if(files.length>8 || files.reduce((n,f)=>n+f.size,0)>20*1024*1024) throw new Error('Maximum 8 fichiers et 20 Mo au total.');
+            if(files.length>10 || files.reduce((n,f)=>n+f.size,0)>20*1024*1024) throw new Error('Maximum 10 fichiers et 20 Mo au total.');
             for(const file of files) if(!file.size || file.size>10*1024*1024 || !['image/jpeg','image/png','image/webp','application/pdf'].includes(file.type)) throw new Error('Choisissez des fichiers JPG, PNG, WebP ou PDF de 10 Mo maximum chacun.');
             const body=new FormData();body.append('request_id',requestId);body.append('application',JSON.stringify(appToDb(app)));
             files.forEach(file=>body.append('files',file,file.name));
