@@ -133,12 +133,7 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-between">
-                <label class="flex items-center cursor-pointer">
-                    <input type="checkbox" id="rememberMe" class="w-4 h-4 rounded border-gray-600 bg-white/5 text-gmfRed focus:ring-gmfRed focus:ring-offset-0">
-                    <span class="ml-2 text-gray-400 text-sm">Se souvenir de moi</span>
-                </label>
-            </div>
+            <p class="text-gray-400 text-xs leading-5">Pour protéger les dossiers clients, la session se ferme après 30 minutes sans activité.</p>
 
             <button type="submit" id="loginBtn"
                 class="w-full bg-gmfRed hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-red-900/30 hover:shadow-xl hover:shadow-red-900/40 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
@@ -160,16 +155,32 @@
         © 2026 GMFLEET — George Michael Logistics
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.js"></script>
+    <script src="vendor/supabase-2.57.4.js"></script>
     <script src="supabase-config.js"></script>
     <script src="supabaseClient.js"></script>
     <script>
-        // Check if already logged in
+        const ADMIN_IDLE_MS = 30 * 60 * 1000;
+        const ACTIVITY_KEY = 'gmfleet-admin-last-activity';
+
+        const reason = new URLSearchParams(location.search).get('reason');
+        if (reason === 'inactivity') {
+            requestAnimationFrame(() => showLoginError('Votre session a expiré après 30 minutes sans activité. Reconnectez-vous.'));
+        }
+
+        // Check if an active, recent staff session already exists.
         (async function redirectAuthenticatedAdmin() {
             if (!window.GMFleetBackend?.isConfigured()) return;
 
             const { data } = await window.GMFleetBackend.getSession();
-            if (data.session) window.location.href = 'admin.html';
+            if (!data.session) return;
+            const last = Number(localStorage.getItem(ACTIVITY_KEY) || 0);
+            if (last && Date.now() - last >= ADMIN_IDLE_MS) {
+                await window.GMFleetBackend.signOut();
+                localStorage.removeItem(ACTIVITY_KEY);
+                return;
+            }
+            localStorage.setItem(ACTIVITY_KEY, String(Date.now()));
+            window.location.href = 'admin.html';
         })();
 
         function togglePassword() {
@@ -210,6 +221,7 @@
                     const { error } = await window.GMFleetBackend.signIn(email, password);
                     if (error) throw error;
                 } else { throw new Error('Service de connexion indisponible.'); }
+                localStorage.setItem(ACTIVITY_KEY, String(Date.now()));
 
                 btn.innerHTML = '<i class="fas fa-check mr-2"></i> Connecté !';
                 btn.classList.remove('bg-gmfRed', 'hover:bg-red-700');

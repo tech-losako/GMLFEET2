@@ -29,11 +29,12 @@
     };
 
     const serviceFields = ['email', 'idNumber', 'carBrand', 'carModel', 'carPlate',
-        'carYear', 'carChassis', 'permisFileName', 'carteRoseFileName',
+        'carYear', 'carChassis', 'permisFileName', 'permisRectoFileName', 'permisVersoFileName', 'carteRoseFileName',
         'transportAuthorizationFileName', 'vignetteFileName', 'insuranceFileName',
         'technicalInspectionFileName', 'frontPhotoFileName', 'rearPhotoFileName',
         'leftPhotoFileName', 'rightPhotoFileName', 'interiorPhotoFileName',
-        'photosCount', 'cvFileName'];
+        'photosCount', 'cvFileName', 'licenseRectoFileName', 'licenseVersoFileName',
+        'dailyPayment', 'weeklyPayment', 'planTotal', 'initialDeposit'];
 
     const appFromDb = (row) => ({
         ...Object.fromEntries(serviceFields.filter(key => row.service_details?.[key] !== undefined)
@@ -170,7 +171,13 @@
             const {data,error}=await client.functions.invoke('submit-application',{body});
             if(error){let message='Envoi interrompu. Réessayez sans fermer le formulaire.';try{message=(await error.context.json()).error||message;}catch{}throw new Error(message);}
             if(!data?.success)throw new Error(data?.error||'La demande n’a pas été confirmée. Réessayez.');
-            return app;
+            return {
+                ...app,
+                application_id: data.application_id,
+                reference: data.reference,
+                submitted_at: data.submitted_at,
+                sms_status: data.sms_status || 'pending'
+            };
         },
 
         async updateApplicationStatus(id, status) {

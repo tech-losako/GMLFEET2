@@ -52,6 +52,58 @@ const carsData = {
     }
 };
 
+function moneyValue(value) {
+    return Number(String(value || '').replace(/[^0-9.,-]/g, '').replace(',', '.')) || 0;
+}
+
+function formatUsd(value, decimals = 2) {
+    return `${new Intl.NumberFormat('fr-FR', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+    }).format(Number(value) || 0).replace(/[\u202f\u00a0]/g, ' ')} USD`;
+}
+
+function getPlanQuote(carKey, duration) {
+    const months = Number(duration);
+    const offer = carsData[carKey]?.pricing?.[String(months)];
+    if (!offer || !months) return null;
+    const total = moneyValue(offer.total);
+    const initialDeposit = moneyValue(offer.avance);
+    const paymentWeeks = months * 52 / 12;
+    const weeklyPayment = total / paymentWeeks;
+    const dailyPayment = weeklyPayment / 6;
+    return { months, total, initialDeposit, paymentWeeks, weeklyPayment, dailyPayment };
+}
+
+function congolesePhone(value) {
+    const digits = String(value || '').replace(/\D/g, '').replace(/^243/, '').replace(/^0/, '').slice(0, 9);
+    return digits.length === 9 ? `+243${digits}` : '';
+}
+
+const receiptLabels = {
+    name: 'Nom complet', phone: 'Téléphone', address: 'Adresse', service: 'Type de demande', vehicle: 'Véhicule choisi',
+    duration: 'Durée du plan', dailyPayment: 'Versement journalier', weeklyPayment: 'Versement hebdomadaire',
+    planTotal: 'Total du plan', initialDeposit: 'Acompte initial', experience: 'Expérience de conduite',
+    coBorrowerName: 'Co-emprunteur', coBorrowerPhone: 'Téléphone du co-emprunteur', coBorrowerAddress: 'Adresse du co-emprunteur',
+    licenseRectoFileName: 'Permis de conduire - recto', licenseVersoFileName: 'Permis de conduire - verso',
+    email: 'E-mail', idNumber: "Numéro de pièce d'identité", carBrand: 'Marque', carModel: 'Modèle', carPlate: 'Plaque',
+    carYear: 'Année du véhicule', carChassis: 'Châssis / VIN', permisRectoFileName: 'Permis de conduire - recto',
+    permisVersoFileName: 'Permis de conduire - verso', carteRoseFileName: 'Carte rose',
+    transportAuthorizationFileName: 'Autorisation de transport', vignetteFileName: 'Vignette', insuranceFileName: 'Assurance',
+    technicalInspectionFileName: 'Contrôle technique', frontPhotoFileName: 'Photo avant', rearPhotoFileName: 'Photo arrière',
+    leftPhotoFileName: 'Photo côté gauche', rightPhotoFileName: 'Photo côté droit', interiorPhotoFileName: 'Photo intérieure',
+    cvFileName: 'CV'
+};
+
+function receiptFields(app) {
+    return Object.entries(receiptLabels).flatMap(([key, label]) => {
+        const value = app[key];
+        if (value === undefined || value === null || value === '') return [];
+        const display = key === 'duration' ? `${value} mois` : value;
+        return [{ label, value: display }];
+    });
+}
+
 function openModal(carKey) {
     window.location.href = `detail-vehicule.html?car=${carKey}`;
 }
@@ -156,7 +208,8 @@ function handleServiceSelect(val) {
     if (val === 'Chauffeur Yango') {
         if (fYango) fYango.classList.remove('hidden');
         document.getElementById('yangoCarModel')?.setAttribute('required', 'true');
-        document.getElementById('yangoPermis')?.setAttribute('required', 'true');
+        document.getElementById('yangoPermisRecto')?.setAttribute('required', 'true');
+        document.getElementById('yangoPermisVerso')?.setAttribute('required', 'true');
     } else if (val === 'Gestion de flotte') {
         if (fFlotte) fFlotte.classList.remove('hidden');
         document.getElementById('flotteCarModel')?.setAttribute('required', 'true');
@@ -164,7 +217,8 @@ function handleServiceSelect(val) {
     } else if (val === 'Recrutement') {
         if (fRecrutement) fRecrutement.classList.remove('hidden');
         document.getElementById('recrutementExperience')?.setAttribute('required', 'true');
-        document.getElementById('recrutementPermis')?.setAttribute('required', 'true');
+        document.getElementById('recrutementPermisRecto')?.setAttribute('required', 'true');
+        document.getElementById('recrutementPermisVerso')?.setAttribute('required', 'true');
     }
 
     if (noServiceWarn) noServiceWarn.classList.add('hidden');
@@ -184,27 +238,26 @@ function updatePricingDisplay() {
     const val = select ? select.value : null;
     if (!val) return;
 
-    const data = carsData[val];
-    if (!data) return;
-
-    const dailyEl = document.getElementById('modalValJour');
-    if (dailyEl && data.daily) {
-        dailyEl.textContent = data.daily;
-    }
-
-    // Default to 12 if no duration specifically selected yet
     const durContainer = document.getElementById('planDuration');
-    const selectedDuration = durContainer && durContainer.value ? durContainer.value : "12";
+    const selectedDuration = durContainer?.value || '';
+    const quote = getPlanQuote(val, selectedDuration);
+    const dailyEl = document.getElementById('modalValJour');
+    const summary = document.getElementById('planDailySummary');
+    if (dailyEl) dailyEl.textContent = quote ? formatUsd(quote.dailyPayment) : '-';
+    if (summary) summary.textContent = quote
+        ? `${quote.months} mois · ${Math.round(quote.paymentWeeks * 6)} jours de versement · ${formatUsd(quote.dailyPayment)} par jour, 6 jours par semaine.`
+        : 'Choisissez une durée pour calculer votre versement journalier.';
 
-    const pricing = data.pricing[selectedDuration];
-    if (pricing) {
+    const data = carsData[val];
+    const pricing = data?.pricing?.[selectedDuration];
+    if (pricing && quote) {
         const totalEl = document.getElementById('modalValPrix');
         const advanceEl = document.getElementById('modalValAcompte');
         const semaineEl = document.getElementById('modalValSemaine');
 
-        if (totalEl) totalEl.textContent = pricing.total;
-        if (advanceEl) advanceEl.textContent = pricing.avance;
-        if (semaineEl) semaineEl.textContent = pricing.week;
+        if (totalEl) totalEl.textContent = formatUsd(quote.total, 0);
+        if (advanceEl) advanceEl.textContent = formatUsd(quote.initialDeposit, 0);
+        if (semaineEl) semaineEl.textContent = formatUsd(quote.weeklyPayment);
     }
 }
 
@@ -391,14 +444,18 @@ function applicationFiles(service){
   const ordered=[['flotteCarteRose','01-carte-rose'],['flotteAutorisationTransport','02-autorisation-transport'],['flotteVignette','03-vignette'],['flotteAssurance','04-assurance'],['flotteControleTechnique','05-controle-technique'],['flottePhotoAvant','06-photo-avant'],['flottePhotoArriere','07-photo-arriere'],['flottePhotoGauche','08-photo-gauche'],['flottePhotoDroite','09-photo-droite'],['flottePhotoInterieur','10-photo-interieur']];
   return ordered.flatMap(([id,prefix])=>Array.from(document.getElementById(id)?.files||[]).map(file=>new File([file],prefix+'-'+file.name.replace(/[^a-zA-Z0-9._-]+/g,'-'),{type:file.type,lastModified:file.lastModified})));
  }
- const ids=service==='Chauffeur Yango'?['yangoPermis','yangoCarteRose']:service?['recrutementPermis','recrutementCV','applicantDocument']:['clientPermisUpload'];
- return ids.flatMap(id=>Array.from(document.getElementById(id)?.files||[]));
+ const ordered=service==='Chauffeur Yango'
+  ?[['yangoPermisRecto','01-permis-recto'],['yangoPermisVerso','02-permis-verso'],['yangoCarteRose','03-carte-rose']]
+  :service?[['recrutementPermisRecto','01-permis-recto'],['recrutementPermisVerso','02-permis-verso'],['recrutementCV','03-cv'],['applicantDocument','03-document']]
+  :[['clientPermisRecto','01-permis-recto'],['clientPermisVerso','02-permis-verso']];
+ return ordered.flatMap(([id,prefix])=>Array.from(document.getElementById(id)?.files||[]).map(file=>new File([file],prefix+'-'+file.name.replace(/[^a-zA-Z0-9._-]+/g,'-'),{type:file.type,lastModified:file.lastModified})));
 }
 async function sendPublicApplication(app,form){
  if(!window.GMFleetBackend?.isConfigured())throw new Error('Le service est indisponible. Réessayez plus tard.');
  const id=form.dataset.submissionId||(form.dataset.submissionId=crypto.randomUUID());
- await window.GMFleetBackend.createApplication(app,applicationFiles(app.service),id);
+ const confirmation=await window.GMFleetBackend.createApplication(app,applicationFiles(app.service),id);
  delete form.dataset.submissionId;
+ return confirmation;
 }
 
 async function submitForm(e) {
@@ -414,25 +471,35 @@ async function submitForm(e) {
     }
 
     const carName = document.getElementById('selectedVehicle') ? document.getElementById('selectedVehicle').value : '';
-    const licenseInput = document.getElementById('clientPermisUpload');
+    const carKey = document.getElementById('generalVehicleSelect')?.value || '';
+    const duration = document.getElementById('planDuration')?.value || '';
+    const quote = getPlanQuote(carKey, duration);
+    const licenseRecto = document.getElementById('clientPermisRecto');
+    const licenseVerso = document.getElementById('clientPermisVerso');
 
     const newApp = {
         name: document.getElementById('clientName') ? document.getElementById('clientName').value.trim() : 'Client',
-        phone: document.getElementById('clientPhone') ? document.getElementById('clientPhone').value.trim() : '',
+        phone: congolesePhone(document.getElementById('clientPhone')?.value),
         address: document.getElementById('clientAddress') ? document.getElementById('clientAddress').value.trim() : '',
         experience: document.getElementById('clientExperience') ? document.getElementById('clientExperience').value : '',
         coBorrowerName: document.getElementById('coBorrowerName') ? document.getElementById('coBorrowerName').value.trim() : '',
-        coBorrowerPhone: document.getElementById('coBorrowerPhone') ? document.getElementById('coBorrowerPhone').value.trim() : '',
+        coBorrowerPhone: congolesePhone(document.getElementById('coBorrowerPhone')?.value),
         coBorrowerAddress: document.getElementById('coBorrowerAddress') ? document.getElementById('coBorrowerAddress').value.trim() : '',
-        duration: document.getElementById('planDuration') ? document.getElementById('planDuration').value : '',
+        duration,
         vehicle: carName,
+        dailyPayment: quote ? formatUsd(quote.dailyPayment) : '',
+        weeklyPayment: quote ? formatUsd(quote.weeklyPayment) : '',
+        planTotal: quote ? formatUsd(quote.total, 0) : '',
+        initialDeposit: quote ? formatUsd(quote.initialDeposit, 0) : '',
         date: new Date().toLocaleDateString('fr-FR'),
         status: 'En attente',
-        licenseFileName: licenseInput && licenseInput.files.length ? licenseInput.files[0].name : ''
+        licenseRectoFileName: licenseRecto?.files[0]?.name || '',
+        licenseVersoFileName: licenseVerso?.files[0]?.name || '',
+        licenseFileName: licenseRecto?.files[0]?.name || ''
     };
 
     try {
-        await sendPublicApplication(newApp,actualForm);
+        const confirmation = await sendPublicApplication(newApp,actualForm);
 
         const successCarName = document.getElementById('successCarName');
         if (successCarName) successCarName.textContent = carName;
@@ -441,6 +508,14 @@ async function submitForm(e) {
         if (successModal) {
             successModal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
+            window.GMFleetRequestReceipt?.present(successModal, {
+                reference: confirmation.reference,
+                title: 'Récépissé de candidature Car na ngai',
+                category: 'Candidature véhicule',
+                submittedAt: confirmation.submitted_at,
+                fields: receiptFields(newApp),
+                smsStatus: confirmation.sms_status
+            });
         } else if (successMessage) {
             successMessage.classList.remove('hidden');
         }
@@ -476,7 +551,9 @@ async function submitServiceForm(e) {
     if (serviceName === 'Chauffeur Yango') {
         specificData.carModel = document.getElementById('yangoCarModel')?.value || '';
         specificData.carYear = document.getElementById('yangoCarYear')?.value || '';
-        specificData.permisFileName = document.getElementById('yangoPermis')?.files[0]?.name || '';
+        specificData.permisRectoFileName = document.getElementById('yangoPermisRecto')?.files[0]?.name || '';
+        specificData.permisVersoFileName = document.getElementById('yangoPermisVerso')?.files[0]?.name || '';
+        specificData.permisFileName = specificData.permisRectoFileName;
         specificData.carteRoseFileName = document.getElementById('yangoCarteRose')?.files[0]?.name || '';
     } else if (serviceName === 'Gestion de flotte') {
         specificData.email = document.getElementById('flotteEmail')?.value || '';
@@ -500,13 +577,15 @@ async function submitServiceForm(e) {
         specificData.photosCount = ['flottePhotoAvant','flottePhotoArriere','flottePhotoGauche','flottePhotoDroite','flottePhotoInterieur'].filter(id=>fleetFileName(id)).length;
     } else if (serviceName === 'Recrutement' || serviceName === 'Recrutement Chauffeur') {
         specificData.experience = document.getElementById('recrutementExperience')?.value || document.getElementById('applicantExperience')?.value || '';
-        specificData.permisFileName = document.getElementById('recrutementPermis')?.files[0]?.name || document.getElementById('applicantDocument')?.files[0]?.name || '';
+        specificData.permisRectoFileName = document.getElementById('recrutementPermisRecto')?.files[0]?.name || '';
+        specificData.permisVersoFileName = document.getElementById('recrutementPermisVerso')?.files[0]?.name || '';
+        specificData.permisFileName = specificData.permisRectoFileName || document.getElementById('applicantDocument')?.files[0]?.name || '';
         specificData.cvFileName = document.getElementById('recrutementCV')?.files[0]?.name || '';
     }
 
     const newApp = {
         name: document.getElementById('applicantName')?.value.trim() || [document.getElementById('applicantFirstName')?.value.trim(), document.getElementById('applicantLastName')?.value.trim()].filter(Boolean).join(' '),
-        phone: document.getElementById('applicantPhone') ? document.getElementById('applicantPhone').value.trim() : '',
+        phone: congolesePhone(document.getElementById('applicantPhone')?.value),
         address: document.getElementById('applicantAddress')?.value.trim() || document.getElementById('applicantCommune')?.value.trim() || '',
         service: serviceName,
         ...specificData,
@@ -516,7 +595,7 @@ async function submitServiceForm(e) {
     };
 
     try {
-        await sendPublicApplication(newApp,actualForm);
+        const confirmation = await sendPublicApplication(newApp,actualForm);
 
         const successServiceName = document.getElementById('successServiceName');
         if (successServiceName) successServiceName.textContent = serviceName;
@@ -525,6 +604,14 @@ async function submitServiceForm(e) {
         if (successModal) {
             successModal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
+            window.GMFleetRequestReceipt?.present(successModal, {
+                reference: confirmation.reference,
+                title: `Récépissé - ${serviceName}`,
+                category: serviceName,
+                submittedAt: confirmation.submitted_at,
+                fields: receiptFields(newApp),
+                smsStatus: confirmation.sms_status
+            });
         }
 
         if (actualForm) actualForm.reset();

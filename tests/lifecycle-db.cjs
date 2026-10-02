@@ -26,10 +26,11 @@ const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
    create policy "Authenticated admins can manage payments" on public.payments for all using(true);
    create function public.rls_auto_enable() returns event_trigger language plpgsql as $$begin end$$;
   `);
-  for(const name of ['20260915151421_service_applications','20260916114252_operations_dashboard','20260916133033_contracts_cashier_reconciliation','20260924094709_candidature_lifecycle'])await db.exec(read(`supabase/migrations/${name}.sql`));
+  for(const name of ['20260915151421_service_applications','20260916114252_operations_dashboard','20260916133033_contracts_cashier_reconciliation','20260924094709_candidature_lifecycle','20261001175015_admin_guided_workflow'])await db.exec(read(`supabase/migrations/${name}.sql`));
   await db.exec(read('tests/candidature-lifecycle.sql'));
+  await db.exec(read('tests/admin-guided-workflow.sql'));
   assert.equal((await db.query('select count(*)::integer as n from public.applications')).rows[0].n,0,'test applications rolled back');
   assert.equal((await db.query('select count(*)::integer as n from public.contracts')).rows[0].n,0,'test contracts rolled back');
-  console.log('PASS PostgreSQL: review/LOLC separation, required checks, appointment drafts, next-day first installment, owner fuel receipt, idempotent onboarding, available fleet allocation, confirmed Yango membership, RLS and nonstaff denial. All fixtures rolled back.');
+  console.log('PASS PostgreSQL: permanent category references, ordered appointments, guided LOLC/purchase/installation/handover outcomes, lifecycle guards, contract timing, owner intake, RLS and rollback.');
  }finally{await db.close();}
 })().catch(e=>{console.error(e.message,e.detail||'',e.where||'');process.exitCode=1;});

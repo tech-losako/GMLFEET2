@@ -2,6 +2,22 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 const headers={'Access-Control-Allow-Origin':'https://gmfleet.georgemichaellogistics.cd','Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type','Access-Control-Allow-Methods':'POST, OPTIONS','Content-Type':'application/json','Cache-Control':'no-store'};
 const reply=(status:number,data:unknown)=>new Response(JSON.stringify(data),{status,headers});
 const digest=async(bytes:BufferSource)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(b=>b.toString(16).padStart(2,'0')).join('');
+const reference=(id:number,service:unknown,stamp=new Date())=>{
+ const prefix=service==='Chauffeur Yango'?'YNG':service==='Gestion de flotte'?'FLT':['Recrutement','Recrutement Chauffeur'].includes(String(service))?'DRV':'CNG';
+ return prefix+'-'+stamp.getUTCFullYear()+'-'+String(id).padStart(6,'0');
+};
+async function sendConfirmationSms(phone:string,requestReference:string){
+ const username=Deno.env.get('AFRICASTALKING_USERNAME'),apiKey=Deno.env.get('AFRICASTALKING_API_KEY'),senderId=Deno.env.get('AFRICASTALKING_SENDER_ID');
+ if(!username||!apiKey)return 'not_configured';
+ try{
+  const form=new URLSearchParams({username,to:phone,message:`GM Fleet : demande ${requestReference} reçue. Notre équipe l'examine et vous appellera dès que le traitement sera terminé. Conservez votre récépissé.`,enqueue:'true'});
+  if(senderId)form.set('from',senderId);
+  const endpoint=username==='sandbox'?'https://api.sandbox.africastalking.com/version1/messaging':'https://api.africastalking.com/version1/messaging';
+  const response=await fetch(endpoint,{method:'POST',headers:{apiKey,'Content-Type':'application/x-www-form-urlencoded','Accept':'application/json'},body:form});
+  if(!response.ok)throw new Error(`Africa's Talking HTTP ${response.status}`);
+  return 'sent';
+ }catch(error){console.error('Application SMS failed',error);return 'failed';}
+}
 function fileType(b:Uint8Array){
  if(b[0]===255&&b[1]===216&&b[2]===255)return ['image/jpeg','jpg'];
  if([137,80,78,71,13,10,26,10].every((v,i)=>b[i]===v))return ['image/png','png'];
@@ -26,10 +42,12 @@ Deno.serve(async req=>{
    const value=input[key]==null?'':String(input[key]).trim();if(value.length>max)throw new Error('Champ trop long : '+key);app[key]=value||null;
   }
   if(!app.name||!app.phone||!app.vehicle)throw new Error('Nom, téléphone et véhicule ou service requis');
+  if(!/^\+243[0-9]{9}$/.test(String(app.phone)))throw new Error('Téléphone invalide : saisissez 9 chiffres après +243');
+  if(app.co_borrower_phone&&!/^\+243[0-9]{9}$/.test(String(app.co_borrower_phone)))throw new Error('Téléphone du co-emprunteur invalide');
   const service=input.service||null;if(service&&!['Chauffeur Yango','Gestion de flotte','Recrutement Chauffeur','Recrutement'].includes(service))throw new Error('Service invalide');
   app.service=service==='Recrutement'?'Recrutement Chauffeur':service;app.application_type=service?'service':'vehicle';
   const months=input.plan_duration_months==null?null:Number(input.plan_duration_months);if(months!==null&&![12,15,18].includes(months))throw new Error('Durée invalide');app.plan_duration_months=months;
-  const details:Record<string,unknown>={};for(const key of ['email','idNumber','carBrand','carModel','carPlate','carYear','carChassis','permisFileName','carteRoseFileName','transportAuthorizationFileName','vignetteFileName','insuranceFileName','technicalInspectionFileName','frontPhotoFileName','rearPhotoFileName','leftPhotoFileName','rightPhotoFileName','interiorPhotoFileName','photosCount','cvFileName']){const value=input.service_details?.[key];if(value!==undefined){if(!['string','number'].includes(typeof value)||String(value).length>500)throw new Error('Détail de formulaire invalide');details[key]=value;}}app.service_details=details;
+  const details:Record<string,unknown>={};for(const key of ['email','idNumber','carBrand','carModel','carPlate','carYear','carChassis','permisFileName','permisRectoFileName','permisVersoFileName','carteRoseFileName','transportAuthorizationFileName','vignetteFileName','insuranceFileName','technicalInspectionFileName','frontPhotoFileName','rearPhotoFileName','leftPhotoFileName','rightPhotoFileName','interiorPhotoFileName','photosCount','cvFileName','licenseRectoFileName','licenseVersoFileName','dailyPayment','weeklyPayment','planTotal','initialDeposit']){const value=input.service_details?.[key];if(value!==undefined){if(!['string','number'].includes(typeof value)||String(value).length>500)throw new Error('Détail de formulaire invalide');details[key]=value;}}app.service_details=details;
   const files=form.getAll('files');if(files.length>10)throw new Error('Maximum 10 fichiers par demande');
   const manifest=[];const contents=[];let bytes=0;
   for(const [i,file] of files.entries()){
@@ -42,7 +60,8 @@ Deno.serve(async req=>{
   const serviceClient=createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,{auth:{persistSession:false,autoRefreshToken:false}});
   const {data:reservation,error:reserveError}=await serviceClient.rpc('reserve_public_submission',{p:{request_id:requestId,fingerprint,application:app,files:manifest}});
   if(reserveError)return reply(409,{error:reserveError.message});
-  if(reservation.completed)return reply(200,{success:true});
+  const submittedAt=new Date();
+  if(reservation.completed)return reply(200,{success:true,application_id:reservation.application_id,reference:reference(reservation.application_id,app.service,submittedAt),submitted_at:submittedAt.toISOString(),sms_status:'previously_processed'});
   for(const [i,file] of manifest.entries()){
    const path=reservation.application_id+'/'+requestId+'/'+file.key;
    const {error}=await serviceClient.storage.from('application-documents').upload(path,contents[i],{contentType:file.type,upsert:false});
@@ -50,6 +69,7 @@ Deno.serve(async req=>{
   }
   const {error:completeError}=await serviceClient.rpc('complete_public_submission',{request:requestId});
   if(completeError)return reply(503,{error:'Enregistrement interrompu. Réessayez pour terminer la demande.'});
-  return reply(200,{success:true});
+  const requestReference=reference(reservation.application_id,app.service,submittedAt),smsStatus=await sendConfirmationSms(String(app.phone),requestReference);
+  return reply(200,{success:true,application_id:reservation.application_id,reference:requestReference,submitted_at:submittedAt.toISOString(),sms_status:smsStatus});
  }catch(error){return reply(400,{error:error instanceof Error?error.message:'Formulaire invalide'});}
 });

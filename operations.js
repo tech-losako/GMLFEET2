@@ -5,7 +5,7 @@
  const workflow=window.GMFleetWorkflow;
  const $ = id => document.getElementById(id);
  const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const programs = {DRIVE_TO_OWN:'Drive to Own · LOLC',YANGO:'Agrégateur Yango',FLEET_OWNER:'Gestion de flotte',PARTNER_DRIVER:'Chauffeur Partenaire'};
+ const programs = {DRIVE_TO_OWN:'Car na ngai · LOLC',YANGO:'Partenaire Yango',FLEET_OWNER:'Gestion de flotte',PARTNER_DRIVER:'Chauffeur Partenaire'};
  const services = {DRIVE_TO_OWN:null,YANGO:'Chauffeur Yango',FLEET_OWNER:'Gestion de flotte',PARTNER_DRIVER:'Recrutement Chauffeur'};
  const stages = {new:'Nouvelle candidature',to_contact:'À contacter',contacted:'Contacté',appointment:'Rendez-vous fixé',screening:'En vérification',kyc:'Dossier / KYC LOLC',lolc_pending:'Décision LOLC attendue',approved:'Approuvé',vehicle_arrangements:'Arrivée du véhicule',paperwork_check:'Contrôle administratif',inspection:'Inspection mécanique',preparation:'Préparation GML',ready:'Prêt pour remise',handed_over:'Véhicule remis',available:'Chauffeur disponible',on_hold:'En attente',rejected:'Refusé',withdrawn:'Retiré'};
  const commonStages = ['new','to_contact','contacted','appointment','screening'];
@@ -20,6 +20,7 @@
  const appointmentStates = {scheduled:'Programmé',confirmed:'Confirmé',completed:'Effectué',missed:'Absent',cancelled:'Annulé',rescheduled:'Reprogrammé'};
  const detailLabels = {email:'E-mail',idNumber:'Pièce d’identité',carBrand:'Marque',carModel:'Modèle',carPlate:'Plaque',carYear:'Année',carChassis:'Châssis',permisFileName:'Permis (nom déclaré)',carteRoseFileName:'Carte rose (nom déclaré)',photosCount:'Photos déclarées',cvFileName:'CV (nom déclaré)',licenseNumber:'Numéro de permis',yangoStatus:'Statut Yango'};
  const state = {apps:[],appointments:[],staff:[],user:null,view:'overview',current:null,detailToken:0,filters:{query:'',program:'',stage:'',queue:'pending'}};
+ const ADMIN_IDLE_MS=30*60*1000,ACTIVITY_KEY='gmfleet-admin-last-activity';let idleTimer,activityWrite=0;
  const date = (value, time=false) => value ? new Intl.DateTimeFormat('fr-FR',{dateStyle:'medium',...(time?{timeStyle:'short'}:{}),timeZone:'Africa/Kinshasa'}).format(new Date(value.length===10?value+'T12:00:00+01:00':value)) : '—';
  const todayKey = () => new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Kinshasa',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
  const person = id => state.staff.find(s=>s.user_id===id)?.display_name || 'Équipe GM Fleet';
@@ -28,7 +29,12 @@
  function notify(message,error=false) { $('notice').hidden=false; $('notice').textContent=message; $('notice').className=error?'error':''; }
  function tag(app) { const tone=['approved','ready','handed_over','available'].includes(app.workflow_stage)?'green':['rejected','withdrawn'].includes(app.workflow_stage)?'red':''; return `<span class="tag ${tone}">${escape(stages[app.workflow_stage]||app.workflow_stage)}</span>`; }
  function link(app) { return `<button class="link-button" data-case="${app.id}">${escape(app.name)}</button>`; }
+ const reference=app=>app.case_reference||`DOSSIER-${app.id}`;
  function fail(error) { console.error(error); return error.message || 'Une erreur est survenue. Réessayez.'; }
+ async function expireSession(){clearTimeout(idleTimer);try{await db?.auth.signOut();}finally{localStorage.removeItem(ACTIVITY_KEY);location.replace('/login.html?reason=inactivity');}}
+ function armIdleTimer(){clearTimeout(idleTimer);const last=Number(localStorage.getItem(ACTIVITY_KEY)||Date.now()),remaining=ADMIN_IDLE_MS-(Date.now()-last);if(remaining<=0){expireSession();return;}idleTimer=setTimeout(expireSession,remaining+250);}
+ function noteActivity(){if(document.hidden)return;const now=Date.now();if(now-activityWrite<15000)return;activityWrite=now;localStorage.setItem(ACTIVITY_KEY,String(now));armIdleTimer();}
+ function enforceIdle(){const last=Number(localStorage.getItem(ACTIVITY_KEY)||0);if(last&&Date.now()-last>=ADMIN_IDLE_MS){expireSession();return false;}return true;}
  async function rows(table, modify=query=>query) {
   let all=[];
   for(let offset=0;;offset+=500) {
@@ -85,7 +91,7 @@
    if(state.view!==selected)return;
    if(selected==='preparation'){
     const apps=state.apps.filter(a=>workflow.review(a)==='accepted'&&!contracts.some(c=>c.application_id===a.id&&c.status==='active')&&!vehicles.some(v=>v.owner_application_id===a.id)&&!(a.program_type==='YANGO'&&a.process_step==='joined'));
-    $('content').innerHTML=`<p class="section-note">Dossiers retenus par GML : suivez les contrôles, les décisions LOLC, les installations et les remises. Les contrats actifs et véhicules intégrés se retrouvent dans la flotte.</p>${Object.entries(programs).map(([key,label])=>{const group=apps.filter(a=>a.program_type===key);return `<section class="card"><h3>${escape(label)} · ${group.length}</h3>${group.length?group.map(a=>`<div class="row"><div>${link(a)}<small>${escape(workflow.step(a))}</small><small>${escape(a.next_action||'Ouvrir le dossier pour poursuivre')}</small></div><button class="secondary" data-case="${a.id}" data-open-tab="process">Poursuivre →</button></div>`).join(''):'<p class="muted">Aucun dossier en préparation.</p>'}</section>`;}).join('')}`;
+    $('content').innerHTML=`<p class="section-note">Dossiers retenus par GML : suivez les contrôles, les décisions LOLC, les installations et les remises. Les contrats actifs et véhicules intégrés se retrouvent dans la flotte.</p>${Object.entries(programs).map(([key,label])=>{const group=apps.filter(a=>a.program_type===key);return `<section class="card"><h3>${escape(label)} · ${group.length}</h3>${group.length?group.map(a=>`<div class="row"><div>${link(a)}<small>${escape(workflow.step(a))}</small><small>${escape(a.next_action||'Ouvrir le dossier pour poursuivre')}</small></div><button class="secondary" data-case="${a.id}" data-open-tab="${a.program_type==='DRIVE_TO_OWN'?'appointments':'process'}">Poursuivre →</button></div>`).join(''):'<p class="muted">Aucun dossier en préparation.</p>'}</section>`;}).join('')}`;
     return;
    }
    const partners=state.apps.filter(a=>a.program_type==='YANGO'&&a.process_step==='joined'&&workflow.review(a)==='accepted');
@@ -109,17 +115,25 @@
  }
  function renderTable() {
   const q=state.filters.query.toLocaleLowerCase('fr').trim();
-  const apps=state.apps.filter(a=>((state.filters.queue||'pending')==='all'||workflow.review(a)===(state.filters.queue||'pending'))&&(!state.filters.followups||(isOpen(a)&&a.follow_up_on&&a.follow_up_on<=todayKey()))&&(!state.filters.program||a.program_type===state.filters.program)&&(!state.filters.stage||a.workflow_stage===state.filters.stage)&&(!q||`${a.id} ${a.name} ${a.phone}`.toLocaleLowerCase('fr').includes(q)));
-  $('applicationTable').innerHTML=`<div class="card-heading"><h3>${apps.length} candidature${apps.length!==1?'s':''}</h3><span class="muted">${state.filters.followups?'Relances dues aujourd’hui ou avant · changez le filtre Étape pour tout voir':'Cliquez sur un nom pour ouvrir le dossier'}</span></div>${apps.length?`<div class="table-wrap"><table><thead><tr><th>Candidat</th><th>Programme</th><th>Étape</th><th>Suivi</th><th>Origine</th></tr></thead><tbody>${apps.map(a=>`<tr><td>${link(a)}<small>#${a.id} · ${escape(a.phone)}</small></td><td>${escape(programs[a.program_type])}<small>${date(a.created_on)}</small></td><td>${tag(a)}</td><td>${escape(a.assigned_to?person(a.assigned_to):'Non attribué')}<small>${a.follow_up_on?'Relance : '+date(a.follow_up_on):'Aucune relance planifiée'}</small></td><td>${escape(sources[a.source])}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Aucun dossier ne correspond à ces filtres.</div>'}`;
+  const apps=state.apps.filter(a=>((state.filters.queue||'pending')==='all'||workflow.review(a)===(state.filters.queue||'pending'))&&(!state.filters.followups||(isOpen(a)&&a.follow_up_on&&a.follow_up_on<=todayKey()))&&(!state.filters.program||a.program_type===state.filters.program)&&(!state.filters.stage||a.workflow_stage===state.filters.stage)&&(!q||`${a.id} ${a.case_reference||''} ${a.name} ${a.phone}`.toLocaleLowerCase('fr').includes(q)));
+  $('applicationTable').innerHTML=`<div class="card-heading"><h3>${apps.length} candidature${apps.length!==1?'s':''}</h3><span class="muted">${state.filters.followups?'Relances dues aujourd’hui ou avant · changez le filtre Étape pour tout voir':'Cliquez sur un nom pour ouvrir le dossier'}</span></div>${apps.length?`<div class="table-wrap"><table><thead><tr><th>Candidat</th><th>Programme</th><th>Étape</th><th>Suivi</th><th>Origine</th></tr></thead><tbody>${apps.map(a=>`<tr><td>${link(a)}<small>${escape(reference(a))} · ${escape(a.phone)}</small></td><td>${escape(programs[a.program_type])}<small>${date(a.created_on)}</small></td><td>${tag(a)}</td><td>${escape(a.assigned_to?person(a.assigned_to):'Attribué à la première ouverture')}<small>${a.follow_up_on?'Relance : '+date(a.follow_up_on):'Aucune relance planifiée'}</small></td><td>${escape(sources[a.source])}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Aucun dossier ne correspond à ces filtres.</div>'}`;
  }
  function appointmentRow(a) {
   const app=state.apps.find(x=>x.id===a.application_id);
-  return `<div class="appointment"><time>${date(a.starts_at,true)}</time><div class="grow">${app?link(app):'Dossier #'+a.application_id}<small class="muted"> · ${escape(workflow.purposes[a.purpose]||'Rendez-vous')} · ${escape(a.location)} · ${escape(person(a.assigned_to))}</small><p class="muted">${escape(a.instructions)}</p></div><span class="tag">${escape(appointmentStates[a.status])}</span></div>`;
+  return `<div class="appointment"><time>${date(a.starts_at,true)}</time><div class="grow">${app?link(app):'Dossier #'+a.application_id}<small class="muted">${a.sequence_no?'Étape '+a.sequence_no+' · ':''}${escape(workflow.purposes[a.purpose]||'Rendez-vous')} · ${escape(a.location)} · ${escape(person(a.assigned_to))}</small><p class="muted">${escape(a.outcome_notes||a.instructions)}</p></div><span class="tag">${escape(appointmentStates[a.status])}</span></div>`;
+ }
+ function caseAppointmentsHTML(appointments,a){
+  const editableStates={scheduled:'Programmé',confirmed:'Confirmé',rescheduled:'Reprogrammé',cancelled:'Annulé'};
+  const outcomeLabels={lolc_approved:'Crédit approuvé',lolc_rejected:'Crédit refusé',information_required:'Complément demandé',vehicle_bought:'Véhicule acheté',delayed:'Reporté',installed:'Installation terminée',installation_incomplete:'Installation incomplète',handed_over:'Véhicule remis',completed:'Effectué',missed:'Absent',cancelled:'Annulé'};
+  const expectedPurpose=workflow.nextPurpose(a),purchaseStage=expectedPurpose==='vehicle_purchase';
+  const cards=appointments.map(p=>`<div class="appointment-card" data-appointment-card="${escape(p.id)}"><div class="appointment-card-head"><div><span class="eyebrow">RENDEZ-VOUS ${p.sequence_no||''}</span><h4>${escape(workflow.purposes[p.purpose]||'Rendez-vous')}</h4><p>${date(p.starts_at,true)} · ${escape(p.location)}</p><small>${escape(person(p.assigned_to))}${p.instructions?' · '+escape(p.instructions):''}</small></div><span class="tag ${p.status==='completed'?'green':''}">${escape(appointmentStates[p.status])}</span></div>${p.outcome?`<p class="appointment-result"><strong>${escape(outcomeLabels[p.outcome]||p.outcome)}</strong>${p.outcome_notes?' · '+escape(p.outcome_notes):''}</p>`:''}${['scheduled','confirmed'].includes(p.status)?`<label>État du rendez-vous<select data-appointment="${p.id}" data-original="${p.status}">${options(editableStates,p.status)}</select></label>`:''}</div>`).join('');
+  const scheduler=expectedPurpose?`<details class="appointment-scheduler"><summary>＋ ${purchaseStage?'Enregistrer l’achat lorsqu’il est confirmé':'Programmer la prochaine étape'}</summary><form id="appointmentForm"><div class="fields"><label>${purchaseStage?'Date et heure réelles de l’achat':'Date et heure · Kinshasa'}<input name="starts_at" type="datetime-local" required></label><label>Agent attribué<input value="${escape(person(a.assigned_to||state.user.id))}" disabled><input type="hidden" name="assigned_to" value="${escape(a.assigned_to||state.user.id)}"></label><label class="wide">Lieu<input name="location" required maxlength="500" placeholder="${purchaseStage?'Concessionnaire / agence LOLC':'Bureau GM Fleet — adresse'}"></label><label class="wide">${purchaseStage?'Premières observations':'Instructions pour le client'}<textarea name="instructions" maxlength="3000" placeholder="${purchaseStage?'Informations connues au moment de l’achat…':'Documents à apporter, point de rencontre, personne à demander…'}"></textarea></label><label class="check wide"><input type="checkbox" name="briefing_confirmed" required>${purchaseStage?'Je confirme que l’achat a eu lieu et que je vais compléter la fiche du véhicule.':'Les informations du rendez-vous ont été vérifiées avant l’envoi du message.'}</label></div><div class="form-error" role="alert"></div><button class="primary">${purchaseStage?'Ouvrir la fiche d’achat':'Programmer et préparer le message'}</button></form></details>`:'<p class="section-note">Toutes les étapes opérationnelles sont terminées. Activez le contrat signé pour démarrer les échéances.</p>';
+  return `${cards||'<p class="muted">Aucun rendez-vous enregistré.</p>'}${scheduler}`;
  }
  function renderAppointments() {
   const upcoming=state.appointments.filter(a=>!['completed','missed','cancelled','rescheduled'].includes(a.status));
   const past=state.appointments.filter(a=>!upcoming.includes(a)).reverse();
-  const awaiting=state.apps.filter(a=>workflow.review(a)==='accepted'&&a.program_type!=='YANGO'&&['appointment','documents'].includes(a.process_step)&&!upcoming.some(p=>p.application_id===a.id&&(a.process_step!=='documents'||p.purpose==='handover')));
+  const awaiting=state.apps.filter(a=>workflow.review(a)==='accepted'&&workflow.nextPurpose(a)&&!upcoming.some(p=>p.application_id===a.id));
   $('content').innerHTML=`<section class="card"><h3>À programmer · ${awaiting.length}</h3>${awaiting.map(a=>`<div class="row"><div>${link(a)}<small>${escape(workflow.step(a))}</small></div><button class="secondary" data-case="${a.id}" data-open-tab="appointments">Programmer →</button></div>`).join('')||'<p class="muted">Aucun rendez-vous à programmer.</p>'}</section><section><h3>À venir / à clôturer · ${upcoming.length}</h3>${upcoming.length?upcoming.map(appointmentRow).join(''):'<div class="card empty">Planifiez un rendez-vous depuis le dossier du candidat.</div>'}</section><section class="card"><h3>Historique</h3>${past.length?past.slice(0,50).map(appointmentRow).join(''):'<p class="muted">Aucun rendez-vous clôturé.</p>'}</section>`;
  }
  function detailsHTML(a) {
@@ -129,9 +143,13 @@
  async function openCase(id) {
   const token=++state.detailToken;
   if(state.current?.id!==Number(id))state.caseTab='summary';
-  state.current=state.apps.find(a=>a.id===Number(id)); if(!state.current) return;
-  const a=state.current;
-  $('caseRef').textContent=`DOSSIER #${a.id} / ${programs[a.program_type]}`;
+  let a=state.apps.find(item=>item.id===Number(id)); if(!a) return;
+  if(!a.assigned_to){
+   const claimed=await check(await db.from('applications').update({assigned_to:state.user.id,claimed_at:new Date().toISOString()}).eq('id',a.id).eq('revision',a.revision).select('*'));
+   if(claimed.length)Object.assign(a,claimed[0]);else{await reload();a=state.apps.find(item=>item.id===Number(id));if(!a)return;}
+  }
+  state.current=a;
+  $('caseRef').textContent=`${reference(a)} / ${programs[a.program_type]}`;
   $('caseName').textContent=a.name;
   $('caseBody').innerHTML='<p class="muted">Chargement du dossier…</p>';
   if(!$('caseDialog').open) $('caseDialog').showModal();
@@ -141,15 +159,15 @@
    const appointments=state.appointments.filter(x=>x.application_id===a.id);
    const staffOptions=Object.fromEntries(state.staff.map(s=>[s.user_id,s.display_name]));
    const drive=a.program_type==='DRIVE_TO_OWN';
-   $('caseBody').innerHTML=`<div class="badge-line">${tag(a)}<span class="tag">${escape(sources[a.source])}</span><span class="tag">Reçu le ${date(a.created_on)}</span></div><div class="case-grid"><div>
+   $('caseBody').innerHTML=`<div class="badge-line">${tag(a)}<span class="tag">${escape(sources[a.source])}</span><span class="tag">${escape(reference(a))}</span><span class="tag">Agent : ${escape(person(a.assigned_to))}</span><span class="tag">Reçu le ${date(a.created_on)}</span></div><div class="case-grid"><div>
    <section class="card"><h3>Informations du candidat</h3>${detailsHTML(a)}${a.note?`<p class="note">${escape(a.note)}</p>`:''}</section>
    <section class="card">${a.lifecycle_version===1?`<h3>Parcours du dossier</h3><form id="workflowForm"><div class="fields"><label>Étape<select name="workflow_stage">${options(Object.fromEntries(stageSets[a.program_type].map(s=>[s,stages[s]])),a.workflow_stage)}</select></label><label>Agent responsable<select name="assigned_to"><option value="">Non attribué</option>${options(staffOptions,a.assigned_to)}</select></label>${drive?`<label>Décision LOLC<select name="lolc_status">${options(lolc,a.lolc_status)}</select></label><label>Référence LOLC<input name="lolc_reference" value="${escape(a.lolc_reference)}" maxlength="200"></label>`:''}<label class="wide">Prochaine action<input name="next_action" value="${escape(a.next_action)}" maxlength="1000" placeholder="Appeler le candidat, compléter les pièces…"></label><label>Relance prévue<input name="follow_up_on" type="date" value="${escape(a.follow_up_on)}"></label></div>${drive?'<p class="section-note">LOLC décide du financement. L’approbation ne déclenche aucun échéancier de paiement.</p>':''}<h3 style="margin-top:22px">Préparation et contrôles</h3><div class="checklist">${Object.entries({administrative:'Contrôle administratif effectué',inspection_requested:'Inspection mécanique demandée par le client',inspection_completed:'Rapport de l’atelier reçu',paperwork:'Documents de remise finalisés',tracker:'Tracker installé',yango:'Intégration Yango terminée'}).map(([key,label])=>`<label class="check"><input type="checkbox" name="${key}" ${a.preparation?.[key]?'checked':''}>${label}</label>`).join('')}</div><label style="margin-top:16px">Atelier choisi / observations d’inspection<textarea name="inspection_notes" maxlength="3000">${escape(a.preparation?.inspection_notes)}</textarea></label><div class="form-error" role="alert"></div><button class="primary">Enregistrer le suivi</button></form>`:workflow.form(a,{escape,options,staffOptions,lolc})}</section>
    <section class="card"><h3>Notes internes</h3><form id="noteForm"><label>Ajouter une note<textarea name="body" required maxlength="10000" placeholder="Compte rendu d’appel, pièces manquantes, prochaine démarche…"></textarea></label><div class="form-error" role="alert"></div><button class="secondary">Ajouter la note</button></form>${notes.map(n=>`<div class="row"><div><p class="note">${escape(n.body)}</p><small>${escape(person(n.created_by))} · ${date(n.created_at,true)}</small></div></div>`).join('')}</section></div><div>
-   <section class="card"><h3>Rendez-vous</h3>${appointments.map(p=>`<div class="row"><div><strong>${date(p.starts_at,true)}</strong><small>${escape(workflow.purposes[p.purpose]||'Rendez-vous')} · ${escape(p.location)} · ${escape(person(p.assigned_to))}</small><small>${escape(p.instructions)}</small><label style="margin-top:8px">Statut<select data-appointment="${p.id}" data-original="${p.status}">${options(appointmentStates,p.status)}</select></label></div></div>`).join('')}<details style="margin-top:16px"><summary>＋ Programmer un rendez-vous</summary><form id="appointmentForm" style="margin-top:16px"><div class="fields"><label>Date et heure · Kinshasa<input name="starts_at" type="datetime-local" required></label><label>Agent<select name="assigned_to">${options(staffOptions,a.assigned_to||state.user.id)}</select></label><label class="wide">Lieu<input name="location" required maxlength="500" placeholder="Bureau GM Fleet — adresse"></label><label class="wide">Instructions<textarea name="instructions" maxlength="3000"></textarea></label><label class="check wide"><input type="checkbox" name="briefing_confirmed" required>Le candidat a été informé des conditions, documents et apports requis.</label></div><div class="form-error" role="alert"></div><button class="primary">Programmer</button><p class="muted">Un SMS sera préparé en brouillon. Africa’s Talking n’est pas encore connecté.</p></form></details></section>
+   <section class="card"><h3>Rendez-vous et décisions</h3>${caseAppointmentsHTML(appointments,a)}</section>
    <section class="card"><h3>Documents privés</h3><p class="muted">PDF, JPG, PNG ou WebP · 10 Mo maximum par fichier. Accès réservé au personnel.</p>${documents.length?documents.map(d=>`<div class="document-card">${d.mime_type.startsWith('image/')?`<div data-image-preview="${escape(d.storage_path)}" class="document-preview">Chargement de l’image…</div>`:''}<div class="row"><div><strong>${escape(d.name)}</strong><small>${Math.ceil(d.size_bytes/1024)} Ko · ${date(d.created_at)}</small></div><button class="link-button" data-document="${escape(d.storage_path)}">Ouvrir</button></div></div>`).join(''):'<p class="muted">Aucun document téléversé. Les noms déclarés sur le site ne sont pas des fichiers reçus.</p>'}<form id="documentForm"><label>Ajouter une pièce<input type="file" name="file" accept="application/pdf,image/jpeg,image/png,image/webp" required></label><div class="form-error" role="alert"></div><button class="secondary">Téléverser</button></form></section>
    <section class="card"><h3>Historique du dossier</h3><div class="timeline">${audit.length?audit.slice(0,60).map(eventHTML).join(''):'<p class="muted">Les nouvelles actions seront enregistrées ici.</p>'}</div></section></div></div>`;
    bindCase(a);
-   workflow.mount(a,{escape,options,submit,check,db,refreshCase,notify,state,notifications:state.notifications});
+   workflow.mount(a,{escape,options,submit,check,db,refreshCase,notify,state,notifications:state.notifications,appointments});
    $('caseBody').querySelectorAll('[data-image-preview]').forEach(async preview=>{
     try{const {data,error}=await db.storage.from('application-documents').createSignedUrl(preview.dataset.imagePreview,300);if(error)throw error;if(token!==state.detailToken)return;
      const img=document.createElement('img');img.alt='Document du candidat';img.loading='lazy';img.src=data.signedUrl;img.onload=()=>{};img.onerror=()=>{preview.textContent='Aperçu indisponible. Cliquez sur Ouvrir.';};preview.replaceChildren(img);
@@ -187,13 +205,13 @@
  async function check(result) {if(result.error) throw result.error;return result.data;}
  async function refreshCase(id) {await reload();await openCase(id);}
  function bindCase(a) {
-  submit($('workflowForm'),async f=>{
+  if($('workflowForm'))submit($('workflowForm'),async f=>{
    const preparation={...a.preparation};
    if(f.has('inspection_notes'))preparation.inspection_notes=f.get('inspection_notes').trim();
    const keys=a.lifecycle_version===1?['administrative','inspection_requested','inspection_completed','paperwork','tracker','yango']:Object.keys(workflow.flows[a.program_type].checks);
-   if(a.lifecycle_version===1||workflow.review(a)==='accepted')keys.forEach(k=>preparation[k]=f.has(k));
+   if(a.lifecycle_version===1||workflow.review(a)==='accepted')keys.forEach(k=>{if($('workflowForm').elements.namedItem(k))preparation[k]=f.has(k);});
    if(f.has('handover_on'))preparation.handover_on=f.get('handover_on')||null;
-   const payload={assigned_to:f.get('assigned_to')||null,next_action:f.get('next_action').trim()||null,follow_up_on:f.get('follow_up_on')||null,preparation};
+   const payload={assigned_to:a.assigned_to||state.user.id,next_action:f.get('next_action').trim()||null,follow_up_on:f.get('follow_up_on')||null,preparation};
    if(f.has('workflow_stage'))payload.workflow_stage=f.get('workflow_stage');
    if(f.has('process_step'))payload.process_step=f.get('process_step');
    if(f.has('lolc_status'))Object.assign(payload,{lolc_status:f.get('lolc_status'),lolc_reference:f.get('lolc_reference').trim()||null});
@@ -202,10 +220,10 @@
    await refreshCase(a.id);notify('Suivi du dossier enregistré.');
   });
   submit($('noteForm'),async f=>{await check(await db.from('admin_notes').insert({application_id:a.id,body:f.get('body').trim()}));await refreshCase(a.id);});
-  submit($('appointmentForm'),async f=>{
+  if($('appointmentForm'))submit($('appointmentForm'),async f=>{
    const starts_at=new Date(f.get('starts_at')+':00+01:00').toISOString();
-   await check(await db.from('appointments').insert({application_id:a.id,purpose:f.get('purpose'),starts_at,location:f.get('location').trim(),assigned_to:f.get('assigned_to'),instructions:f.get('instructions').trim(),briefing_confirmed:f.has('briefing_confirmed')}));
-   await refreshCase(a.id);notify('Rendez-vous enregistré. Contactez le candidat pour confirmer les détails.');
+   await check(await db.from('appointments').insert({application_id:a.id,purpose:f.get('purpose'),starts_at,location:f.get('location').trim(),assigned_to:a.assigned_to||state.user.id,instructions:f.get('instructions').trim(),briefing_confirmed:f.has('briefing_confirmed')}));
+   await refreshCase(a.id);notify('Rendez-vous enregistré. Le message client a été préparé avec la date, l’heure et le lieu.');
   });
   submit($('documentForm'),async f=>{
    const file=f.get('file'); const ext={'application/pdf':'pdf','image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[file.type];
@@ -266,15 +284,18 @@
  async function init() {
   try {
    if(!db) throw new Error('Le service de connexion est indisponible. Réessayez plus tard.');
+   if(!enforceIdle())return;
    const {data,error}=await db.auth.getUser();if(error||!data.user){location.replace('/login.html');return;}
    state.user=data.user;
    const staff=await check(await db.from('staff_members').select('*').eq('user_id',data.user.id).eq('active',true).maybeSingle());
    if(!staff) {$('access').innerHTML='<h1>Accès réservé au personnel</h1><p>Ce compte ne dispose pas d’un accès aux opérations GM Fleet.</p><button id="accessLogout" class="secondary">Changer de compte</button>';$('accessLogout').onclick=async()=>{await db.auth.signOut();location.replace('/login.html');};return;}
    $('staffName').textContent=staff.display_name;
+   localStorage.setItem(ACTIVITY_KEY,String(Date.now()));activityWrite=Date.now();armIdleTimer();
+   ['pointerdown','keydown','touchstart'].forEach(event=>window.addEventListener(event,noteActivity,{passive:true}));
    $('today').textContent=new Intl.DateTimeFormat('fr-FR',{dateStyle:'full',timeZone:'Africa/Kinshasa'}).format(new Date());
    await reload();$('access').hidden=true;$('workspace').hidden=false;
    db.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT')location.replace('/login.html');});
-   const refreshVisible=async()=>{if(document.hidden||state.view!=='overview'||document.querySelector('dialog[open]'))return;try{await reload();}catch(e){notify('Actualisation interrompue. '+fail(e),true);}};
+   const refreshVisible=async()=>{if(!enforceIdle()||document.hidden||state.view!=='overview'||document.querySelector('dialog[open]'))return;try{await reload();}catch(e){notify('Actualisation interrompue. '+fail(e),true);}};
    setInterval(refreshVisible,60000);window.addEventListener('focus',refreshVisible);window.addEventListener('online',refreshVisible);document.addEventListener('visibilitychange',refreshVisible);
   } catch(e) {$('access').innerHTML=`<h1>Connexion indisponible</h1><p>${escape(fail(e))}</p><button class="secondary" id="retry">Réessayer</button>`;$('retry').onclick=()=>location.reload();}
  }

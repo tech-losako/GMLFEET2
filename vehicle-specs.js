@@ -8,12 +8,21 @@
  function load(force=false){
   if(pending&&!force)return pending;
   const config=window.GMFLEET_SUPABASE_CONFIG,controller=new AbortController(),timer=setTimeout(()=>controller.abort(),10000);
-  pending=Promise.all([
-   fetch('/config/vehicles.json',{cache:'no-store',signal:controller.signal}).then(r=>{if(!r.ok)throw Error();return r.json();}),
-   config?.url&&config?.anonKey?fetch(config.url+'/rest/v1/vehicle_model_specs?select=model_key,specs,revision,updated_at',{headers:{apikey:config.anonKey,Authorization:'Bearer '+config.anonKey},cache:'no-store',signal:controller.signal}).then(r=>{if(!r.ok)throw Error();return r.json();}):Promise.reject(Error())
-  ]).then(([catalogue,rows])=>{
-   if(!Array.isArray(rows)||!Array.isArray(catalogue.models))throw Error();
-   return {...catalogue,models:catalogue.models.map(m=>{const row=rows.find(r=>r.model_key===m.key);if(!row||fields.some(([k])=>typeof row.specs?.[k]!=='string'))throw Error();return {...m,...row.specs,revision:row.revision};})};
+  pending=fetch('/config/vehicles.json',{cache:'no-store',signal:controller.signal}).then(async r=>{
+   if(!r.ok)throw Error();
+   const catalogue=await r.json();
+   if(!Array.isArray(catalogue.models)||catalogue.models.some(m=>!m.key||!m.name||!String(m.image).startsWith('/img/')))throw Error();
+   let rows=[];
+   if(config?.url&&config?.anonKey){
+    try{
+     const response=await fetch(config.url+'/rest/v1/vehicle_model_specs?select=model_key,specs,revision,updated_at',{headers:{apikey:config.anonKey,Authorization:'Bearer '+config.anonKey},cache:'no-store',signal:controller.signal});
+     if(response.ok)rows=await response.json();
+    }catch{}
+   }
+   return {...catalogue,models:catalogue.models.map(m=>{
+    const row=Array.isArray(rows)?rows.find(r=>r.model_key===m.key):null;
+    return row&&fields.every(([k])=>typeof row.specs?.[k]==='string')?{...m,...row.specs,revision:row.revision}:m;
+   })};
   }).catch(()=>{pending=null;throw new Error('Les caractéristiques sont momentanément indisponibles. Réessayez.');}).finally(()=>clearTimeout(timer));
   return pending;
  }

@@ -3,13 +3,15 @@ const fs=require('fs'),assert=require('assert/strict');
 (async()=>{const db=new PGlite();try{
  await db.exec(`create role anon;create role authenticated;create schema private;create function private.is_staff() returns boolean language sql stable as $$select coalesce(current_setting('test.staff',true),'')='yes'$$;grant usage on schema private to authenticated;`);
  await db.exec(fs.readFileSync('supabase/migrations/20260925090959_equipment_quotes.sql','utf8'));
+ await db.exec(fs.readFileSync('supabase/migrations/20261001152040_equipment_quote_confirmation.sql','utf8'));
  const p={name:'Test Person',email:'test@example.test',phone:'+243900000000',city:'Kinshasa',equipment:'gps',vehicle_type:'Voiture',model:'Toyota Vitz',quantity:1,message:''};
  const submit=(n,v=p)=>db.query('select public.submit_equipment_quote($1,$2)',[`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`,JSON.stringify(v)]);
- await db.exec('set role anon');await submit(1);await submit(1);
+ await db.exec('set role anon');assert.equal((await submit(1)).rows[0].submit_equipment_quote.created,true);assert.equal((await submit(1)).rows[0].submit_equipment_quote.created,false);
  await assert.rejects(db.exec('select * from equipment_quotes'),/permission denied/);
  await assert.rejects(db.exec("update equipment_quotes set status='closed'"),/permission denied/);
  await assert.rejects(submit(1,{...p,model:'Changed'}),/modifiée/);
  await assert.rejects(submit(2,{...p,email:'bad'}),/mail/);
+ await assert.rejects(submit(2,{...p,phone:'0900000000'}),/téléphone/);
  await assert.rejects(submit(2,{...p,quantity:0}),/invalide/);
  await assert.rejects(submit(2,{...p,status:'closed'}),/Champs/);
  await submit(2);await submit(3);await assert.rejects(submit(4),/Plusieurs/);

@@ -85,8 +85,9 @@
   const benefitLead='<section class="service-benefits"><div class="brief-heading"><p class="pub-eyebrow">'+esc(brief.benefitEyebrow)+'</p><h2>'+esc(brief.benefitTitle)+'</h2><p>'+esc(brief.benefitIntro)+'</p></div><div class="service-benefit-grid">'+brief.benefits.map(([icon,title,description])=>'<article><span class="service-benefit-icon"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+icon+'</svg></span><h3>'+esc(title)+'</h3><p>'+esc(description)+'</p></article>').join('')+'</div></section>';
   landing.innerHTML=benefitLead+'<section class="brief-process" id="comment-ca-marche"><div class="brief-heading"><p class="pub-eyebrow">COMMENT ÇA MARCHE</p><h2>Trois étapes pour commencer.</h2></div><ol>'+brief.steps.map(([t,d],i)=>'<li><div class="brief-step-art"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">'+icons[i]+'</svg><span>0'+(i+1)+'</span></div><h3>'+esc(t)+'</h3><p>'+esc(d)+'</p></li>').join('')+'</ol></section>';
   if(path==='vehicule-credit.html'){
-   const daily=typeof carsData!=='undefined'?carsData.Swift.daily:null;
-   if(daily)hero.querySelector('.pub-hero-actions').insertAdjacentHTML('beforebegin','<p class="brief-price">À partir de <strong>'+esc(daily)+'/jour</strong><small>Selon le modèle et le plan choisi. Acompte initial requis ; consultez l’offre du véhicule avant de postuler.</small></p>');
+   const quote=typeof getPlanQuote==='function'?getPlanQuote('Swift','18'):null;
+   const daily=quote&&typeof formatUsd==='function'?formatUsd(quote.dailyPayment):null;
+   if(daily)hero.querySelector('.pub-hero-actions').insertAdjacentHTML('beforebegin','<p class="brief-price">À partir de <strong>'+esc(daily)+'/jour</strong><small>Calculé sur le plan de 18 mois, avec versement 6 jours par semaine. Le montant change selon le modèle et la durée choisis.</small></p>');
   }
   if(path==='gestion-flotte.html'){
    const source=info[0],returns=document.createElement('section');returns.className='owner-returns';
@@ -99,6 +100,10 @@
   landing.insertAdjacentHTML('beforeend','<section class="service-readiness"><div class="service-readiness-media'+(readiness.photo?' is-photo':'')+'"><img src="'+esc(readiness.image)+'" alt="'+esc(readiness.alt)+'" loading="lazy"><p><strong>'+esc(names[path])+'</strong><span>'+esc(readiness.caption)+'</span></p></div><div class="service-readiness-copy"><p class="pub-eyebrow">'+esc(readiness.eyebrow)+'</p><h2>'+esc(readiness.title)+'</h2><p>'+esc(readiness.intro)+'</p><ul class="service-requirement-list">'+brief.needs.map(t=>'<li><span class="requirement-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4 10-10"/></svg></span><span>'+esc(t)+'</span></li>').join('')+'</ul></div></section>');
   info.forEach(s=>s.remove());
   const launch=document.createElement('button');launch.type='button';launch.className='pub-button primary service-apply';launch.textContent=path==='gestion-flotte.html'?'Présenter mon véhicule':path==='agregateur-yango.html'?'Postuler pour rejoindre GML':'Commencer ma candidature';landing.append(launch);
+  if(path!=='vehicule-credit.html'){
+   const form=app.querySelector('form');
+   if(form)app.replaceChildren(form);
+  }
   app.className='application-view';app.removeAttribute('role');app.hidden=true;
   const appHeading=document.createElement('div');appHeading.className='application-heading';appHeading.innerHTML=`<button type="button" class="application-back">← Retour à ${esc(names[path])}</button><p class="pub-eyebrow">${esc(names[path])} / CANDIDATURE</p><h1 tabindex="-1">${path==='gestion-flotte.html'?'Présenter mon véhicule':'Votre candidature'}</h1><p>Complétez chaque étape. Vous pourrez vérifier votre dossier avant l’envoi.</p>`;
   const originalIntro=app.querySelector('h2');if(originalIntro){const intro=originalIntro.parentElement;if(!intro.querySelector('form'))intro.remove();}
