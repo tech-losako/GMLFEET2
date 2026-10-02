@@ -31,7 +31,7 @@ for(const width of [390,1440]){
    assert.equal(await page.locator('.vehicle-options button').count(),4);assert.equal(await page.locator('.vehicle-next').isDisabled(),true);
    assert.equal(await page.locator('#noCarSelectedWarning').count(),0);
    await page.screenshot({path:path.join(root,`tests/artifacts/flow-choose-${width}.png`),fullPage:true,timeout:15000});
-   await page.locator('[data-vehicle="Swift"]').click();assert.equal(await page.locator('#generalVehicleSelect').inputValue(),'Swift');
+   await page.locator('[data-vehicle="Swift"]').click();assert.equal(await page.locator('#generalVehicleSelect').inputValue(),'Swift');assert.match(await page.locator('#modalValJour').innerText(),/23,85/);
    await page.locator('.vehicle-next').click();await page.locator('#planDuration').selectOption('12');const daily12=await page.locator('#modalValJour').innerText();assert.match(daily12,/29,77/);assert.match(await page.locator('#planDailySummary').innerText(),/12 mois.*312 jours.*29,77 USD/);
    await page.locator('#planDuration').selectOption('18');const daily18=await page.locator('#modalValJour').innerText();assert.match(daily18,/23,85/);assert.notEqual(daily12,daily18);assert.deepEqual(await page.locator('#applicationForm input[type=file]').evaluateAll(nodes=>nodes.map(n=>n.id)),['clientPermisRecto','clientPermisVerso']);
    await page.locator('#clientName').fill('Saved Candidate');

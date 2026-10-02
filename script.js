@@ -75,6 +75,13 @@ function getPlanQuote(carKey, duration) {
     return { months, total, initialDeposit, paymentWeeks, weeklyPayment, dailyPayment };
 }
 
+function getStartingQuote(carKey) {
+    return Object.keys(carsData[carKey]?.pricing || {})
+        .map(duration => getPlanQuote(carKey, duration))
+        .filter(Boolean)
+        .sort((a, b) => a.dailyPayment - b.dailyPayment)[0] || null;
+}
+
 function congolesePhone(value) {
     const digits = String(value || '').replace(/\D/g, '').replace(/^243/, '').replace(/^0/, '').slice(0, 9);
     return digits.length === 9 ? `+243${digits}` : '';
@@ -241,9 +248,10 @@ function updatePricingDisplay() {
     const durContainer = document.getElementById('planDuration');
     const selectedDuration = durContainer?.value || '';
     const quote = getPlanQuote(val, selectedDuration);
+    const displayQuote = quote || getStartingQuote(val);
     const dailyEl = document.getElementById('modalValJour');
     const summary = document.getElementById('planDailySummary');
-    if (dailyEl) dailyEl.textContent = quote ? formatUsd(quote.dailyPayment) : '-';
+    if (dailyEl) dailyEl.textContent = displayQuote ? formatUsd(displayQuote.dailyPayment) : '-';
     if (summary) summary.textContent = quote
         ? `${quote.months} mois · ${Math.round(quote.paymentWeeks * 6)} jours de versement · ${formatUsd(quote.dailyPayment)} par jour, 6 jours par semaine.`
         : 'Choisissez une durée pour calculer votre versement journalier.';
