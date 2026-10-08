@@ -80,7 +80,7 @@
   const result=await window.GMFleetDashboard.render({db,escape,date,apps:state.apps,appointments:state.appointments,programs,stages,person,isCurrent:()=>state.view==='overview'});
   if(state.view==='overview'){
    const pending=state.apps.filter(a=>workflow.review(a)==='pending');
-   $('content').insertAdjacentHTML('afterbegin',`<section class="intake-notice"><div><span class="eyebrow">À EXAMINER</span><h3>${pending.length} candidature${pending.length!==1?'s':''} en attente de décision</h3><p>Demandes du site et de l’agence · Africa’s Talking non connecté</p></div><button class="secondary" data-view="applications">Ouvrir les candidatures →</button></section>`);
+   $('content').insertAdjacentHTML('afterbegin',`<section class="intake-notice"><div><span class="eyebrow">À EXAMINER</span><h3>${pending.length} candidature${pending.length!==1?'s':''} en attente de décision</h3><p>Demandes du site et de l’agence · alertes internes, SMS admin et notifications push selon configuration</p></div><button class="secondary" data-view="applications">Ouvrir les candidatures →</button></section>`);
   }
   return result;
  }
@@ -290,6 +290,7 @@
    const staff=await check(await db.from('staff_members').select('*').eq('user_id',data.user.id).eq('active',true).maybeSingle());
    if(!staff) {$('access').innerHTML='<h1>Accès réservé au personnel</h1><p>Ce compte ne dispose pas d’un accès aux opérations GM Fleet.</p><button id="accessLogout" class="secondary">Changer de compte</button>';$('accessLogout').onclick=async()=>{await db.auth.signOut();location.replace('/login.html');};return;}
    $('staffName').textContent=staff.display_name;
+   window.GMFleetAdminNotifications?.mount({db,user:state.user,staff,notify});
    localStorage.setItem(ACTIVITY_KEY,String(Date.now()));activityWrite=Date.now();armIdleTimer();
    ['pointerdown','keydown','touchstart'].forEach(event=>window.addEventListener(event,noteActivity,{passive:true}));
    $('today').textContent=new Intl.DateTimeFormat('fr-FR',{dateStyle:'full',timeZone:'Africa/Kinshasa'}).format(new Date());

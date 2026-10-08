@@ -9,12 +9,12 @@ async function run({files=[{data:png,name:'photo.png',type:'image/png'}],storage
  const response=await handler(new Request('https://test',{method:'POST',body:form}));return {status:response.status,data:await response.json(),uploads,reserved,finalized};
 }
 (async()=>{
- const ok=await run();assert.equal(ok.status,200);assert.match(ok.data.reference,/^CNG-\d{4}-000077$/);assert.equal(ok.data.sms_status,'not_configured');assert.equal(ok.uploads.length,1);assert.equal(ok.uploads[0].bucket,'application-documents');assert.ok(ok.uploads[0].path.startsWith('77/'));assert.equal(ok.reserved.application.workflow_stage,undefined);assert.equal(ok.reserved.application.assigned_to,undefined);assert.equal(ok.reserved.application.note,undefined);
+ const ok=await run();assert.equal(ok.status,200);assert.match(ok.data.reference,/^CNG-\d{4}-000077$/);assert.equal(ok.data.sms_status,'not_configured');assert.equal(ok.data.admin_sms_status,'not_configured');assert.equal(ok.data.admin_push_status,'not_configured');assert.equal(ok.uploads.length,1);assert.equal(ok.uploads[0].bucket,'application-documents');assert.ok(ok.uploads[0].path.startsWith('77/'));assert.equal(ok.reserved.application.workflow_stage,undefined);assert.equal(ok.reserved.application.assigned_to,undefined);assert.equal(ok.reserved.application.note,undefined);
  const forged=await run({files:[{data:'<svg onload="alert(1)">',name:'fake.png',type:'image/png'}]});assert.equal(forged.status,400);assert.equal(forged.uploads.length,0);
  assert.equal((await run({files:Array.from({length:10},(_,i)=>({data:png,name:'photo-'+i+'.png',type:'image/png'}))})).status,200);
  assert.equal((await run({files:Array.from({length:11},()=>({data:png,name:'photo.png',type:'image/png'}))})).status,400);
  const failed=await run({storageFail:true});assert.equal(failed.status,503);assert.equal(failed.finalized,0);
  assert.equal((await run({duplicate:true})).status,200);assert.equal((await run({completeFail:true})).status,503);
- const repeat=await run({completed:true});assert.equal(repeat.status,200);assert.equal(repeat.uploads.length,0);
+ const repeat=await run({completed:true});assert.equal(repeat.status,200);assert.equal(repeat.uploads.length,0);assert.equal(repeat.data.admin_sms_status,'previously_processed');
  console.log('PASS: actual multipart file bytes, private paths, applicant-field allowlist, magic-byte validation, file-count limit, upload failure, duplicate-file retry and completed-request retry.');
 })().catch(e=>{console.error(e);process.exit(1)});

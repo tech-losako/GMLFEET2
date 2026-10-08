@@ -182,5 +182,24 @@ const assert=require('node:assert/strict');
  assert.ok((await as('authenticated',admin,'select * from staff_events')).rows.some(e=>e.action==='deleted'));
  console.log('PASS: protected deletion, removed-account access denial and no revival; email validation, retry, concurrent edit blocking, server-only completion and audit.');
 
+ await db.exec('reset role');
+ await db.exec(fs.readFileSync(require('node:path').join(__dirname,'../supabase/migrations/20260924094709_candidature_lifecycle.sql'),'utf8'));
+ await db.exec(fs.readFileSync(require('node:path').join(__dirname,'../supabase/migrations/20260925090959_equipment_quotes.sql'),'utf8'));
+ await db.exec(fs.readFileSync(require('node:path').join(__dirname,'../supabase/migrations/20261001154207_equipment_quote_confirmation.sql'),'utf8'));
+ await db.exec(fs.readFileSync(require('node:path').join(__dirname,'../supabase/migrations/20261008104727_admin_phone_push_notifications.sql'),'utf8'));
+ const alertAdmin='33333333-3333-4333-8333-333333333333';
+ await db.query("insert into auth.users(id,email,email_confirmed_at) values($1,'alerts@example.test',now())",[alertAdmin]);
+ await rpc('manage_staff',{user_id:alertAdmin,display_name:'Alert Admin',role:'admin',active:true,revision:0,phone:'+243810000002'});
+ assert.equal((await members()).rows[0].members.find(x=>x.user_id===alertAdmin).phone,'+243810000002');
+ await assert.rejects(()=>rpc('manage_staff',{user_id:'44444444-4444-4444-8444-444444444444',display_name:'Bad Phone',role:'admin',active:true,revision:0,phone:'0810000002'}),/Téléphone administratif/);
+ await as('authenticated',alertAdmin,"select public.save_staff_push_token('{\"token\":\"fcm-test-token-1234567890\",\"platform\":\"web\",\"user_agent\":\"Playwright\"}'::jsonb)");
+ const tokenRow=(await db.query("select user_id,platform,active,user_agent from public.staff_push_tokens where token='fcm-test-token-1234567890'")).rows[0];
+ assert.equal(tokenRow.user_id,alertAdmin);assert.equal(tokenRow.platform,'web');assert.equal(tokenRow.active,true);assert.equal(tokenRow.user_agent,'Playwright');
+ await assert.rejects(()=>as('authenticated',other,"select public.save_staff_push_token('{\"token\":\"fcm-test-token-outsider\",\"platform\":\"web\"}'::jsonb)"),/Accès personnel requis/);
+ await db.exec('reset role');
+ await db.exec("insert into equipment_quotes(id,payload) values('55555555-5555-4555-8555-555555555555','{\"name\":\"Quote\",\"email\":\"q@example.test\",\"phone\":\"+243810000000\",\"city\":\"Gombe\",\"equipment\":\"gps\",\"vehicle_type\":\"Voiture\",\"model\":\"Vitz\",\"quantity\":1,\"message\":\"\"}'::jsonb)");
+ assert.equal((await as('authenticated',admin,"select count(*) as n from operations_notifications where quote_id='55555555-5555-4555-8555-555555555555' and kind='quote'")).rows[0].n,1);
+ console.log('PASS: admin phone numbers, push-token registration, outsider denial and quote inbox notifications.');
+
  await db.close();
 })().catch(e=>{console.error(e);process.exit(1)});
