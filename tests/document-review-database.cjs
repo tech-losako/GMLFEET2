@@ -1,0 +1,60 @@
+const {PGlite}=require(process.env.PGLITE_MODULE||'@electric-sql/pglite');
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const admin='11111111-1111-1111-1111-111111111111',other='22222222-2222-2222-2222-222222222222';
+(async()=>{
+ const db=new PGlite();
+ try{
+  await db.exec(`
+   create role anon;create role authenticated;create schema auth;create schema private;create schema storage;
+   create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
+   create table public.staff_members(user_id uuid primary key,active boolean not null default true);
+   insert into public.staff_members values ('${admin}',true),('${other}',false);
+   create function private.is_staff() returns boolean language sql stable security definer set search_path='' as $$select exists(select 1 from public.staff_members where user_id=auth.uid() and active)$$;
+   grant usage on schema auth,private,storage to authenticated;
+   grant execute on function auth.uid(),private.is_staff() to authenticated;
+   create table public.applications(id bigint primary key);insert into public.applications values(1),(2);
+   create table storage.objects(bucket_id text,name text);grant select on storage.objects to authenticated;
+   create table public.documents(id uuid primary key default gen_random_uuid(),application_id bigint not null references public.applications(id),name text not null,storage_path text not null unique,mime_type text not null,size_bytes bigint not null check(size_bytes>0 and size_bytes<=10485760),created_by uuid default auth.uid() references public.staff_members(user_id),created_at timestamptz not null default now(),check(split_part(storage_path,'/',1)=application_id::text));
+   alter table public.documents enable row level security;
+   grant select,insert on public.documents to authenticated;
+   create policy staff_read on public.documents for select to authenticated using((select private.is_staff()));
+   create policy staff_insert on public.documents for insert to authenticated with check((select private.is_staff()) and created_by=(select auth.uid()));
+   create table public.audit_logs(changes jsonb);
+   create function private.audit_case() returns trigger language plpgsql security definer set search_path='' as $$begin insert into public.audit_logs values(jsonb_build_object('after',to_jsonb(new)));return new;end$$;
+   create trigger audit_case after insert or update on public.documents for each row execute function private.audit_case();
+   insert into storage.objects values('application-documents','1/original.pdf'),('application-documents','1/replacement.pdf'),('application-documents','1/fork.pdf'),('application-documents','2/cross.pdf'),('application-documents','1/web.pdf');
+   insert into public.documents(application_id,name,storage_path,mime_type,size_bytes,created_by) values(1,'Existing file.pdf','1/original.pdf','application/pdf',100,'${admin}');
+  `);
+  const migration=fs.readdirSync(path.join(__dirname,'../supabase/migrations')).find(name=>name.endsWith('_application_document_review.sql'));
+  await db.exec(fs.readFileSync(path.join(__dirname,'../supabase/migrations',migration),'utf8'));
+  async function as(role,uid,sql,params=[]){await db.exec('reset role');await db.query("select set_config('request.jwt.claim.sub',$1,false)",[uid||'']);await db.exec('set role '+role);return db.query(sql,params);}
+  const existing=(await as('authenticated',admin,'select * from public.documents')).rows[0];
+  assert.equal(existing.review_status,'pending');assert.equal(existing.reviewed_by,null);
+  await assert.rejects(()=>as('authenticated',admin,"update documents set review_status='rejected',review_reason='  ' where id=$1",[existing.id]),/check constraint/);
+  const approved=(await as('authenticated',admin,"update documents set review_status='approved' where id=$1 and revision=1 returning *",[existing.id])).rows[0];
+  assert.equal(approved.reviewed_by,admin);assert.ok(approved.reviewed_at);assert.equal(approved.revision,2);
+  assert.equal((await as('authenticated',admin,"update documents set review_status='rejected',review_reason='Unreadable' where id=$1 and revision=1 returning id",[existing.id])).rows.length,0);
+  await assert.rejects(()=>as('authenticated',admin,"update documents set reviewed_by=$1 where id=$2",[other,existing.id]),/permission denied/);
+  await assert.rejects(()=>as('authenticated',admin,"update documents set storage_path='1/other.pdf' where id=$1",[existing.id]),/permission denied/);
+  assert.equal((await as('authenticated',other,'select * from documents')).rows.length,0);
+  assert.equal((await as('authenticated',other,"update documents set review_status='approved' returning id")).rows.length,0);
+  await assert.rejects(()=>as('anon',null,'select * from documents'),/permission denied/);
+  const replacement=(await as('authenticated',admin,"insert into documents(application_id,name,storage_path,mime_type,size_bytes,replaces_document_id,category,review_status) values(1,'Corrected.pdf','1/replacement.pdf','application/pdf',100,$1,'identity','approved') returning *",[existing.id])).rows[0];
+  assert.equal(replacement.review_status,'pending');assert.equal(replacement.reviewed_by,null);assert.equal(replacement.category,existing.category);
+  await assert.rejects(()=>as('authenticated',admin,"update documents set review_status='rejected',review_reason='Changed later' where id=$1",[existing.id]),/remplacée/);
+  await assert.rejects(()=>as('authenticated',admin,"insert into documents(application_id,name,storage_path,mime_type,size_bytes,replaces_document_id) values(1,'Fork.pdf','1/fork.pdf','application/pdf',100,$1)",[existing.id]),/déjà été remplacée/);
+  await assert.rejects(()=>as('authenticated',admin,"insert into documents(application_id,name,storage_path,mime_type,size_bytes,replaces_document_id) values(2,'Cross.pdf','2/cross.pdf','application/pdf',100,$1)",[replacement.id]),/même dossier/);
+  await assert.rejects(()=>as('authenticated',admin,"insert into documents(application_id,name,storage_path,mime_type,size_bytes) values(1,'Missing.pdf','1/missing.pdf','application/pdf',100)"),/téléversé/);
+  await assert.rejects(()=>as('authenticated',other,"insert into documents(application_id,name,storage_path,mime_type,size_bytes) values(1,'Unauthorized.pdf','1/fork.pdf','application/pdf',100)"),/row-level security/);
+  const rejected=(await as('authenticated',admin,"update documents set review_status='rejected',review_reason='  Scan illisible  ' where id=$1 returning *",[replacement.id])).rows[0];
+  assert.equal(rejected.review_reason,'Scan illisible');assert.equal(rejected.revision,2);
+  const reset=(await as('authenticated',admin,"update documents set review_status='pending' where id=$1 returning *",[replacement.id])).rows[0];
+  assert.equal(reset.reviewed_by,null);assert.equal(reset.reviewed_at,null);assert.equal(reset.review_reason,null);assert.equal(reset.revision,3);
+  const original=(await as('authenticated',admin,'select * from documents where id=$1',[existing.id])).rows[0];
+  assert.equal(original.storage_path,'1/original.pdf');assert.equal(original.review_status,'approved');
+  await db.exec('reset role');await db.query("select set_config('request.jwt.claim.sub','',false)");
+  await db.exec("insert into documents(application_id,name,storage_path,mime_type,size_bytes,created_by) values(1,'Public submission.pdf','1/web.pdf','application/pdf',100,null)");
+  assert.ok((await db.query("select * from audit_logs where changes->'after'->>'review_status'='rejected'")).rows.length);
+  console.log('PASS: existing and public uploads, staff-only review, server-stamped decisions, refusal reasons, stale writes, reset, immutable originals, replacement history, same-case validation and duplicate replacement prevention.');
+ }finally{await db.close();}
+})().catch(error=>{console.error(error);process.exitCode=1;});
