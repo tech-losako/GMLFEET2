@@ -31,15 +31,15 @@
   const sections=[...body.querySelectorAll('.case-grid > div > section')];
   if(sections.length<6)throw new Error(`Structure du dossier incomplète (${sections.length}/6 sections).`);
   const status=review(a),decision=document.createElement('section');decision.className='card decision-card';
-  const panels=[{id:'summary',label:'Informations du candidat',nodes:[sections[0]]},{id:'documents',label:'Documents',nodes:[sections[4]]},{id:'decision',label:'Décision GML',nodes:[decision]}];
+  const panels=[{id:'summary',label:'Informations du candidat',nodes:[sections[0]]},{id:'documents',label:'Documents',nodes:[sections[4]]}];
   if(status==='accepted')panels.push({id:'appointments',label:'Rendez-vous',nodes:a.program_type==='DRIVE_TO_OWN'?[sections[3],sections[1]]:[sections[3]]});
   if(status==='accepted'&&a.program_type!=='DRIVE_TO_OWN')panels.push({id:'process',label:'Suivi',nodes:[sections[1]]});
-  panels.push({id:'history',label:'Notes & historique',nodes:[sections[2],sections[5]]});
+  panels.push({id:'history',label:'Notes & journal',nodes:[sections[2],sections[5]]},{id:'decision',label:'Décision GML',nodes:[decision]});
   const nav=document.createElement('div');nav.className='case-tabs';nav.setAttribute('role','tablist');nav.setAttribute('aria-label','Dossier candidat');
   const container=document.createElement('div');container.className='case-panels';
   panels.forEach(p=>{const panel=document.createElement('section');panel.id='case-panel-'+p.id;panel.setAttribute('role','tabpanel');panel.setAttribute('aria-labelledby','case-tab-'+p.id);panel.append(...p.nodes);container.append(panel);const b=document.createElement('button');b.type='button';b.id='case-tab-'+p.id;b.dataset.caseTab=p.id;b.textContent=p.label;b.setAttribute('role','tab');b.setAttribute('aria-controls',panel.id);nav.append(b);});
   body.querySelector('.case-grid').replaceWith(nav,container);
-  c.selectTab=id=>{c.state.caseTab=id;nav.querySelectorAll('button').forEach(b=>{const on=b.dataset.caseTab===id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1;});container.querySelectorAll('[role="tabpanel"]').forEach(p=>p.hidden=p.id!=='case-panel-'+id);};
+  c.selectTab=id=>{c.state.caseTab=id;nav.querySelectorAll('button').forEach(b=>{const on=b.dataset.caseTab===id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1;});[...container.children].forEach(p=>p.hidden=p.id!=='case-panel-'+id);};
   nav.onclick=ev=>{const b=ev.target.closest('[data-case-tab]');if(b)c.selectTab(b.dataset.caseTab);};
   nav.onkeydown=ev=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(ev.key))return;ev.preventDefault();const bs=[...nav.children],i=bs.indexOf(document.activeElement),n=ev.key==='Home'?0:ev.key==='End'?bs.length-1:(i+(ev.key==='ArrowRight'?1:-1)+bs.length)%bs.length;bs[n].click();bs[n].focus();};
   c.selectTab(panels.some(p=>p.id===c.state.caseTab)?c.state.caseTab:'summary');
