@@ -1,4 +1,4 @@
-/* Project-specific operations. Provider integrations intentionally remain disconnected. */
+/* Programme-specific decisions, backed by guarded database transitions. */
 (() => {
  'use strict';
  const flows={
@@ -10,21 +10,45 @@
  const purposes={account:'Ouverture du compte LOLC',driving_test:'Entretien et test de conduite',vehicle_inspection:'Inspection du véhicule propriétaire',vehicle_purchase:'Achat et réception du véhicule',handover:'Remise du véhicule',installation:'Installation des équipements',meeting:'Échange / accompagnement'};
  const review=a=>a.review_status||(['rejected','withdrawn'].includes(a.workflow_stage)?'rejected':['new','to_contact','contacted','screening'].includes(a.workflow_stage)?'pending':'accepted');
  const step=a=>flows[a.program_type]?.steps[a.process_step]||'Suivi existant';
- const nextPurpose=a=>a.program_type!=='DRIVE_TO_OWN'?flows[a.program_type].purpose:({appointment:'account',account:'account',sourcing:'vehicle_purchase',gml_inspection:'vehicle_purchase',lolc_inspection:'vehicle_purchase',client_validation:'vehicle_purchase',custody:'vehicle_purchase',equipment:'installation',documents:'handover'})[a.process_step]||null;
- const dtoJourney=[['account','Décision LOLC'],['vehicle_purchase','Achat du véhicule'],['installation','Installation'],['handover','Remise et démarrage']];
+ const nextPurpose=a=>a.process_step==='appointment'?flows[a.program_type]?.purpose:null;
  function form(a,{escape:e,options,staffOptions,lolc}){
   const f=flows[a.program_type],accepted=review(a)==='accepted';
+  if(a.lifecycle_version!==1&&accepted){
+   if(a.program_type==='DRIVE_TO_OWN'&&a.process_step==='handover')return '<h3>Véhicule remis</h3><button class="primary" data-case-contracts>Activer le contrat signé</button>';
+   if(a.program_type==='PARTNER_DRIVER'&&a.process_step==='allocation')return '<h3>Chauffeur prêt pour affectation</h3><button class="primary" data-case-contracts>Ouvrir les contrats et affectations</button>';
+   if(a.program_type==='YANGO'&&a.process_step==='joined')return '<h3>Rattachement Yango confirmé</h3>';
+   return '';
+  }
   const agent=staffOptions[a.assigned_to]||'Agent non attribué';
   if(a.program_type==='DRIVE_TO_OWN')return `<h3>Responsable et prochaine action</h3><form id="workflowForm"><div class="fields"><label>Agent attribué<input value="${e(agent)}" disabled><input type="hidden" name="assigned_to" value="${e(a.assigned_to||'')}"></label><label>Relance prévue<input name="follow_up_on" type="date" value="${e(a.follow_up_on||'')}"></label><label class="wide">Prochaine action<input name="next_action" value="${e(a.next_action||'')}" maxlength="1000"></label></div><p class="section-note">L’avancement est mis à jour automatiquement lorsque chaque rendez-vous est clôturé.</p><div class="form-error" role="alert"></div><button class="secondary">Enregistrer le suivi</button></form>${accepted&&a.process_step==='handover'?'<div class="next-action"><p>La remise est terminée. Le contrat reste volontairement à valider par un administrateur avant la création des échéances.</p><button class="primary" data-case-contracts>Activer le contrat signé</button></div>':''}`;
   return `<h3>Suivi · ${e(a.program_type==='YANGO'?'Partenaire Yango':a.program_type==='FLEET_OWNER'?'Véhicule propriétaire':'Chauffeur GML')}</h3><p class="section-note">${e(f.hint)}</p><form id="workflowForm"><div class="fields"><label>Agent attribué<input value="${e(agent)}" disabled><input type="hidden" name="assigned_to" value="${e(a.assigned_to||'')}"></label><label>Relance prévue<input name="follow_up_on" type="date" value="${e(a.follow_up_on||'')}"></label><label class="wide">Prochaine action<input name="next_action" value="${e(a.next_action||'')}" maxlength="1000"></label></div>${accepted?`<fieldset class="process-fields"><legend>Avancement du projet</legend><label>Situation actuelle<select name="process_step">${options(f.steps,a.process_step in f.steps?a.process_step:'appointment')}</select></label><div class="process-checks">${Object.entries(f.checks).map(([k,label])=>`<label class="check"><input type="checkbox" name="${k}" ${a.preparation?.[k]?'checked':''}>${e(label)}</label>`).join('')}</div><label>Observations<textarea name="inspection_notes" maxlength="3000">${e(a.preparation?.inspection_notes||'')}</textarea></label></fieldset>`:'<p class="section-note">Examinez le récapitulatif et les documents avant de prendre une décision.</p>'}<div class="form-error" role="alert"></div><button class="primary">Enregistrer le suivi</button></form>${accepted&&a.program_type==='PARTNER_DRIVER'&&a.process_step==='allocation'?'<div class="next-action"><p>Le chauffeur est prêt. Sélectionnez un véhicule disponible et enregistrez son contrat signé.</p><button class="secondary" data-case-contracts>Ouvrir les contrats et affectations →</button></div>':''}`;
  }
- function outcomeForm(appointment,e){
-  const common='<option value="missed">Le client ne s’est pas présenté</option><option value="cancelled">Rendez-vous annulé</option>';
-  if(appointment.purpose==='account')return `<form class="appointment-outcome" data-outcome-form="${e(appointment.id)}"><h4>Décision après le rendez-vous LOLC</h4><div class="fields"><label>Résultat<select name="outcome"><option value="lolc_approved">Crédit approuvé par LOLC</option><option value="information_required">Complément demandé</option><option value="lolc_rejected">Crédit refusé par LOLC</option>${common}</select></label><label>Référence LOLC<input name="lolc_reference" maxlength="200"></label></div><label>Compte rendu<textarea name="notes" maxlength="2000"></textarea></label><div class="form-error" role="alert"></div><button class="primary">Clôturer ce rendez-vous</button></form>`;
-  if(appointment.purpose==='vehicle_purchase')return `<form class="appointment-outcome" data-outcome-form="${e(appointment.id)}"><h4>Réception et onboarding du véhicule</h4><div class="fields"><label>Résultat<select name="outcome"><option value="vehicle_bought">Véhicule acheté</option><option value="delayed">Achat reporté</option>${common}</select></label><label>Date d’achat<input type="date" name="purchase_date"></label><label>Modèle<input name="model" maxlength="200"></label><label>Plaque<input name="plate" maxlength="60"></label><label>Châssis / VIN<input name="vin" maxlength="100"></label><label>Couleur<input name="color" maxlength="80"></label></div><label>Compte rendu<textarea name="notes" maxlength="2000"></textarea></label><div class="form-error" role="alert"></div><button class="primary">Enregistrer le résultat</button></form>`;
-  if(appointment.purpose==='installation')return `<form class="appointment-outcome" data-outcome-form="${e(appointment.id)}"><h4>Installation technique</h4><div class="fields"><label>Résultat<select name="outcome"><option value="installed">Installation terminée</option><option value="installation_incomplete">Installation à terminer</option><option value="delayed">Installation reportée</option>${common}</select></label><label>Date d’installation<input type="date" name="installation_date"></label><label>Identifiant tracker<input name="tracker_id" maxlength="150"></label><label>Identifiant dashcam<input name="dashcam_id" maxlength="150"></label></div><label>Compte rendu<textarea name="notes" maxlength="2000"></textarea></label><div class="form-error" role="alert"></div><button class="primary">Enregistrer l’installation</button></form>`;
-  if(appointment.purpose==='handover')return `<form class="appointment-outcome" data-outcome-form="${e(appointment.id)}"><h4>Remise au propriétaire</h4><div class="fields"><label>Résultat<select name="outcome"><option value="handed_over">Véhicule remis</option><option value="delayed">Remise reportée</option>${common}</select></label><label>Date réelle de remise<input type="date" name="handover_date"></label></div><label>Compte rendu<textarea name="notes" maxlength="2000"></textarea></label><div class="form-error" role="alert"></div><button class="primary">Confirmer la remise</button></form>`;
-  return `<form class="appointment-outcome" data-outcome-form="${e(appointment.id)}"><h4>Résultat du rendez-vous</h4><label>Résultat<select name="outcome"><option value="completed">Rendez-vous effectué</option><option value="delayed">Suite à reprogrammer</option>${common}</select></label><label>Compte rendu<textarea name="notes" maxlength="2000"></textarea></label><div class="form-error" role="alert"></div><button class="primary">Clôturer le rendez-vous</button></form>`;
+ const decisions={
+  DRIVE_TO_OWN:{
+   appointment:{title:'Décision LOLC',choices:{lolc_approved:'Dossier approuvé par LOLC',information_required:'Complément demandé par LOLC',lolc_rejected:'Dossier refusé par LOLC'}},
+   sourcing:{title:'Identification du véhicule',choices:{vehicle_selected:'Véhicule identifié',deferred:'Recherche à poursuivre'},fields:[['model','Modèle'],['plate','Plaque'],['vin','Châssis / VIN'],['color','Couleur','text',false]]},
+   gml_inspection:{title:'Contrôle GML',choices:{inspection_passed:'Contrôle GML favorable',deferred:'Contrôle non favorable / à compléter'}},
+   lolc_inspection:{title:'Contrôle LOLC',choices:{inspection_passed:'Contrôle LOLC favorable',deferred:'Contrôle non favorable / à compléter'}},
+   client_validation:{title:'Validation du candidat',choices:{vehicle_accepted:'Véhicule accepté par le candidat',deferred:'Véhicule refusé / décision attendue'}},
+   custody:{title:'Achat et réception',choices:{vehicle_received:'Véhicule acheté et reçu chez GML',deferred:'Réception en attente'},fields:[['purchase_date','Date réelle d’achat / réception','date']]},
+   equipment:{title:'Installation des équipements',choices:{installed:'Installation terminée',deferred:'Installation à terminer'},fields:[['tracker_id','Identifiant tracker'],['dashcam_id','Identifiant dashcam','text',false]]},
+   documents:{title:'Remise du véhicule',choices:{handed_over:'Véhicule remis au candidat',deferred:'Remise reportée'},fields:[['handover_date','Date réelle de remise','date']],checks:{paperwork:'Documents de remise finalisés',yango:'Intégration Yango confirmée'}}
+  },
+  PARTNER_DRIVER:{appointment:{title:'Décision entretien',choices:{interview_passed:'Entretien favorable',deferred:'Entretien non favorable / à reprendre'}},interview:{title:'Test de conduite',choices:{driving_test_passed:'Test de conduite réussi',deferred:'Test non réussi / à reprendre'}},test:{title:'Formation et intégration',choices:{training_completed:'Formation et intégration terminées',deferred:'Intégration à compléter'}}},
+  FLEET_OWNER:{appointment:{title:'Décision inspection propriétaire',choices:{inspection_passed:'Véhicule et documents conformes',repairs_required:'Réparations / documents à compléter'},checks:Object.fromEntries(Object.entries(flows.FLEET_OWNER.checks).filter(([k])=>!['tracker','dashcam'].includes(k)))},equipment:{title:'Installation propriétaire',choices:{installed:'Tracker et dashcam installés',deferred:'Installation à terminer'},fields:[['tracker_id','Identifiant tracker'],['dashcam_id','Identifiant dashcam']]}},
+  YANGO:{appointment:{title:'Accompagnement Yango',choices:{invitation_explained:'Instructions de rattachement transmises',deferred:'Accompagnement à reprendre'}},invited:{title:'Confirmation du rattachement',choices:{yango_joined:'Rattachement GM Fleet vérifié',deferred:'Rattachement non confirmé'}}}
+ };
+ decisions.DRIVE_TO_OWN.account=decisions.DRIVE_TO_OWN.appointment;
+ decisions.FLEET_OWNER.inspection=decisions.FLEET_OWNER.appointment;
+ decisions.FLEET_OWNER.repairs={...decisions.FLEET_OWNER.appointment,title:'Contrôle après réparations'};
+ const decisionSpec=a=>decisions[a.program_type]?.[a.process_step];
+ const kinshasaDay=value=>new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Kinshasa',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(value));
+ function decisionForm(a,ap,e){
+  const spec=decisionSpec(a),today=kinshasaDay(new Date()),future=ap&&kinshasaDay(ap.starts_at)>today;
+  if(!spec)return '';
+  const choices={...spec.choices,...(ap?{missed:'Le candidat ne s’est pas présenté',cancelled:'Annuler le rendez-vous'}:{})};
+  const values={...a.preparation?.purchased_vehicle,...a.preparation?.equipment};
+  return `<form id="caseStepForm" class="case-step-form"><div class="case-step-heading"><span class="eyebrow">${e(a.case_reference||'')}</span><h3>${e(spec.title)}</h3></div>${a.program_type==='DRIVE_TO_OWN'&&['appointment','account'].includes(a.process_step)?`<label>Référence de suivi LOLC<input data-lolc-reference value="${e(a.lolc_reference||'Attribuée automatiquement après approbation')}" readonly></label>`:''}<label>Décision<select name="outcome" required><option value="">Sélectionner la décision</option>${Object.entries(choices).map(([value,label])=>`<option value="${value}" ${future&&value!=='cancelled'?'disabled':''}>${e(label)}</option>`).join('')}</select></label><div data-decision-fields hidden><div class="fields">${(spec.fields||[]).map(([key,label,type='text',required=true])=>`<label>${e(label)}<input name="${key}" type="${type}" ${type==='date'?`max="${today}"`:'maxlength="200"'} data-decision-required="${required}" value="${e(type==='date'?today:values[key]||'')}"></label>`).join('')}</div>${spec.checks?`<fieldset class="process-fields"><legend>Contrôles à confirmer</legend><div class="process-checks">${Object.entries(spec.checks).map(([key,label])=>`<label class="check"><input type="checkbox" name="${key}" data-decision-required="true">${e(label)}</label>`).join('')}</div></fieldset>`:''}</div><label>Compte rendu<textarea name="notes" maxlength="2000" rows="3"></textarea></label><div class="form-error" role="alert"></div><button type="submit" class="primary"><i data-lucide="check-check" aria-hidden="true"></i>Confirmer la décision</button></form>`;
  }
  function mount(a,c){
   const {escape:e,submit,check,db,refreshCase,notify}=c,body=document.getElementById('caseBody');
@@ -32,8 +56,9 @@
   if(sections.length<6)throw new Error(`Structure du dossier incomplète (${sections.length}/6 sections).`);
   const status=review(a),decision=document.createElement('section');decision.className='card decision-card';
   const panels=[{id:'summary',label:'Informations du candidat',nodes:[sections[0]]},{id:'documents',label:'Documents',nodes:[sections[4]]}];
-  if(status==='accepted')panels.push({id:'appointments',label:'Rendez-vous',nodes:a.program_type==='DRIVE_TO_OWN'?[sections[3],sections[1]]:[sections[3]]});
-  if(status==='accepted'&&a.program_type!=='DRIVE_TO_OWN')panels.push({id:'process',label:'Suivi',nodes:[sections[1]]});
+  const activeAppointments=(c.appointments||[]).filter(p=>['scheduled','confirmed'].includes(p.status));
+  const spec=decisionSpec(a),future=activeAppointments.some(p=>kinshasaDay(p.starts_at)>kinshasaDay(new Date()));
+  if(status==='accepted')panels.push({id:'appointments',label:spec&&(a.process_step!=='appointment'||activeAppointments.length&&!future)?spec.title:a.process_step==='appointment'?'Rendez-vous':'Parcours terminé',nodes:[sections[3],...(!spec?[sections[1]]:[])]});
   panels.push({id:'history',label:'Notes & journal',nodes:[sections[2],sections[5]]},{id:'decision',label:'Décision GML',nodes:[decision]});
   const nav=document.createElement('div');nav.className='case-tabs';nav.setAttribute('role','tablist');nav.setAttribute('aria-label','Dossier candidat');
   const container=document.createElement('div');container.className='case-panels';
@@ -50,20 +75,42 @@
   }
   const expected=nextPurpose(a);
   const appointment=document.getElementById('appointmentForm');
-  if(status==='accepted'&&expected&&!appointment)throw new Error('Formulaire de rendez-vous introuvable dans le dossier.');
+  if(status==='accepted'&&expected&&!appointment&&!activeAppointments.length)throw new Error('Formulaire de rendez-vous introuvable dans le dossier.');
   if(status==='accepted'){
-  if(appointment){
-   if(a.program_type==='DRIVE_TO_OWN')appointment.insertAdjacentHTML('afterbegin',`<label>Prochaine étape<input value="${e(purposes[expected])}" disabled><input type="hidden" name="purpose" value="${e(expected)}"></label>`);
-   else appointment.insertAdjacentHTML('afterbegin',`<label>Objet du rendez-vous<select name="purpose">${c.options(purposes,flows[a.program_type].purpose)}</select></label>`);
+  sections[3].classList.remove('card');
+  sections[3].querySelector('h3')?.remove();
+  const steps=Object.keys(flows[a.program_type].steps),index=steps.indexOf(a.process_step);
+  sections[3].insertAdjacentHTML('afterbegin',`<div class="case-progress"><span>Étape ${index+1} sur ${steps.length}</span><progress max="${steps.length}" value="${index+1}" aria-label="Avancement du dossier"></progress>${a.lolc_reference?`<span class="muted">Référence de suivi LOLC : ${e(a.lolc_reference)}</span>`:''}</div>`);
+  activeAppointments.forEach(p=>{
+   const card=sections[3].querySelector(`[data-appointment-card="${CSS.escape(String(p.id))}"]`);if(!card)return;
+   const notification=(c.notifications||[]).find(n=>n.appointment_id===p.id&&n.kind==='appointment');
+   const smsStatus=notification?.delivery_status||'pending',smsLabels={sent:'SMS envoyé au candidat',pending:'SMS non envoyé',failed:'Échec de l’envoi SMS',not_configured:'Service SMS indisponible',sending:'Envoi SMS en cours / à vérifier',unknown:'Envoi SMS à vérifier'};
+   card.insertAdjacentHTML('beforeend',`<div class="appointment-sms-state" data-sms-state="${e(smsStatus)}"><span>${e(smsLabels[smsStatus]||smsLabels.pending)}</span>${['pending','failed','not_configured'].includes(smsStatus)?`<button type="button" class="secondary" data-retry-appointment-sms="${e(p.id)}"><i data-lucide="send" aria-hidden="true"></i>Envoyer le SMS</button>`:''}</div>`);
+  });
+  body.querySelectorAll('[data-retry-appointment-sms]').forEach(button=>button.onclick=async()=>{
+   button.disabled=true;
+   try{
+    const result=await db.functions.invoke('schedule-appointment',{body:{appointment_id:button.dataset.retryAppointmentSms}});
+    if(result.error||!result.data?.success)throw new Error('Envoi interrompu. Réessayez.');
+    if(result.data.sms_status==='sent'&&!result.data.sms_error){document.getElementById('caseDialog').close();await c.reload();notify('Rendez-vous fixé. SMS envoyé au candidat.');}
+    else{await refreshCase(a.id);notify(result.data.sms_error||'Vérifiez l’état du SMS avant de réessayer.',true);}
+   }catch(error){notify(error.message,true);}finally{button.disabled=false;}
+  });
+  if(spec&&(a.process_step!=='appointment'||activeAppointments.length)){
+   sections[3].insertAdjacentHTML('beforeend',decisionForm(a,activeAppointments[0],e));
+   const form=document.getElementById('caseStepForm'),positive=Object.keys(spec.choices)[0];
+   form.elements.outcome.onchange=()=>{const approved=form.elements.outcome.value===positive;form.querySelector('[data-decision-fields]').hidden=!approved;form.querySelectorAll('[data-decision-required]').forEach(input=>{input.disabled=!approved;input.required=approved&&input.dataset.decisionRequired==='true';});form.elements.notes.required=!!form.elements.outcome.value&&!approved;};
+   form.elements.outcome.onchange();
+   submit(form,async f=>{
+    const result={};for(const [key,value] of f.entries())if(!['outcome','notes'].includes(key))result[key]=form.elements.namedItem(key).type==='checkbox'?true:value;
+    const p={application_id:a.id,revision:a.revision,step:a.process_step,appointment_id:activeAppointments[0]?.id||null,outcome:f.get('outcome'),notes:f.get('notes').trim(),result};
+    const fingerprint=JSON.stringify(p);if(c.state.decisionRequest?.fingerprint!==fingerprint)c.state.decisionRequest={fingerprint,id:crypto.randomUUID()};
+    await check(await db.rpc('record_case_step',{p:{...p,request_id:c.state.decisionRequest.id}}));c.state.decisionRequest=null;c.state.caseTab='appointments';await refreshCase(a.id);notify('Décision enregistrée. Le parcours du dossier est actualisé.');
+   });
   }
-  if(status==='accepted'&&a.program_type==='DRIVE_TO_OWN'){
-   const completed=new Set((c.appointments||[]).filter(p=>p.status==='completed').map(p=>p.purpose));
-   sections[3].insertAdjacentHTML('afterbegin',`<div class="case-journey">${dtoJourney.map(([key,label],i)=>`<div class="journey-step ${completed.has(key)?'done':expected===key?'current':''}"><span>${completed.has(key)?'✓':String(i+1).padStart(2,'0')}</span><strong>${e(label)}</strong><small>${completed.has(key)?'Terminé':expected===key?'Étape actuelle':'À venir'}</small></div>`).join('')}</div>`);
-  }
-  (c.appointments||[]).filter(p=>['scheduled','confirmed'].includes(p.status)).forEach(p=>{const card=sections[3].querySelector(`[data-appointment-card="${CSS.escape(String(p.id))}"]`);if(card)card.insertAdjacentHTML('beforeend',outcomeForm(p,e));});
-  body.querySelectorAll('[data-outcome-form]').forEach(form=>submit(form,async f=>{const result={};for(const [key,value] of f.entries())if(!['outcome','notes'].includes(key)&&value!=='')result[key]=value;await check(await db.rpc('record_guided_appointment',{p:{appointment_id:form.dataset.outcomeForm,outcome:f.get('outcome'),notes:f.get('notes').trim(),result}}));c.state.caseTab='appointments';await refreshCase(a.id);notify('Rendez-vous clôturé et statut du dossier actualisé.');}));
-  const drafts=(c.notifications||[]).filter(n=>n.application_id===a.id&&n.channel==='sms_draft');
-  sections[3].insertAdjacentHTML('beforeend',`<div class="sms-drafts"><h3>Messages client</h3><p class="muted">Chaque rendez-vous prépare un message avec le nom, la date, l’heure et le lieu. L’envoi dépend de la configuration Africa’s Talking.</p>${drafts.length?drafts.map(n=>`<label>${n.kind==='appointment'?'Invitation au rendez-vous':'Décision GML'} · ${e(n.recipient)}<textarea readonly rows="4">${e(n.body)}</textarea></label>`).join(''):'<p>Aucun message préparé pour le moment.</p>'}</div>`);
+  const archived=[...sections[3].querySelectorAll('[data-appointment-card]')].filter(card=>!activeAppointments.some(ap=>String(ap.id)===card.dataset.appointmentCard));
+  if(archived.length){const history=document.createElement('details');history.className='appointment-archive';history.innerHTML=`<summary>Rendez-vous passés · ${archived.length}</summary>`;history.append(...archived);sections[3].append(history);}
+  window.lucide?.createIcons({attrs:{'aria-hidden':'true'}});
   }
   if(a.program_type==='FLEET_OWNER'&&a.process_step==='ready'){
    if(a.preparation?.fleet_joined_on)sections[1].insertAdjacentHTML('beforeend','<p class="section-note">Véhicule intégré. Retrouvez-le dans Flotte & partenaires.</p>');
@@ -74,5 +121,5 @@
   }
   body.querySelectorAll('[data-case-contracts]').forEach(b=>b.onclick=()=>{document.getElementById('caseDialog').close();document.querySelector('nav [data-view="contracts"]').click();});
  }
- window.GMFleetWorkflow={flows,purposes,review,step,nextPurpose,form,mount};
+ window.GMFleetWorkflow={flows,purposes,review,step,nextPurpose,decisionSpec,form,mount};
 })();

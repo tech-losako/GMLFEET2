@@ -13,7 +13,8 @@ begin
  insert into public.appointments(application_id,starts_at,location,assigned_to,briefing_confirmed,purpose)
  values(app_id,now(),'LOLC',auth.uid(),true,'account') returning id into ap;
  assert (select sequence_no=1 from public.appointments where id=ap),'first appointment numbered';
- perform public.record_guided_appointment(jsonb_build_object('appointment_id',ap,'outcome','lolc_approved','notes','Accord reçu','result',jsonb_build_object('lolc_reference','LOLC-TEST')));
+ perform public.record_guided_appointment(jsonb_build_object('appointment_id',ap,'outcome','lolc_approved','notes','Accord reçu','result','{}'::jsonb));
+ assert (select lolc_reference='LOLC-'||ref from public.applications where id=app_id),'automatic internal LOLC tracking reference';
  assert (select process_step='sourcing' and lolc_status='approved' from public.applications where id=app_id),'LOLC decision advances sourcing';
 
  insert into public.appointments(application_id,starts_at,location,assigned_to,briefing_confirmed,purpose)

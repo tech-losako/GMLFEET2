@@ -3,7 +3,7 @@
  let dialog;
  const scripts={
   pdf:'/vendor/jspdf-4.2.1.umd.min.js',
-  receipt:'/request-receipt.js?v=20261001-request-confirmation'
+  receipt:'/request-receipt.js?v=20261009-simple-receipt'
  };
  const loadScript=src=>new Promise((resolve,reject)=>{
   const existing=[...document.scripts].find(script=>script.src.includes(src.split('?')[0]));

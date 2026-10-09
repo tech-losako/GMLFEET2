@@ -44,6 +44,7 @@
   const nested=(field,group)=>{
    const old=flatten(before[field]),next=flatten(after[field]);
    [...new Set([...Object.keys(old),...Object.keys(next)])].forEach(path=>{
+    if(path.startsWith('last_decision.'))return;
     if(same(old[path],next[path]))return;
     const parts=path.split('.'),key=parts.at(-1),prefix={purchased_vehicle:'V\u00e9hicule achet\u00e9',equipment:'Installation',owner_vehicle:'V\u00e9hicule propri\u00e9taire'}[parts[0]];
     changes.push({label:[prefix||group,fieldLabels[key]||key.replaceAll('_',' ')].join(' \u00b7 '),before:insert?null:format(key,old[path]),after:format(key,next[path])});
@@ -55,6 +56,12 @@
    else{
     const fields=['assigned_to','review_status','process_step','workflow_stage','lolc_status','lolc_reference','review_reason','next_action','follow_up_on','name','phone','whatsapp','email','address','birth_date','experience','vehicle','plan_duration_months','co_borrower_name','co_borrower_phone','co_borrower_address','license_file_name','note'];
     fields.forEach(field=>add(field));nested('preparation','Contr\u00f4les');nested('service_details','Informations du candidat');
+    const decision=after.preparation?.last_decision;
+    if(decision&&decision.request_id!==before.preparation?.last_decision?.request_id){
+     const spec=c.workflow.decisionSpec?.({program_type:program,process_step:decision.step});
+     changes.unshift({label:spec?.title||'D\u00e9cision op\u00e9rationnelle',before:null,after:spec?.choices[decision.outcome]||outcomeLabels[decision.outcome]||decision.outcome.replaceAll('_',' ')});
+     if(decision.notes)changes.push({label:'Compte rendu',before:null,after:decision.notes});
+    }
     title=before.review_status!==after.review_status&&after.review_status?({accepted:'Candidature retenue par GML',rejected:'Candidature refus\u00e9e par GML',pending:'Dossier remis en examen'})[after.review_status]||title:
      before.assigned_to!==after.assigned_to?(before.assigned_to?'Responsable du dossier chang\u00e9':'Dossier pris en charge'):
      before.process_step!==after.process_step||before.workflow_stage!==after.workflow_stage?'\u00c9tape du dossier actualis\u00e9e':'Suivi du dossier actualis\u00e9';

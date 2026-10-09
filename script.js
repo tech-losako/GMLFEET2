@@ -90,7 +90,7 @@ function congolesePhone(value) {
 const receiptLabels = {
     name: 'Nom complet', phone: 'Téléphone', address: 'Adresse', service: 'Type de demande', vehicle: 'Véhicule choisi',
     duration: 'Durée du plan', dailyPayment: 'Versement journalier', weeklyPayment: 'Versement hebdomadaire',
-    planTotal: 'Total du plan', initialDeposit: 'Acompte initial', experience: 'Expérience de conduite',
+    experience: 'Expérience de conduite',
     coBorrowerName: 'Co-emprunteur', coBorrowerPhone: 'Téléphone du co-emprunteur', coBorrowerAddress: 'Adresse du co-emprunteur',
     licenseRectoFileName: 'Permis de conduire - recto', licenseVersoFileName: 'Permis de conduire - verso',
     email: 'E-mail', idNumber: "Numéro de pièce d'identité", carBrand: 'Marque', carModel: 'Modèle', carPlate: 'Plaque',
@@ -103,12 +103,16 @@ const receiptLabels = {
 };
 
 function receiptFields(app) {
-    return Object.entries(receiptLabels).flatMap(([key, label]) => {
+    const documents = [];
+    const fields = Object.entries(receiptLabels).flatMap(([key, label]) => {
         const value = app[key];
         if (value === undefined || value === null || value === '') return [];
+        if (key.endsWith('FileName')) { documents.push(label); return []; }
         const display = key === 'duration' ? `${value} mois` : value;
         return [{ label, value: display }];
     });
+    if (documents.length) fields.push({ label: 'Documents transmis', value: [...new Set(documents)].join(', ') });
+    return fields;
 }
 
 function openModal(carKey) {
