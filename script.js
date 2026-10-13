@@ -13,42 +13,18 @@ const carsData = {
     'IST': {
         name: 'Toyota IST',
         img: './img/ist-official.png',
-        daily: '32,5 $',
-        pricing: {
-            "12": { total: "10 536 $", avance: "1 300 $", week: "203 $" },
-            "15": { total: "11 784 $", avance: "1 300 $", week: "181 $" },
-            "18": { total: "12 560 $", avance: "1 300 $", week: "161 $" }
-        }
     },
     'Blade': {
         name: 'Toyota Blade',
         img: './img/blade-official-v2.png',
-        daily: '38,5 $',
-        pricing: {
-            "12": { total: "11 160 $", avance: "1 400 $", week: "215 $" },
-            "15": { total: "12 174 $", avance: "1 400 $", week: "187 $" },
-            "18": { total: "13 500 $", avance: "1 400 $", week: "173 $" }
-        }
     },
     'Swift': {
         name: 'Suzuki Swift',
         img: './img/swift-official-v2.png',
-        daily: '29,5 $',
-        pricing: {
-            "12": { total: "9 288 $", avance: "1 100 $", week: "179 $" },
-            "15": { total: "10 224 $", avance: "1 100 $", week: "157 $" },
-            "18": { total: "11 160 $", avance: "1 100 $", week: "143 $" }
-        }
     },
     'Vitz': {
         name: 'Toyota Vitz',
         img: './img/vitz-official-v2.png',
-        daily: '29,5 $',
-        pricing: {
-            "12": { total: "9 288 $", avance: "1 100 $", week: "179 $" },
-            "15": { total: "10 224 $", avance: "1 100 $", week: "157 $" },
-            "18": { total: "11 160 $", avance: "1 100 $", week: "143 $" }
-        }
     }
 };
 
@@ -65,22 +41,38 @@ function formatUsd(value, decimals = 2) {
 
 function getPlanQuote(carKey, duration) {
     const months = Number(duration);
-    const offer = carsData[carKey]?.pricing?.[String(months)];
-    if (!offer || !months) return null;
-    const total = moneyValue(offer.total);
-    const initialDeposit = moneyValue(offer.avance);
-    const paymentWeeks = months * 52 / 12;
+    const offer = carsData[carKey];
+    if (months !== 12 || !Number.isFinite(offer?.total) || offer.total <= 0) return null;
+    const total = offer.total;
+    const initialDeposit = offer.initialDeposit;
+    const paymentWeeks = 52;
     const weeklyPayment = total / paymentWeeks;
     const dailyPayment = weeklyPayment / 6;
-    return { months, total, initialDeposit, paymentWeeks, weeklyPayment, dailyPayment };
+    return { months, total, initialDeposit, paymentWeeks, weeklyPayment, dailyPayment, offerRevision: offer.revision };
 }
 
 function getStartingQuote(carKey) {
-    return Object.keys(carsData[carKey]?.pricing || {})
-        .map(duration => getPlanQuote(carKey, duration))
-        .filter(Boolean)
-        .sort((a, b) => a.dailyPayment - b.dailyPayment)[0] || null;
+    return getPlanQuote(carKey, 12);
 }
+
+async function loadVehiclePrices(force = false) {
+    try {
+        const catalogue = await window.GMFleetSpecs.load(force);
+        for (const [key, car] of Object.entries(carsData)) {
+            const model = catalogue.models.find(m => m.key === key);
+            car.total = model?.totalPriceUsd == null ? null : Number(model.totalPriceUsd);
+            car.initialDeposit = Number(model?.initialDepositUsd || 0);
+            car.revision = model?.revision;
+        }
+    } catch {
+        for (const car of Object.values(carsData)) car.total = null;
+    }
+    updatePricingDisplay();
+    window.dispatchEvent(new Event('gmfleet-prices'));
+}
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('applicationForm')) loadVehiclePrices();
+});
 
 function congolesePhone(value) {
     const digits = String(value || '').replace(/\D/g, '').replace(/^243/, '').replace(/^0/, '').slice(0, 9);
@@ -250,24 +242,27 @@ function updatePricingDisplay() {
     if (!val) return;
 
     const durContainer = document.getElementById('planDuration');
-    const selectedDuration = durContainer?.value || '';
+    const selectedDuration = durContainer?.value || '12';
     const quote = getPlanQuote(val, selectedDuration);
     const displayQuote = quote || getStartingQuote(val);
     const dailyEl = document.getElementById('modalValJour');
     const summary = document.getElementById('planDailySummary');
-    if (dailyEl) dailyEl.textContent = displayQuote ? formatUsd(displayQuote.dailyPayment) : '-';
+    if (dailyEl) dailyEl.textContent = displayQuote ? formatUsd(displayQuote.dailyPayment) : 'Tarif indisponible';
     if (summary) summary.textContent = quote
         ? `${quote.months} mois · ${Math.round(quote.paymentWeeks * 6)} jours de versement · ${formatUsd(quote.dailyPayment)} par jour, 6 jours par semaine.`
-        : 'Choisissez une durée pour calculer votre versement journalier.';
+        : 'Le tarif doit être disponible avant de poursuivre la candidature.';
 
-    const data = carsData[val];
-    const pricing = data?.pricing?.[selectedDuration];
-    if (pricing && quote) {
+    const breakdown = document.getElementById('offerBreakdown');
+    if (breakdown) breakdown.textContent = displayQuote
+        ? `12 mois · 52 semaines · 312 jours de versement. Total : ${formatUsd(displayQuote.total)}. Par semaine : ${formatUsd(displayQuote.weeklyPayment)}. Montants arrondis ; échéancier définitif au contrat.`
+        : 'Les tarifs sont momentanément indisponibles. Réessayez avant de choisir votre véhicule.';
+
+    if (quote) {
         const totalEl = document.getElementById('modalValPrix');
         const advanceEl = document.getElementById('modalValAcompte');
         const semaineEl = document.getElementById('modalValSemaine');
 
-        if (totalEl) totalEl.textContent = formatUsd(quote.total, 0);
+        if (totalEl) totalEl.textContent = formatUsd(quote.total);
         if (advanceEl) advanceEl.textContent = formatUsd(quote.initialDeposit, 0);
         if (semaineEl) semaineEl.textContent = formatUsd(quote.weeklyPayment);
     }
@@ -484,7 +479,7 @@ async function submitForm(e) {
 
     const carName = document.getElementById('selectedVehicle') ? document.getElementById('selectedVehicle').value : '';
     const carKey = document.getElementById('generalVehicleSelect')?.value || '';
-    const duration = document.getElementById('planDuration')?.value || '';
+    const duration = '12';
     const quote = getPlanQuote(carKey, duration);
     const licenseRecto = document.getElementById('clientPermisRecto');
     const licenseVerso = document.getElementById('clientPermisVerso');
@@ -501,8 +496,9 @@ async function submitForm(e) {
         vehicle: carName,
         dailyPayment: quote ? formatUsd(quote.dailyPayment) : '',
         weeklyPayment: quote ? formatUsd(quote.weeklyPayment) : '',
-        planTotal: quote ? formatUsd(quote.total, 0) : '',
+        planTotal: quote ? formatUsd(quote.total) : '',
         initialDeposit: quote ? formatUsd(quote.initialDeposit, 0) : '',
+        offerRevision: quote?.offerRevision,
         date: new Date().toLocaleDateString('fr-FR'),
         status: 'En attente',
         licenseRectoFileName: licenseRecto?.files[0]?.name || '',
@@ -511,6 +507,7 @@ async function submitForm(e) {
     };
 
     try {
+        if (!quote) throw new Error('Le tarif du véhicule est indisponible. Rechargez les tarifs avant de poursuivre.');
         const confirmation = await sendPublicApplication(newApp,actualForm);
 
         const successCarName = document.getElementById('successCarName');
@@ -534,6 +531,8 @@ async function submitForm(e) {
 
         if (actualForm) actualForm.reset();
     } catch (error) {
+        if (/Le tarif a changé/.test(error.message || '')) delete actualForm.dataset.submissionId;
+        if (/tarif|modèle du catalogue/.test(error.message || '')) await loadVehiclePrices(true);
         console.error('Erreur Supabase:', error);
         if(actualForm?.classList.contains('pub-wizard'))actualForm.dispatchEvent(new CustomEvent('gmfleet-error',{detail:error.message||'Envoi interrompu. Vos informations sont conservées. Réessayez.'}));else alert(error.message || 'Envoi interrompu. Réessayez.');
     } finally {

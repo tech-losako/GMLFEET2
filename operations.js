@@ -70,7 +70,7 @@
   if(state.view!=='overview')window.GMFleetDashboard.cancel();
   document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===state.view));
   $('newApplication').textContent=state.view==='appointments'?'＋ Programmer un rendez-vous':'＋ Nouvelle candidature';
-  $('pageTitle').textContent={overview:'Tableau de bord',applications:'Candidatures',appointments:'Rendez-vous',contracts:'Contrats & véhicules',payments:'Caisse / versements',reconciliation:'Rapprochement LOLC',users:'Utilisateurs',preparation:'Préparation & remises',fleet:'Flotte & partenaires',modelSpecs:'Fiches véhicules'}[state.view];
+  $('pageTitle').textContent={overview:'Tableau de bord',applications:'Candidatures',appointments:'Rendez-vous',contracts:'Contrats & véhicules',payments:'Caisse / versements',reconciliation:'Rapprochement LOLC',users:'Utilisateurs',preparation:'Préparation & remises',fleet:'Flotte & partenaires',modelSpecs:'Véhicules & tarifs'}[state.view];
   document.getElementById('newApplication').hidden=['users','contracts','payments','reconciliation','preparation','fleet','modelSpecs'].includes(state.view);
   if(['contracts','payments','reconciliation'].includes(state.view)) { const rendering=window.GMFleetFinance.render(state.view,{db,escape,date,person,notify,rows,staff:state.staff,user:state.user,apps:state.apps,openContract:state.dashboardContract});state.dashboardContract=null; return rendering; }
   if(state.view==='modelSpecs')return window.GMFleetModelAdmin.render({db,escape,notify,user:state.user,staff:state.staff,isCurrent:()=>state.view==='modelSpecs'});
@@ -250,12 +250,14 @@ $('content').innerHTML=`<p class="section-note">Dossiers retenus par GML : suive
    catch(error) {preview?.close();notify(fail(error),true);} finally {b.disabled=false;}
   }
  });
- $('newApplication').addEventListener('click',()=>{if(state.view==='appointments'){chooseAppointment();return;}$('intakeForm').reset();$('intakeForm').querySelector('.form-error').textContent='';$('intake').showModal();});
+ const updateIntakeTerm=()=>{$('intakeTerm').hidden=$('intakeProgram').value!=='DRIVE_TO_OWN';};
+ $('intakeProgram').addEventListener('change',updateIntakeTerm);
+ $('newApplication').addEventListener('click',()=>{if(state.view==='appointments'){chooseAppointment();return;}$('intakeForm').reset();updateIntakeTerm();$('intakeForm').querySelector('.form-error').textContent='';$('intake').showModal();});
  submit($('intakeForm'),async f=>{
   const program=f.get('program'),service=services[program];
   const payload={name:f.get('name').trim(),phone:f.get('phone').trim(),source:f.get('source'),vehicle:f.get('vehicle').trim()||service||'À préciser',service,application_type:service?'service':'vehicle',assigned_to:state.user.id,service_details:{licenseNumber:f.get('licenseNumber').trim(),carPlate:f.get('carPlate').trim(),carModel:f.get('vehicle').trim(),yangoStatus:f.get('yangoStatus').trim()}};
   ['whatsapp','email','birth_date','address','experience','co_borrower_name','co_borrower_phone','co_borrower_address'].forEach(k=>payload[k]=f.get(k).trim()||null);
-  payload.plan_duration_months=program==='DRIVE_TO_OWN'&&f.get('duration')?Number(f.get('duration')):null;
+  payload.plan_duration_months=program==='DRIVE_TO_OWN'?12:null;
   const data=await check(await db.from('applications').insert(payload).select('id').single());
   $('intake').close();await reload();await openCase(data.id);notify('Candidature créée. Vous pouvez ajouter les pièces et planifier le rendez-vous.');
  });

@@ -15,13 +15,13 @@
    let rows=[];
    if(config?.url&&config?.anonKey){
     try{
-     const response=await fetch(config.url+'/rest/v1/vehicle_model_specs?select=model_key,specs,revision,updated_at',{headers:{apikey:config.anonKey,Authorization:'Bearer '+config.anonKey},cache:'no-store',signal:controller.signal});
+     const response=await fetch(config.url+'/rest/v1/vehicle_model_specs?select=model_key,specs,revision,updated_at,total_price_usd,initial_deposit_usd',{headers:{apikey:config.anonKey,Authorization:'Bearer '+config.anonKey},cache:'no-store',signal:controller.signal});
      if(response.ok)rows=await response.json();
     }catch{}
    }
    return {...catalogue,models:catalogue.models.map(m=>{
     const row=Array.isArray(rows)?rows.find(r=>r.model_key===m.key):null;
-    return row&&fields.every(([k])=>typeof row.specs?.[k]==='string')?{...m,...row.specs,revision:row.revision}:m;
+    return row&&fields.every(([k])=>typeof row.specs?.[k]==='string')?{...m,...row.specs,revision:row.revision,totalPriceUsd:row.total_price_usd,initialDepositUsd:row.initial_deposit_usd}:m;
    })};
   }).catch(()=>{pending=null;throw new Error('Les caractéristiques sont momentanément indisponibles. Réessayez.');}).finally(()=>clearTimeout(timer));
   return pending;

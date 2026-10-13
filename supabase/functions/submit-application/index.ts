@@ -106,8 +106,8 @@ Deno.serve(async req=>{
   if(app.co_borrower_phone&&!/^\+243[0-9]{9}$/.test(String(app.co_borrower_phone)))throw new Error('Téléphone du co-emprunteur invalide');
   const service=input.service||null;if(service&&!['Chauffeur Yango','Gestion de flotte','Recrutement Chauffeur','Recrutement'].includes(service))throw new Error('Service invalide');
   app.service=service==='Recrutement'?'Recrutement Chauffeur':service;app.application_type=service?'service':'vehicle';
-  const months=input.plan_duration_months==null?null:Number(input.plan_duration_months);if(months!==null&&![12,15,18].includes(months))throw new Error('Durée invalide');app.plan_duration_months=months;
-  const details:Record<string,unknown>={};for(const key of ['email','idNumber','carBrand','carModel','carPlate','carYear','carChassis','permisFileName','permisRectoFileName','permisVersoFileName','carteRoseFileName','transportAuthorizationFileName','vignetteFileName','insuranceFileName','technicalInspectionFileName','frontPhotoFileName','rearPhotoFileName','leftPhotoFileName','rightPhotoFileName','interiorPhotoFileName','photosCount','cvFileName','licenseRectoFileName','licenseVersoFileName','dailyPayment','weeklyPayment','planTotal','initialDeposit']){const value=input.service_details?.[key];if(value!==undefined){if(!['string','number'].includes(typeof value)||String(value).length>500)throw new Error('Détail de formulaire invalide');details[key]=value;}}app.service_details=details;
+  const months=input.plan_duration_months==null?null:Number(input.plan_duration_months);if(!service&&months!==null&&months!==12)throw new Error('Le seul plan proposé est de 12 mois');app.plan_duration_months=service?null:12;
+  const details:Record<string,unknown>={};for(const key of ['email','idNumber','carBrand','carModel','carPlate','carYear','carChassis','permisFileName','permisRectoFileName','permisVersoFileName','carteRoseFileName','transportAuthorizationFileName','vignetteFileName','insuranceFileName','technicalInspectionFileName','frontPhotoFileName','rearPhotoFileName','leftPhotoFileName','rightPhotoFileName','interiorPhotoFileName','photosCount','cvFileName','licenseRectoFileName','licenseVersoFileName','dailyPayment','weeklyPayment','planTotal','initialDeposit','offerRevision']){const value=input.service_details?.[key];if(value!==undefined){if(!['string','number'].includes(typeof value)||String(value).length>500)throw new Error('Détail de formulaire invalide');details[key]=value;}}app.service_details=details;
   const files=form.getAll('files');if(files.length>10)throw new Error('Maximum 10 fichiers par demande');
   const manifest=[];const contents=[];let bytes=0;
   for(const [i,file] of files.entries()){
@@ -128,7 +128,10 @@ Deno.serve(async req=>{
    if(error&&!['409','Duplicate'].includes(String(error.statusCode))&&error.message!=='The resource already exists')return reply(503,{error:'Envoi de fichier interrompu. Vos données restent dans le formulaire : réessayez.'});
   }
   const {error:completeError}=await serviceClient.rpc('complete_public_submission',{request:requestId});
-  if(completeError)return reply(503,{error:'Enregistrement interrompu. Réessayez pour terminer la demande.'});
+  if(completeError){
+   if(/Le tarif a changé|seul plan proposé|modèle du catalogue/.test(completeError.message||''))return reply(409,{error:completeError.message});
+   return reply(503,{error:'Enregistrement interrompu. Réessayez pour terminer la demande.'});
+  }
   const requestReference=reference(reservation.application_id,app.service,submittedAt),smsStatus=await sendConfirmationSms(String(app.phone),requestReference);
   const adminBody=`Nouvelle candidature ${requestReference} : ${app.name} (${app.vehicle||app.service||'demande'}). Ouvrez l'espace opérations.`;
   const adminSmsStatus=await sendAdminSms(serviceClient,'GM Fleet admin : '+adminBody);

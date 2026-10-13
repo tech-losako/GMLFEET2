@@ -23,7 +23,7 @@
         setTimeout(function () { if (document.documentElement.classList.contains('public-ui-pending')) window.publicUIFailed(); }, 15000);
     </script>
     <link rel="preload" href="/public-panels.js?v=20260929-public" as="script">
-    <link rel="preload" href="/public-ui.js?v=20261001-request-confirmation" as="script">
+    <link rel="preload" href="/public-ui.js?v=20261013-offers" as="script">
     <link rel="stylesheet" href="/vendor/public-utilities.css?v=20260923">
     <link rel="stylesheet" href="/public-ui.css?v=20260929-public">
 
@@ -58,7 +58,7 @@
     
 
 <link rel="stylesheet" href="/public-discovery.css?v=20260929-public">
-<link rel="stylesheet" href="/vehicle-specs.css?v=20260924-specs">
+<link rel="stylesheet" href="/vehicle-specs.css?v=20261013-offers">
 </head>
 
 <body class="bg-gray-50 text-gray-800 antialiased" id="accueil">
@@ -272,10 +272,7 @@
                                 </label>
                                 <select id="planDuration" required onchange="updatePricingDisplay()"
                                     class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gmfBlue focus:border-gmfBlue transition-all outline-none bg-gray-50">
-                                    <option value="">Sélectionnez...</option>
                                     <option value="12">12 mois</option>
-                                    <option value="15">15 mois</option>
-                                    <option value="18">18 mois</option>
                                 </select>
                                 <p id="planDailySummary" class="text-xs text-gray-500 mt-2" aria-live="polite">Choisissez une durée pour calculer votre versement journalier.</p>
                             </div>
@@ -477,15 +474,15 @@
     <!-- Scripts -->
     <script src="/vendor/supabase-2.57.4.js"></script>
     <script src="supabase-config.js"></script>
-    <script src="supabaseClient.js?v=20261001-request-confirmation"></script>
+    <script src="supabaseClient.js?v=20261013-offers"></script>
     <script src="/vendor/jspdf-4.2.1.umd.min.js"></script>
     <script src="/request-receipt.js?v=20261009-simple-receipt"></script>
-    <script src="script.js?v=20261009-simple-receipt"></script>
+    <script src="script.js?v=20261013-offers"></script>
 <script src="/public-panels.js?v=20260929-public"></script>
-<script src="/public-flow.js?v=20261001-request-confirmation"></script>
+<script src="/public-flow.js?v=20261013-offers"></script>
 <script src="/equipment-quote.js?v=20261009-simple-receipt"></script><script src="/public-equipment.js?v=20260925-equipment"></script>
-<script src="/vehicle-specs.js?v=20260924-specs"></script><script src="/public-catalogue.js?v=20260929-public"></script><script src="/public-directory.js?v=20260929-public"></script>
-<script src="/public-ui.js?v=20261001-request-confirmation" onerror="publicUIFailed()"></script>
+<script src="/vehicle-specs.js?v=20261013-offers"></script><script src="/public-catalogue.js?v=20260929-public"></script><script src="/public-directory.js?v=20260929-public"></script>
+<script src="/public-ui.js?v=20261013-offers" onerror="publicUIFailed()"></script>
 </body>
 
 </html>
