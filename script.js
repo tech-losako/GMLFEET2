@@ -252,11 +252,6 @@ function updatePricingDisplay() {
         ? `${quote.months} mois · ${Math.round(quote.paymentWeeks * 6)} jours de versement · ${formatUsd(quote.dailyPayment)} par jour, 6 jours par semaine.`
         : 'Le tarif doit être disponible avant de poursuivre la candidature.';
 
-    const breakdown = document.getElementById('offerBreakdown');
-    if (breakdown) breakdown.textContent = displayQuote
-        ? `12 mois · 52 semaines · 312 jours de versement. Total : ${formatUsd(displayQuote.total)}. Par semaine : ${formatUsd(displayQuote.weeklyPayment)}. Montants arrondis ; échéancier définitif au contrat.`
-        : 'Les tarifs sont momentanément indisponibles. Réessayez avant de choisir votre véhicule.';
-
     if (quote) {
         const totalEl = document.getElementById('modalValPrix');
         const advanceEl = document.getElementById('modalValAcompte');

@@ -62,6 +62,7 @@ window.GMFleetAdminNotifications = (() => {
   mounted=true;
   button=document.createElement('button');
   button.type='button';
+  button.hidden=!document.querySelector('nav [data-view="overview"]')?.classList.contains('active');
   button.className='secondary notification-toggle';
   button.onclick=()=>enable(false);
   document.querySelector('.header-actions')?.prepend(button);
