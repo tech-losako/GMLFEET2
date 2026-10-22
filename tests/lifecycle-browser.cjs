@@ -4,7 +4,7 @@ const root=path.resolve(__dirname,'..');
 let fixture='function fixture(){'+fs.readFileSync(path.join(__dirname,'finance-browser.cjs'),'utf8').split('function fixture(){')[1].split('\n(async()=>')[0];
 fixture=fixture.replace("if(this.mode==='update')items.forEach(r=>Object.assign(r,this.payload,{revision:r.revision+1}));","if(this.mode==='update')items.forEach(r=>{Object.assign(r,this.payload,{revision:r.revision+1});if(this.payload.review_status){r.process_step=r.review_status==='accepted'?'appointment':'review';r.workflow_stage=r.review_status==='accepted'?'contacted':'rejected';}});");
 function seed(){
- const t=window.fixtureTables;t.equipment_quotes=[];
+ const t=window.fixtureTables;t.equipment_quotes=[];t.lolc_case_payments=[{application_id:1,kind:'client_deposit_lolc',amount:2000,purchase_price:10000,paid_on:'2026-10-01',reference:'DEPOSIT-TEST'}];
  const b={...t.applications[0],lifecycle_version:2,review_status:'pending',process_step:'review',assigned_to:t.staff_members[0].user_id,phone:'+243810000000',preparation:{},service_details:{}};
  t.applications=['DRIVE_TO_OWN','PARTNER_DRIVER','FLEET_OWNER','YANGO'].map((program_type,i)=>({...b,id:i+1,case_reference:'TEST-'+(i+1),name:'Candidate '+program_type,program_type,preparation:{}}));
  const factory=window.supabase.createClient;
@@ -48,7 +48,7 @@ function seed(){
   await page.goto((process.env.LIFECYCLE_BASE_URL||'http://127.0.0.1:'+server.address().port)+'/admin.html');await page.locator('#workspace').waitFor();
   const nav=async v=>page.locator('nav [data-view="'+v+'"]').click();
   const close=async()=>page.locator('[data-close=caseDialog]').click();
-  const open=async program=>{await nav('preparation');await page.locator('.row').filter({has:page.getByRole('button',{name:'Candidate '+program,exact:true})}).locator('[data-open-tab]').click();await page.locator('#case-panel-appointments').waitFor({state:'visible'});};
+  const open=async program=>{const booked=await page.evaluate(program=>{const a=fixtureTables.applications.find(a=>a.program_type===program);return fixtureTables.appointments.some(p=>p.application_id===a.id&&['scheduled','confirmed'].includes(p.status));},program);await nav(booked?'appointments':'preparation');await page.locator(booked?'.appointment':'.row').filter({has:page.getByRole('button',{name:'Candidate '+program,exact:true})}).locator('[data-open-tab]').click();await page.locator('#case-panel-appointments').waitFor({state:'visible'});};
   const accept=async program=>{await nav('applications');await page.getByRole('button',{name:'Candidate '+program,exact:true}).click();assert.equal(await page.locator('.case-tabs button').last().getAttribute('id'),'case-tab-decision');await page.locator('#case-tab-decision').click();await page.locator('#reviewForm button').click();await page.locator('#appointmentForm').waitFor();};
   const book=async(fail=false)=>{
    assert.equal(await page.locator('#appointmentForm input').count(),3);assert.equal(await page.locator('#workflowForm').count(),0);assert.match(await page.locator('#appointmentForm [name=location]').inputValue(),/Ngongo/);
@@ -60,11 +60,11 @@ function seed(){
   const decide=async(choice,fields={},checks=[])=>{
    assert.equal(await page.locator('#caseStepForm button[type=submit]').isDisabled(),true);
    await page.locator('#caseStepForm [name=outcome]').selectOption(choice);
-   assert.equal(await page.locator('#caseStepForm button[type=submit]').isEnabled(),true);
+   await page.waitForFunction(()=>document.querySelector('#caseStepForm button[type=submit]')?.disabled===false);
    await page.locator('#caseStepForm [name=outcome]').selectOption('');
    assert.equal(await page.locator('#caseStepForm button[type=submit]').isDisabled(),true);
    await page.locator('#caseStepForm [name=outcome]').selectOption(choice);
-   for(const [key,value] of Object.entries(fields))await page.locator('#caseStepForm [name="'+key+'"]').fill(value);
+   for(const [key,value] of Object.entries(fields)){const input=page.locator('#caseStepForm [name="'+key+'"]');if(key==='model')await input.selectOption(value);else await input.fill(value);}
    for(const key of checks)await page.locator('#caseStepForm [name="'+key+'"]').check();
    const n=await page.evaluate(()=>window.rpcCalls.length);await page.locator('#caseStepForm button').click();await page.waitForFunction(n=>window.rpcCalls.length>n,n);await page.waitForFunction(()=>!document.querySelector('#caseStepForm')||document.querySelector('#caseStepForm [name=outcome]').value==='');
   };
