@@ -17,6 +17,7 @@ async function deliver(notification:{recipient:string;body:string}):Promise<{sta
   if(!Array.isArray(recipients)||recipients.length!==1)return {status:'unknown',error:'Reponse du service SMS a verifier'};
   const result=recipients[0];
   if(result.status==='Success'&&Number(result.statusCode)===101&&typeof result.messageId==='string')return {status:'sent',messageId:result.messageId};
+  if([100,102].includes(Number(result.statusCode)))return {status:'unknown',messageId:typeof result.messageId==='string'?result.messageId:undefined,error:'SMS accepté par le service ('+String(result.statusCode)+'), réception non confirmée. Vérifiez le rapport de livraison avant de renvoyer.'};
   return {status:'failed',error:'SMS refuse par le service ('+String(result.statusCode||'inconnu')+')'};
  }catch{return {status:'unknown',error:'Envoi SMS a verifier avant toute nouvelle tentative'};}
 }
