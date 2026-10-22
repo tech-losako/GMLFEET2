@@ -58,10 +58,15 @@ function seed(){
    await page.waitForFunction(()=>!document.querySelector('#caseDialog').open);
   };
   const decide=async(choice,fields={},checks=[])=>{
+   assert.equal(await page.locator('#caseStepForm button[type=submit]').isDisabled(),true);
+   await page.locator('#caseStepForm [name=outcome]').selectOption(choice);
+   assert.equal(await page.locator('#caseStepForm button[type=submit]').isEnabled(),true);
+   await page.locator('#caseStepForm [name=outcome]').selectOption('');
+   assert.equal(await page.locator('#caseStepForm button[type=submit]').isDisabled(),true);
    await page.locator('#caseStepForm [name=outcome]').selectOption(choice);
    for(const [key,value] of Object.entries(fields))await page.locator('#caseStepForm [name="'+key+'"]').fill(value);
    for(const key of checks)await page.locator('#caseStepForm [name="'+key+'"]').check();
-   const n=await page.evaluate(()=>window.rpcCalls.length);await page.locator('#caseStepForm button').click();await page.waitForFunction(n=>window.rpcCalls.length>n,n);await page.waitForFunction(()=>!document.querySelector('#caseStepForm button:disabled'));
+   const n=await page.evaluate(()=>window.rpcCalls.length);await page.locator('#caseStepForm button').click();await page.waitForFunction(n=>window.rpcCalls.length>n,n);await page.waitForFunction(()=>!document.querySelector('#caseStepForm')||document.querySelector('#caseStepForm [name=outcome]').value==='');
   };
   await accept('DRIVE_TO_OWN');await book(true);assert.equal(await page.evaluate(()=>fixtureTables.appointments.length),1);
   await nav('overview');await page.locator('.dashboard-today').waitFor();assert.match(await page.locator('.dashboard-today').innerText(),/Candidate DRIVE_TO_OWN/);await page.screenshot({path:path.join(__dirname,'artifacts/dashboard-today.png'),fullPage:true});
