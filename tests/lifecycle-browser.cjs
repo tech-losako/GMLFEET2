@@ -20,12 +20,13 @@ function seed(){
   db.rpc=async(name,{p})=>{
    if(name==='record_case_step'){
     window.rpcCalls.push({name,p});const a=t.applications.find(x=>x.id===p.application_id),ap=t.appointments.find(x=>x.id===p.appointment_id);
-    const targets={lolc_approved:'sourcing',information_required:'account',lolc_rejected:'account',vehicle_selected:'gml_inspection',vehicle_accepted:'custody',vehicle_received:'equipment',installed:a.program_type==='FLEET_OWNER'?'ready':'documents',handed_over:'handover',interview_passed:'interview',driving_test_passed:'test',training_completed:'allocation',invitation_explained:'invited',yango_joined:'joined',repairs_required:'repairs'};
+    const targets={vehicle_validated:'custody',vehicle_change:'sourcing',lolc_approved:'sourcing',information_required:'account',lolc_rejected:'account',vehicle_selected:'gml_inspection',vehicle_accepted:'custody',vehicle_received:'equipment',installed:a.program_type==='FLEET_OWNER'?'ready':'documents',handed_over:'handover',interview_passed:'interview',driving_test_passed:'test',training_completed:'allocation',invitation_explained:'invited',yango_joined:'joined',repairs_required:'repairs'};
     const before=JSON.parse(JSON.stringify(a));
     if(p.outcome==='inspection_passed')a.process_step=a.program_type==='FLEET_OWNER'?'equipment':a.process_step==='gml_inspection'?'lolc_inspection':'client_validation';
     else if(targets[p.outcome])a.process_step=targets[p.outcome];
     if(p.outcome==='lolc_approved'){a.lolc_status='approved';a.lolc_reference='LOLC-'+a.case_reference;}
     if(p.outcome==='vehicle_selected')a.preparation.purchased_vehicle=p.result;
+    if(p.outcome==='vehicle_change'){a.preparation.vehicle_history=[{vehicle:a.preparation.purchased_vehicle,reason:p.notes}];delete a.preparation.purchased_vehicle;delete a.preparation.gml_inspected;delete a.preparation.lolc_inspected;delete a.preparation.client_validated;}
     if(p.outcome==='installed')a.preparation.equipment=p.result;
     a.preparation.last_decision={...p,actor_id:t.staff_members[0].user_id,recorded_at:new Date().toISOString()};a.revision++;
     if(ap){ap.status=['missed','cancelled'].includes(p.outcome)?p.outcome:'completed';ap.outcome=p.outcome;ap.outcome_notes=p.notes;}
@@ -33,6 +34,7 @@ function seed(){
     t.audit_logs.push({id:crypto.randomUUID(),application_id:a.id,entity:'applications',action:'UPDATE',actor_id:t.staff_members[0].user_id,created_at:new Date().toISOString(),changes:{before,after:JSON.parse(JSON.stringify(a))}});
     return {data:a.id};
    }
+   if(name==='save_case_equipment'){const a=t.applications.find(a=>a.id===p.application_id);window.rpcCalls.push({name,p});a.preparation.equipment={...a.preparation.equipment,...p.details};a.revision++;return {data:a.id};}
    if(name==='onboard_owner_vehicle'){t.vehicles.push({id:99,model:p.model,plate:p.plate,vin:p.vin,status:'Disponible',owner_application_id:p.application_id});t.applications.find(a=>a.id===p.application_id).preparation.fleet_joined_on=p.fuel_paid_on;return {data:99};}
    return original(name,{p});
   };
@@ -58,30 +60,34 @@ function seed(){
    await page.waitForFunction(()=>!document.querySelector('#caseDialog').open);
   };
   const decide=async(choice,fields={},checks=[])=>{
+   if(await page.locator('#caseStepForm [name=outcome]').inputValue())await page.locator('#caseStepForm [name=outcome]').selectOption('');
    assert.equal(await page.locator('#caseStepForm button[type=submit]').isDisabled(),true);
+   for(const key of ['equipment_package','gml_result','lolc_result'])if(fields[key])await page.locator('#caseStepForm [name="'+key+'"]').selectOption(fields[key]);
    await page.locator('#caseStepForm [name=outcome]').selectOption(choice);
    await page.waitForFunction(()=>document.querySelector('#caseStepForm button[type=submit]')?.disabled===false);
-   await page.locator('#caseStepForm [name=outcome]').selectOption('');
-   assert.equal(await page.locator('#caseStepForm button[type=submit]').isDisabled(),true);
-   await page.locator('#caseStepForm [name=outcome]').selectOption(choice);
-   for(const [key,value] of Object.entries(fields)){const input=page.locator('#caseStepForm [name="'+key+'"]');if(key==='model')await input.selectOption(value);else await input.fill(value);}
+   await page.locator('#caseStepForm [name=outcome]').selectOption('');assert.equal(await page.locator('#caseStepForm button[type=submit]').isDisabled(),true);await page.locator('#caseStepForm [name=outcome]').selectOption(choice);
+   for(const [key,value] of Object.entries(fields)){if(['equipment_package','gml_result','lolc_result'].includes(key))continue;const input=page.locator('#caseStepForm [name="'+key+'"]');if(key==='model')await input.selectOption(value);else await input.fill(value);}
    for(const key of checks)await page.locator('#caseStepForm [name="'+key+'"]').check();
-   const n=await page.evaluate(()=>window.rpcCalls.length);await page.locator('#caseStepForm button').click();await page.waitForFunction(n=>window.rpcCalls.length>n,n);await page.waitForFunction(()=>!document.querySelector('#caseStepForm')||document.querySelector('#caseStepForm [name=outcome]').value==='');
+   const n=await page.evaluate(()=>window.rpcCalls.length);await page.locator('#caseStepForm button[type=submit]').click();await page.waitForFunction(n=>window.rpcCalls.length>n,n);await page.waitForFunction(expected=>!document.querySelector('#caseStepForm')||document.querySelector('#caseStepForm [name=outcome]').value===expected,choice==='vehicle_change'?'vehicle_selected':'');
   };
   await accept('DRIVE_TO_OWN');await book(true);assert.equal(await page.evaluate(()=>fixtureTables.appointments.length),1);
   await nav('overview');await page.locator('.dashboard-today').waitFor();assert.match(await page.locator('.dashboard-today').innerText(),/Candidate DRIVE_TO_OWN/);await page.screenshot({path:path.join(__dirname,'artifacts/dashboard-today.png'),fullPage:true});
   await page.locator('.dashboard-today [data-open-tab=appointments]').click();await page.locator('#caseStepForm').waitFor();assert.equal(await page.locator('#case-tab-appointments').textContent(),'Décision LOLC');assert.equal(await page.locator('[data-lolc-reference]').evaluate(e=>e.readOnly),true);
   await decide('lolc_approved');await page.locator('#caseStepForm').getByRole('heading',{name:'Identification du véhicule',exact:true}).waitFor();assert.equal(await page.locator('#appointmentForm').count(),0);assert.match(await page.locator('.case-progress').innerText(),/LOLC-TEST-1/);
-  await decide('vehicle_selected',{model:'Toyota Vitz',plate:'TEST-123',vin:'VIN-TEST'});await decide('inspection_passed');await decide('inspection_passed');await decide('vehicle_accepted');
+  await decide('vehicle_selected',{model:'Toyota Vitz',plate:'TEST-123',vin:'VIN-TEST'});
+  await page.locator('#caseStepForm [name=gml_result]').selectOption('passed');await page.locator('#caseStepForm [name=lolc_result]').selectOption('failed');await page.locator('#caseStepForm [name=outcome]').selectOption('vehicle_validated');assert.equal(await page.locator('#caseStepForm button[type=submit]').isDisabled(),true);await page.locator('#caseStepForm [name=outcome]').selectOption('');
+  await decide('vehicle_change',{gml_result:'passed',lolc_result:'failed',notes:'Autre véhicule demandé'});await page.locator('#caseStepForm select[name=model]').waitFor();assert.equal(await page.locator('#caseStepForm [name=plate]').inputValue(),'');
+  await decide('vehicle_selected',{model:'Suzuki Swift',plate:'NEW-123',vin:'VIN-NEW'});await decide('vehicle_validated',{gml_result:'passed',lolc_result:'passed'});
   const today=await page.evaluate(()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Kinshasa',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()));
-  await decide('vehicle_received',{purchase_date:today});await decide('installed',{tracker_id:'TRK-TEST'});await decide('handed_over',{handover_date:today},['paperwork','yango']);await page.getByRole('button',{name:'Activer le contrat signé'}).waitFor();assert.equal(await page.evaluate(()=>fixtureTables.appointments.length),1);await close();
+  await decide('vehicle_received',{purchase_date:today});await decide('installed',{equipment_package:'tracker',tracker_id:'TRK-TEST',sim_number:'+243810000000',sim_operator:'Vodacom',sim_iccid:'8912345678901234567'});
+  await page.locator('#case-tab-equipment').click();assert.match(await page.locator('#case-panel-equipment').innerText(),/243810000000/);await page.locator('#case-panel-equipment summary').click();await page.locator('#caseSimForm [name=sim_number]').fill('+243820000000');await page.locator('#caseSimForm button').click();await page.waitForFunction(()=>fixtureTables.applications[0].preparation.equipment.sim_number==='+243820000000');await page.locator('#case-panel-equipment').waitFor({state:'visible'});assert.match(await page.locator('#case-panel-equipment').innerText(),/243820000000/);await page.locator('#case-tab-appointments').click();await decide('handed_over',{handover_date:today},['paperwork','yango']);await page.getByRole('button',{name:'Activer le contrat signé'}).waitFor();assert.equal(await page.evaluate(()=>fixtureTables.appointments.length),1);await close();
   for(const program of ['PARTNER_DRIVER','FLEET_OWNER','YANGO']){
    await accept(program);await book();await open(program);
    if(program==='PARTNER_DRIVER'){await decide('interview_passed');await decide('driving_test_passed');await decide('training_completed');await page.getByRole('button',{name:'Ouvrir les contrats et affectations'}).waitFor();}
    if(program==='YANGO'){await decide('invitation_explained');await decide('yango_joined');await page.getByRole('heading',{name:'Rattachement Yango confirmé'}).waitFor();}
    if(program==='FLEET_OWNER'){
     await decide('repairs_required',{notes:'Brake repairs needed'});assert.match(await page.locator('#case-tab-appointments').textContent(),/réparations/);
-    await decide('inspection_passed',{},['roadworthy','carte_rose','insurance','transport_authorization','vignette','technical_control']);await decide('installed',{tracker_id:'TRK-OWNER',dashcam_id:'CAM-OWNER'});
+    await decide('inspection_passed',{},['roadworthy','carte_rose','insurance','transport_authorization','vignette','technical_control']);await decide('installed',{equipment_package:'tracker_camera',tracker_id:'TRK-OWNER',dashcam_id:'CAM-OWNER',sim_number:'+243810000001',sim_operator:'Orange'});
     await page.locator('#ownerFleetForm').waitFor();for(const [key,value] of Object.entries({model:'Toyota IST',plate:'OWNER-123',vin:'VIN-OWNER',tracker_id:'TRK-OWNER',fuel_reference:'FUEL-TEST',fuel_paid_on:today}))await page.locator('#ownerFleetForm [name="'+key+'"]').fill(value);await page.locator('#ownerFleetForm input[type=checkbox]').check();await page.locator('#ownerFleetForm button').click();await page.waitForFunction(()=>fixtureTables.vehicles.length===1);
    }
    await close();
