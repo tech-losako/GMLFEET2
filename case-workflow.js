@@ -42,6 +42,11 @@
  decisions.FLEET_OWNER.inspection=decisions.FLEET_OWNER.appointment;
  decisions.FLEET_OWNER.repairs={...decisions.FLEET_OWNER.appointment,title:'Contrôle après réparations'};
  const decisionSpec=a=>decisions[a.program_type]?.[a.process_step];
+ const current=a=>{
+  const steps=Object.keys(flows[a.program_type]?.steps||{}),index=steps.indexOf(a.process_step);
+  const actions={sourcing:'Identifier le véhicule',gml_inspection:'Effectuer le contrôle GML',lolc_inspection:'Effectuer le contrôle LOLC',client_validation:'Confirmer la validation du client',custody:'Confirmer la réception du véhicule',equipment:'Suivre l’installation',documents:'Préparer la remise',handover:'Ouvrir le contrat signé',account:'Vérifier le financement LOLC',appointment:'Traiter le rendez-vous'};
+  return {title:decisionSpec(a)?.title||step(a),position:index>=0?'Étape '+(index+1)+' sur '+steps.length:'Suivi en cours',action:a.next_action||'Ouvrir le dossier pour poursuivre',button:a.program_type==='DRIVE_TO_OWN'?actions[a.process_step]||'Ouvrir le dossier':'Traiter : '+(decisionSpec(a)?.title||step(a))};
+ };
  const kinshasaDay=value=>new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Kinshasa',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(value));
  function decisionForm(a,ap,e){
   const spec=decisionSpec(a),today=kinshasaDay(new Date()),future=ap&&kinshasaDay(ap.starts_at)>today;
@@ -65,7 +70,8 @@
   const nav=document.createElement('div');nav.className='case-tabs';nav.setAttribute('role','tablist');nav.setAttribute('aria-label','Dossier candidat');
   const container=document.createElement('div');container.className='case-panels';
   panels.forEach(p=>{const panel=document.createElement('section');panel.id='case-panel-'+p.id;panel.setAttribute('role','tabpanel');panel.setAttribute('aria-labelledby','case-tab-'+p.id);panel.append(...p.nodes);container.append(panel);const b=document.createElement('button');b.type='button';b.id='case-tab-'+p.id;b.dataset.caseTab=p.id;b.textContent=p.label;b.setAttribute('role','tab');b.setAttribute('aria-controls',panel.id);nav.append(b);});
-  body.querySelector('.case-grid').replaceWith(nav,container);
+  const statusBanner=document.createElement('section');statusBanner.className='case-current-status';statusBanner.setAttribute('aria-label','État actuel du dossier');
+  if(status==='accepted'){const statusInfo=current(a);statusBanner.innerHTML=`<div class="current-stage-meta"><span>ÉTAPE ACTUELLE</span><strong>${e(statusInfo.position)}</strong></div><h3>${e(future&&activeAppointments.length?'Rendez-vous programmé':statusInfo.title)}</h3><p><strong>À faire :</strong> ${e(future&&activeAppointments.length?'Attendre le rendez-vous pour enregistrer son résultat.':statusInfo.action)}</p>`;body.querySelector('.case-grid').replaceWith(statusBanner,nav,container);}else body.querySelector('.case-grid').replaceWith(nav,container);
   c.selectTab=id=>{c.state.caseTab=id;nav.querySelectorAll('button').forEach(b=>{const on=b.dataset.caseTab===id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1;});[...container.children].forEach(p=>p.hidden=p.id!=='case-panel-'+id);};
   nav.onclick=ev=>{const b=ev.target.closest('[data-case-tab]');if(b)c.selectTab(b.dataset.caseTab);};
   nav.onkeydown=ev=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(ev.key))return;ev.preventDefault();const bs=[...nav.children],i=bs.indexOf(document.activeElement),n=ev.key==='Home'?0:ev.key==='End'?bs.length-1:(i+(ev.key==='ArrowRight'?1:-1)+bs.length)%bs.length;bs[n].click();bs[n].focus();};
@@ -119,7 +125,7 @@
     const result={};for(const [key,value] of f.entries())if(!['outcome','notes'].includes(key))result[key]=form.elements.namedItem(key).type==='checkbox'?true:value;
     const p={application_id:a.id,revision:a.revision,step:a.process_step,appointment_id:activeAppointments[0]?.id||null,outcome:f.get('outcome'),notes:f.get('notes').trim(),result};
     const fingerprint=JSON.stringify(p);if(c.state.decisionRequest?.fingerprint!==fingerprint)c.state.decisionRequest={fingerprint,id:crypto.randomUUID()};
-    await check(await db.rpc('record_case_step',{p:{...p,request_id:c.state.decisionRequest.id}}));c.state.decisionRequest=null;c.state.caseTab='appointments';await refreshCase(a.id);notify('Décision enregistrée. Le parcours du dossier est actualisé.');
+    await check(await db.rpc('record_case_step',{p:{...p,request_id:c.state.decisionRequest.id}}));c.state.decisionRequest=null;c.state.caseTab='appointments';await refreshCase(a.id);notify('Décision enregistrée. Étape actuelle : '+current(c.state.current||a).title+'.');
    });
   }
   const archived=[...sections[3].querySelectorAll('[data-appointment-card]')].filter(card=>!activeAppointments.some(ap=>String(ap.id)===card.dataset.appointmentCard));
@@ -136,5 +142,5 @@
   }
   body.querySelectorAll('[data-case-contracts]').forEach(b=>b.onclick=()=>{document.getElementById('caseDialog').close();document.querySelector('nav [data-view="contracts"]').click();});
  }
- window.GMFleetWorkflow={flows,purposes,review,step,nextPurpose,decisionSpec,form,mount};
+ window.GMFleetWorkflow={flows,purposes,review,step,current,nextPurpose,decisionSpec,form,mount};
 })();
