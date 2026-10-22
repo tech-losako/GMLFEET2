@@ -101,7 +101,8 @@
    const [vehicles,contracts,drivers]=await Promise.all(['vehicles','contracts','drivers'].map(t=>rows(t,q=>q.order('id'))));
    if(state.view!==selected)return;
    if(selected==='preparation'){
-    const apps=state.apps.filter(a=>workflow.review(a)==='accepted'&&!contracts.some(c=>c.application_id===a.id&&c.status==='active')&&!vehicles.some(v=>v.owner_application_id===a.id)&&!(a.program_type==='YANGO'&&a.process_step==='joined'));
+    const bookedCases=new Set(state.appointments.filter(p=>['scheduled','confirmed'].includes(p.status)).map(p=>p.application_id));
+    const apps=state.apps.filter(a=>workflow.review(a)==='accepted'&&!bookedCases.has(a.id)&&!contracts.some(c=>c.application_id===a.id&&c.status==='active')&&!vehicles.some(v=>v.owner_application_id===a.id)&&!(a.program_type==='YANGO'&&a.process_step==='joined'));
 const selectedProgram=state.preparationProgram||'';
     const group=apps.filter(a=>!selectedProgram||a.program_type===selectedProgram);
     $('content').innerHTML=`<div class="workspace-toolbar"><label>Catégorie<select id="preparationProgram">${options({'':'Toutes les catégories',...programs},selectedProgram)}</select></label><span class="muted">${group.length} dossier(s) en cours</span></div><section class="card"><h3>Préparation & remise</h3>${group.map(a=>`<div class="row"><div>${link(a)}<small>${escape(programs[a.program_type])} · ${escape(workflow.step(a))}</small><small>${escape(a.next_action||'Ouvrir le dossier pour poursuivre')}</small></div><button class="secondary" data-case="${a.id}" data-open-tab="appointments">Poursuivre →</button></div>`).join('')||'<p class="compact-empty">Aucun dossier en préparation pour cette catégorie.</p>'}</section>`;
