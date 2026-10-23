@@ -6,3 +6,5 @@ a.push({schedule_id:2,amount:70,lolc_amount:60});assert.equal(cal.collection(c,s
 a.push({schedule_id:2,amount:-70,lolc_amount:-60});assert.equal(cal.collection(c,s,a,'2026-10-21').total,70);assert.deepEqual(cal.split(c,s,[{schedule_id:1,amount:35,lolc_amount:30}],35),{lolc:30,gml:5,unallocated:0});
 const w={id:'w',payment_frequency:'weekly'},ws=Array.from({length:6},(_,i)=>({id:i+20,contract_id:'w',due_on:'2026-10-'+(19+i),lolc_due:27,gml_due:2.5}));assert.equal(cal.collection(w,ws,[],'2026-10-23').total,0);assert.equal(cal.collection(w,ws,[],'2026-10-23').next.amount,177);assert.equal(cal.collection(w,ws,[],'2026-10-25').today,177);assert.equal(cal.collection(w,ws,[],'2026-10-26').arrears,177);
 console.log('PASS collection terms, partials, reversals, split and weekly boundaries');
+
+assert.equal(cal.addMonths('2024-02-29',24),'2026-02-28');assert.equal(cal.addMonths('2026-01-31',1),'2026-02-28');

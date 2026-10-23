@@ -22,7 +22,7 @@ function fixture(){
    return {data:this.one?(items[0]||null):items.slice(this.offset,this.end+1),error:null};
   }).then(resolve,reject);}
  }
- Object.assign(tables,{equipment_quotes:[],lolc_case_payments:[],contracts:[],drivers:[],vehicles:[],repayment_schedules:[],payments:[],payment_allocations:[],lolc_deposits:[],lolc_deposit_items:[],finance_events:[],araka_attempts:[]});
+ Object.assign(tables,{fleet_mandates:[],vehicle_inspections:[],vehicle_issues:[],vehicle_advances:[],advance_instalments:[],advance_recoveries:[],owner_settlements:[],equipment_quotes:[],lolc_case_payments:[],contracts:[],drivers:[],vehicles:[],repayment_schedules:[],payments:[],payment_allocations:[],lolc_deposits:[],lolc_deposit_items:[],finance_events:[],araka_attempts:[]});
  staff.role='admin';window.rpcCalls=[];
  async function financeRpc(name,{p}){
   window.rpcCalls.push({name,p:JSON.parse(JSON.stringify(p))});

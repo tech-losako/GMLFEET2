@@ -31,7 +31,11 @@
   }
   return {lolc:lolc/100,gml:(Math.round(Number(amount)*100)-left-lolc)/100,unallocated:left/100};
  }
- const api={settlementDate,collection,split};
+ function addMonths(date,months){
+  const d=new Date(date+'T12:00:00Z'),day=d.getUTCDate();d.setUTCDate(1);d.setUTCMonth(d.getUTCMonth()+months);
+  const last=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,0)).getUTCDate();d.setUTCDate(Math.min(day,last));return d.toISOString().slice(0,10);
+ }
+ const api={settlementDate,collection,split,addMonths};
  if(typeof module==='object'&&module.exports)module.exports=api;
  else root.GMFleetPaymentCalendar=api;
 })(typeof window==='object'?window:globalThis);

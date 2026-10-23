@@ -1,0 +1,13 @@
+# Fleet management ledger
+
+Business terms reconciled against the owner/driver protocols and contracts supplied on 23 October 2026. The user confirmed a single 15% charge and a Monday–Friday collection calendar.
+
+- Category is based on first registration/operation in Kinshasa, with inspection required: A through two years ($500 monthly owner target), B over two through four ($450), C over four ($400). Manufacturing year is not the category clock.
+- The reference model is $31 × 22 = $682. Its separate allocations are owner target, $64 management fee, $44 progression provision, then remaining cash reserve. Category A therefore leaves $74. The management fee is not deducted a second time from the $500 owner target. The provision does not vest a driver benefit automatically.
+- Actual driver instalments follow Monday–Friday, starting on the next eligible weekday after assignment. Twenty-two days is a reference, not a synthetic calendar. A managed vehicle needs an owner mandate and a validated partner-driver contract before its twelve-month operating cycle starts.
+- Fuel, individual documents and repairs can be prefunded with recorded approval and disbursement references. A funded principal receives one 15% fee, never monthly compounding. Scheduled recovery must finish within six months of funding.
+- Owner advances are recovered from confirmed monthly owner settlements. Driver fault requires an incident, an assigned driver, evidence and a repayment agreement. Driver repairs add separate amounts to unpaid future contract instalments and never become owner deductions.
+- Driver recovery uses the same allocation trigger for cash and provider-verified digital receipts. Reversals restore recovery balances. Original signed contract totals remain stored separately from supplemental charges.
+- Monthly statements use actual base receipts in the period, excluding driver repair recovery. Owner targets are reviewed before payout; a lower amount needs a recorded reason and owner agreement. No automatic downtime proration is invented. A closed month cannot accept backdated receipts or reversals that would silently invalidate its statement.
+- Mandates, inspections, incidents, advances and owner settlements are staff-readable. Financial commands require a cashier or administrator. Direct client ledger writes are denied. No external bank transfer is initiated by these bookkeeping commands.
+- Deployment creates no historical advances, owner payments or invented driver receipts. Previously recorded equipment/SIM information is preserved; active dossiers permit validated SIM corrections without changing device identities.
