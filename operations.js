@@ -188,7 +188,7 @@ const selectedProgram=state.preparationProgram||'';
    <section id="caseDocuments" class="document-section"></section>
    <section id="caseJournal"></section></div></div>`;
    bindCase(a);
-   workflow.mount(a,{escape,options,submit,check,db,refreshCase,reload,notify,person,date,state,notifications:state.notifications,appointments});
+   workflow.mount(a,{escape,options,submit,check,db,refreshCase,reload,notify,person,date,state,notifications:state.notifications,appointments,documents});
    window.GMFleetCaseJournal.mount({root:$('case-panel-history'),notes,audit,application:a,escape,date,person,staffMember,workflow,stages,lolc,appointmentStates,detailLabels,submit,check,db,refreshCase,notify,state});
    state.documentReview=window.GMFleetDocuments.mount({root:$('caseDocuments'),documents,application:a,db,escape,date,person,notify,refreshCase,state});
   } catch(error) {$('caseBody').innerHTML=`<p class="form-error">${escape(fail(error))}</p><button class="secondary" data-case="${a.id}">Réessayer</button>`;}
