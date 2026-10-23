@@ -45,10 +45,11 @@
  decisions.FLEET_OWNER.inspection=decisions.FLEET_OWNER.appointment;
  decisions.FLEET_OWNER.repairs={...decisions.FLEET_OWNER.appointment,title:'Contrôle après réparations'};
  const decisionSpec=a=>decisions[a.program_type]?.[a.process_step];
+ const driveStageLabels={appointment:'Rendez-vous / ouverture du compte',account:'Dépôt de 20 % / décision LOLC',sourcing:'Identification du véhicule',gml_inspection:'Contrôles GML, LOLC et choix client',custody:'Achat et réception',equipment:'Installation des équipements',documents:'Documents et remise',handover:'Véhicule remis'};
  const current=a=>{
   const steps=Object.keys(flows[a.program_type]?.steps||{}).filter(k=>a.program_type!=='DRIVE_TO_OWN'||!['lolc_inspection','client_validation'].includes(k)),key=a.program_type==='DRIVE_TO_OWN'&&['lolc_inspection','client_validation'].includes(a.process_step)?'gml_inspection':a.process_step,index=steps.indexOf(key);
   const actions={sourcing:'Identifier le véhicule',gml_inspection:'Contrôler et décider du véhicule',lolc_inspection:'Contrôler et décider du véhicule',client_validation:'Contrôler et décider du véhicule',custody:'Confirmer la réception du véhicule',equipment:'Suivre l’installation',documents:'Préparer la remise',handover:'Ouvrir le contrat signé',account:'Vérifier le financement LOLC',appointment:'Traiter le rendez-vous'};
-  return {total:steps.length,index:index+1,title:decisionSpec(a)?.title||step(a),position:index>=0?'Étape '+(index+1)+' sur '+steps.length:'Suivi en cours',action:a.next_action||'Ouvrir le dossier pour poursuivre',button:a.program_type==='DRIVE_TO_OWN'?actions[a.process_step]||'Ouvrir le dossier':'Traiter : '+(decisionSpec(a)?.title||step(a))};
+  return {total:steps.length,index:index+1,title:decisionSpec(a)?.title||step(a),position:index>=0?'Étape '+(index+1)+' sur '+steps.length:'Étape à préciser',stages:steps.map((key,n)=>({key,number:n+1,label:a.program_type==='DRIVE_TO_OWN'?driveStageLabels[key]:flows[a.program_type].steps[key],state:n===index?'current':index>=0&&n<index?'done':'upcoming'})),action:a.next_action||'Ouvrir le dossier pour poursuivre',button:a.program_type==='DRIVE_TO_OWN'?actions[a.process_step]||'Ouvrir le dossier':'Traiter : '+(decisionSpec(a)?.title||step(a))};
  };
  const kinshasaDay=value=>new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Kinshasa',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(value));
  function vehicleReviewForm(a,e){
@@ -113,8 +114,8 @@
   if(status==='accepted'){
   sections[3].classList.remove('card');
   sections[3].querySelector('h3')?.remove();
-  const progressInfo=current(a),steps={length:progressInfo.total},index=progressInfo.index-1;
-  sections[3].insertAdjacentHTML('afterbegin',`<div class="case-progress"><span>Étape ${index+1} sur ${steps.length}</span><progress max="${steps.length}" value="${index+1}" aria-label="Avancement du dossier"></progress>${a.lolc_reference?`<span class="muted">Référence de suivi LOLC : ${e(a.lolc_reference)}</span>`:''}</div>`);
+  const progressInfo=current(a);
+  sections[3].insertAdjacentHTML('afterbegin',`<div class="case-progress"><span>${e(progressInfo.position)} · ${e(progressInfo.title)}</span>${progressInfo.index>0?`<progress max="${progressInfo.total}" value="${progressInfo.index}" aria-label="Avancement du dossier" aria-valuetext="${e(progressInfo.position)}"></progress>`:''}${a.lolc_reference?`<span class="muted">Référence de suivi LOLC : ${e(a.lolc_reference)}</span>`:''}</div><details class="case-stage-overview"><summary>Voir les ${progressInfo.total} étapes du dossier</summary><ol>${progressInfo.stages.map(s=>`<li data-stage-state="${s.state}" ${s.state==='current'?'aria-current="step"':''}><span>${s.number}</span><div>${e(s.label)}<small>${s.state==='current'?'Étape actuelle':s.state==='done'?'Étape passée':'À venir'}</small></div></li>`).join('')}</ol></details>`);
   activeAppointments.forEach(p=>{
    const card=sections[3].querySelector(`[data-appointment-card="${CSS.escape(String(p.id))}"]`);if(!card)return;
    const notification=(c.notifications||[]).find(n=>n.appointment_id===p.id&&n.kind==='appointment');
