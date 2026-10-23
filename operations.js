@@ -72,7 +72,7 @@
   if(state.view!=='overview')window.GMFleetDashboard.cancel();
   document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===state.view));
   $('newApplication').textContent=state.view==='appointments'?'＋ Programmer un rendez-vous':'＋ Nouvelle candidature';
-  $('pageTitle').textContent={overview:'Tableau de bord',applications:'Candidatures',appointments:'Rendez-vous',contracts:'Contrats & véhicules',payments:'Caisse / versements',reconciliation:'Rapprochement LOLC',users:'Utilisateurs',preparation:'Préparation & remises',fleet:'Flotte & partenaires',modelSpecs:'Véhicules & tarifs'}[state.view];
+  $('pageTitle').textContent={overview:'Tableau de bord',applications:'Candidatures',appointments:'Rendez-vous',contracts:'Contrats & véhicules',payments:'Caisse / versements',reconciliation:'Bilan',users:'Utilisateurs',preparation:'Préparation & remises',fleet:'Flotte & partenaires',modelSpecs:'Véhicules & tarifs'}[state.view];
   document.getElementById('newApplication').hidden=['users','contracts','payments','reconciliation','preparation','fleet','modelSpecs'].includes(state.view);
   if(['contracts','payments','reconciliation'].includes(state.view)) { const rendering=window.GMFleetFinance.render(state.view,{db,escape,date,person,notify,rows,staff:state.staff,user:state.user,apps:state.apps,openContract:state.dashboardContract});state.dashboardContract=null; return rendering; }
   if(state.view==='modelSpecs')return window.GMFleetModelAdmin.render({db,escape,notify,user:state.user,staff:state.staff,isCurrent:()=>state.view==='modelSpecs'});
@@ -294,7 +294,7 @@ const selectedProgram=state.preparationProgram||'';
    $('today').textContent=new Intl.DateTimeFormat('fr-FR',{dateStyle:'full',timeZone:'Africa/Kinshasa'}).format(new Date());
    await reload();$('access').hidden=true;$('workspace').hidden=false;
    db.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT')location.replace('/login.html');});
-   const refreshVisible=async()=>{if(!enforceIdle()||document.hidden||state.view!=='overview'||document.querySelector('dialog[open]'))return;try{await reload();}catch(e){notify('Actualisation interrompue. '+fail(e),true);}};
+   const refreshVisible=async()=>{if(!enforceIdle()||document.hidden||!['overview','payments','reconciliation'].includes(state.view)||document.querySelector('dialog[open]')||document.activeElement?.matches('input,select,textarea'))return;try{await reload();}catch(e){notify('Actualisation interrompue. '+fail(e),true);}};
    setInterval(refreshVisible,60000);window.addEventListener('focus',refreshVisible);window.addEventListener('online',refreshVisible);document.addEventListener('visibilitychange',refreshVisible);
   } catch(e) {$('access').innerHTML=`<h1>Connexion indisponible</h1><p>${escape(fail(e))}</p><button class="secondary" id="retry">Réessayer</button>`;$('retry').onclick=()=>location.reload();}
  }
