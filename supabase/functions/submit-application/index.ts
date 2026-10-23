@@ -108,6 +108,10 @@ Deno.serve(async req=>{
   app.service=service==='Recrutement'?'Recrutement Chauffeur':service;app.application_type=service?'service':'vehicle';
   const months=input.plan_duration_months==null?null:Number(input.plan_duration_months);if(!service&&months!==null&&months!==12)throw new Error('Le seul plan proposé est de 12 mois');app.plan_duration_months=service?null:12;
   const details:Record<string,unknown>={};for(const key of ['email','idNumber','carBrand','carModel','carPlate','carYear','carChassis','permisFileName','permisRectoFileName','permisVersoFileName','carteRoseFileName','transportAuthorizationFileName','vignetteFileName','insuranceFileName','technicalInspectionFileName','frontPhotoFileName','rearPhotoFileName','leftPhotoFileName','rightPhotoFileName','interiorPhotoFileName','photosCount','cvFileName','licenseRectoFileName','licenseVersoFileName','dailyPayment','weeklyPayment','planTotal','initialDeposit','offerRevision']){const value=input.service_details?.[key];if(value!==undefined){if(!['string','number'].includes(typeof value)||String(value).length>500)throw new Error('Détail de formulaire invalide');details[key]=value;}}app.service_details=details;
+  if(app.service==='Chauffeur Yango'){
+   if(input.service_details?.yangoConditionsAccepted!=='true'||input.service_details?.yangoConditionsVersion!=='2026-10-23-v1')throw new Error('Lisez et acceptez les conditions Partenaire Yango avant l’envoi.');
+   details.yangoConditionsAccepted='true';details.yangoConditionsVersion='2026-10-23-v1';
+  }
   const files=form.getAll('files');if(files.length>10)throw new Error('Maximum 10 fichiers par demande');
   const manifest=[];const contents=[];let bytes=0;
   for(const [i,file] of files.entries()){

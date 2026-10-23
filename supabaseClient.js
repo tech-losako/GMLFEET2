@@ -34,7 +34,7 @@
         'technicalInspectionFileName', 'frontPhotoFileName', 'rearPhotoFileName',
         'leftPhotoFileName', 'rightPhotoFileName', 'interiorPhotoFileName',
         'photosCount', 'cvFileName', 'licenseRectoFileName', 'licenseVersoFileName',
-        'dailyPayment', 'weeklyPayment', 'planTotal', 'initialDeposit', 'offerRevision'];
+        'dailyPayment', 'weeklyPayment', 'planTotal', 'initialDeposit', 'offerRevision', 'yangoConditionsAccepted', 'yangoConditionsVersion'];
 
     const appFromDb = (row) => ({
         ...Object.fromEntries(serviceFields.filter(key => row.service_details?.[key] !== undefined)

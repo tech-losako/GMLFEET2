@@ -1,5 +1,5 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),{webcrypto}=require('node:crypto'),{stripTypeScriptTypes}=require('node:module');
-const source=stripTypeScriptTypes(fs.readFileSync('supabase/functions/submit-application/index.ts','utf8').replace(/^import .*\n/,''));
+const source=stripTypeScriptTypes(fs.readFileSync('supabase/functions/submit-application/index.ts','utf8').replace(/^import .*\r?\n/,''));
 async function scenario(options={}){
  let handler,reserved,completed=0;const messages=[];
  const client={from:()=>({select(){return this;},eq(){return this;},in:async()=>({data:[{user_id:'admin-1',phone:'+243820000000'},{user_id:'admin-2',phone:'+243830000000'}]})}),rpc:async(name,p)=>{
@@ -19,7 +19,8 @@ async function scenario(options={}){
  const success=await scenario();assert.equal(success.status,200);assert.equal(success.body.sms_status,'sent');assert.equal(success.reserved.application.plan_duration_months,12);assert.equal(success.reserved.application.service_details.offerRevision,2);assert.equal(success.messages.filter(m=>m.to==='+243810000000').length,1);assert.equal(success.messages.length,3,'one client SMS, two separate admin alerts');assert.match(success.messages[0].message,/demande CNG-.* reçue/);
  for(const months of [15,18,24,0]){const r=await scenario({app:{plan_duration_months:months}});assert.equal(r.status,400);assert.equal(r.messages.length,0);assert.equal(r.reserved,undefined);}
  assert.equal((await scenario({app:{plan_duration_months:null}})).reserved.application.plan_duration_months,12);
- const service=await scenario({app:{service:'Chauffeur Yango',vehicle:'Yango',plan_duration_months:18}});assert.equal(service.reserved.application.plan_duration_months,null);
+ for(const details of [{},{yangoConditionsAccepted:'true',yangoConditionsVersion:'old'},{yangoConditionsAccepted:'false',yangoConditionsVersion:'2026-10-23-v1'}]){const denied=await scenario({app:{service:'Chauffeur Yango',vehicle:'Yango',service_details:details}});assert.equal(denied.status,400);assert.equal(denied.reserved,undefined);assert.equal(denied.messages.length,0);}
+ const service=await scenario({app:{service:'Chauffeur Yango',vehicle:'Yango',plan_duration_months:18,service_details:{yangoConditionsAccepted:'true',yangoConditionsVersion:'2026-10-23-v1',yangoConditionsAcceptedAt:'forged',role:'admin'}}});assert.equal(service.reserved.application.service_details.yangoConditionsAccepted,'true');assert.equal(service.reserved.application.service_details.yangoConditionsVersion,'2026-10-23-v1');assert.equal(service.reserved.application.service_details.yangoConditionsAcceptedAt,undefined);assert.equal(service.reserved.application.service_details.role,undefined);assert.equal(service.reserved.application.plan_duration_months,null);
  const replay=await scenario({replay:true});assert.equal(replay.body.sms_status,'previously_processed');assert.equal(replay.messages.length,0);assert.equal(replay.completed,0);
  for(const failure of [{stale:true},{failComplete:true},{staleComplete:true}]){const r=await scenario(failure);assert.ok(r.status>=400);assert.equal(r.messages.length,0);if(failure.staleComplete){assert.equal(r.status,409);assert.match(r.body.error,/tarif a changé/);}}
  assert.equal((await scenario({noSms:true})).body.sms_status,'not_configured');

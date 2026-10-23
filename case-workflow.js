@@ -86,6 +86,9 @@
   const equipmentHost=status==='accepted'&&(a.preparation?.equipment||a.preparation?.equipment_draft)?document.createElement('section'):null;
   if(equipmentHost)panels.push({id:'equipment',label:'Équipements & SIM',nodes:[equipmentHost]});
   panels.push({id:'history',label:'Notes & journal',nodes:[sections[2],sections[5]]});
+  const contractHost=document.createElement('section');
+  panels.push({id:'contract',label:a.program_type==='YANGO'?'Conditions Yango':'Contrat',nodes:[contractHost]});
+  window.GMFleetContracts.mount(a,c,contractHost);
   const nav=document.createElement('div');nav.className='case-tabs';nav.setAttribute('role','tablist');nav.setAttribute('aria-label','Dossier candidat');
   const container=document.createElement('div');container.className='case-panels';
   panels.forEach(p=>{const panel=document.createElement('section');panel.id='case-panel-'+p.id;panel.setAttribute('role','tabpanel');panel.setAttribute('aria-labelledby','case-tab-'+p.id);panel.append(...p.nodes);container.append(panel);const b=document.createElement('button');b.type='button';b.id='case-tab-'+p.id;b.dataset.caseTab=p.id;b.textContent=p.label;b.setAttribute('role','tab');b.setAttribute('aria-controls',panel.id);nav.append(b);});

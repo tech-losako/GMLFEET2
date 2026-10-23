@@ -174,6 +174,11 @@ function handleServiceSelect(val) {
     const selectedService = document.getElementById('selectedService');
     const noServiceWarn = document.getElementById('noServiceSelectedWarning');
     const form = document.getElementById('serviceApplicationForm');
+    // The dedicated Yango wizard includes the versioned conditions and consent step.
+    if (val === 'Chauffeur Yango' && form?.querySelector('#dynamicFieldsContainer')) {
+        window.location.assign('/agregateur-yango.html#candidature');
+        return;
+    }
 
     if (!val) {
         if (icon) icon.className = "fas fa-briefcase fa-3x";
@@ -454,6 +459,10 @@ function applicationFiles(service){
 }
 async function sendPublicApplication(app,form){
  if(!window.GMFleetBackend?.isConfigured())throw new Error('Le service est indisponible. Réessayez plus tard.');
+ if(app.service==='Chauffeur Yango'){
+  if(!form.querySelector('#yangoConditionsConsent')?.checked)throw new Error('Lisez et acceptez les conditions Partenaire Yango avant l’envoi.');
+  app.yangoConditionsAccepted='true';app.yangoConditionsVersion=window.GMFleetContracts.VERSION;
+ }
  const id=form.dataset.submissionId||(form.dataset.submissionId=crypto.randomUUID());
  const confirmation=await window.GMFleetBackend.createApplication(app,applicationFiles(app.service),id);
  delete form.dataset.submissionId;

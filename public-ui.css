@@ -53,3 +53,5 @@ body.public-site{background:var(--pub-bg);color:var(--pub-ink);font-family:Inter
 
 /* Vehicle imagery uses a single white catalogue treatment. */
 .mini-fleet img,.vehicle-options img,.selected-car-photo,.catalogue-car>img{object-fit:contain!important;background:#fff!important}.vehicle-options button,.vehicle-selection,.catalogue-car{border-radius:8px}.selected-car-photo{border-radius:8px}
+
+.yango-conditions{margin-top:28px;border-top:1px solid #d6dee5;padding-top:20px}.yango-conditions details{margin:16px 0;line-height:1.65}.yango-conditions summary{cursor:pointer;font-weight:700}.yango-conditions details p{font-size:15px}.yango-consent{display:flex;align-items:flex-start;gap:12px;margin-top:20px;line-height:1.6}.yango-consent input{width:20px!important;min-width:20px;height:20px;margin-top:4px}
