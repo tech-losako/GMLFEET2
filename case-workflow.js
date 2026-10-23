@@ -26,7 +26,7 @@
  const decisions={
   DRIVE_TO_OWN:{
    appointment:{title:'Décision LOLC',choices:{lolc_approved:'LOLC approuve après dépôt des 20 %',information_required:'Complément demandé par LOLC',lolc_rejected:'Dossier refusé par LOLC'}},
-   sourcing:{title:'Identification du véhicule',choices:{vehicle_selected:'Véhicule identifié',deferred:'Recherche à poursuivre'},fields:[['model','Modèle'],['plate','Plaque'],['vin','Châssis / VIN'],['color','Couleur','text',false]]},
+   sourcing:{title:'Identification du véhicule',choices:{vehicle_selected:'Véhicule identifié',deferred:'Recherche à poursuivre'},fields:[['model','Modèle'],['plate','Plaque (si disponible)','text',false],['vin','Châssis / VIN'],['color','Couleur','text',false]]},
    gml_inspection:{title:'Contrôle GML',choices:{inspection_passed:'Contrôle GML favorable',deferred:'Contrôle non favorable / à compléter'}},
    lolc_inspection:{title:'Contrôle LOLC',choices:{inspection_passed:'Contrôle LOLC favorable',deferred:'Contrôle non favorable / à compléter'}},
    client_validation:{title:'Validation du candidat',choices:{vehicle_accepted:'Véhicule accepté par le candidat',deferred:'Véhicule refusé / décision attendue'}},

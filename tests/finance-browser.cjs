@@ -22,7 +22,7 @@ function fixture(){
    return {data:this.one?(items[0]||null):items.slice(this.offset,this.end+1),error:null};
   }).then(resolve,reject);}
  }
- Object.assign(tables,{contracts:[],drivers:[],vehicles:[],repayment_schedules:[],payments:[],payment_allocations:[],lolc_deposits:[],lolc_deposit_items:[],finance_events:[],araka_attempts:[]});
+ Object.assign(tables,{equipment_quotes:[],lolc_case_payments:[],contracts:[],drivers:[],vehicles:[],repayment_schedules:[],payments:[],payment_allocations:[],lolc_deposits:[],lolc_deposit_items:[],finance_events:[],araka_attempts:[]});
  staff.role='admin';window.rpcCalls=[];
  async function financeRpc(name,{p}){
   window.rpcCalls.push({name,p:JSON.parse(JSON.stringify(p))});
@@ -31,8 +31,9 @@ function fixture(){
    const id=crypto.randomUUID(),driverId=crypto.randomUUID(),a=tables.applications.find(a=>a.id===p.application_id);
    tables.drivers.push({id:driverId,full_name:a.name,phone:a.phone});
    tables.vehicles.push({id:1,model:p.model,plate:p.plate,vin:p.vin,tracker_id:p.tracker_id});
-   tables.contracts.push({...p,id,driver_id:driverId,vehicle_id:1,status:'active',contract_type:a.program_type});
-   tables.repayment_schedules.push({id:1,contract_id:id,due_on:p.first_payment_date,lolc_due:p.daily_lolc,gml_due:p.daily_gml});
+   const schedule=[];for(let d=new Date(p.first_payment_date+'T12:00:00Z');d<=new Date(p.end_date+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+1)){const day=d.toISOString().slice(0,10);if(p.operating_days.includes(d.getUTCDay()||7)&&!p.excluded_dates.includes(day))schedule.push({id:tables.repayment_schedules.length+schedule.length+1,contract_id:id,due_on:day,lolc_due:p.daily_lolc,gml_due:p.daily_gml});}
+   tables.contracts.push({...p,id,driver_id:driverId,vehicle_id:1,status:'active',contract_type:a.program_type,signed_reference:'GMF-CTR-2026-'+String(tables.contracts.length+1).padStart(6,'0'),repayment_count:schedule.length,repayment_lolc_total:schedule.length*Number(p.daily_lolc),repayment_gml_total:schedule.length*Number(p.daily_gml),repayment_total:schedule.length*(Number(p.daily_lolc)+Number(p.daily_gml)),vehicle_snapshot:{model:p.model,plate:p.plate,vin:p.vin,tracker_id:p.tracker_id,equipment:a.preparation?.equipment||{}}});
+   tables.repayment_schedules.push(...schedule);
    return {data:id,error:null};
   }
   if(name==='confirm_cash_payment'){
@@ -121,7 +122,7 @@ function fixture(){
   await page.locator('nav').getByRole('button',{name:/Contrats & véhicules/}).click();
   await page.getByRole('button',{name:'＋ Activer un contrat'}).click();
   const day=new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Kinshasa',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-  for(const [k,v] of Object.entries({signed_reference:'UI-CONTRACT-01',model:'Toyota Vitz',plate:'UI 001',vin:'UI-VIN-001',tracker_id:'UI-TRACK-001',end_date:day,daily_lolc:'20',daily_gml:'5'}))await page.locator('#activateForm [name="'+k+'"]').fill(v);
+  for(const [k,v] of Object.entries({model:'Toyota Vitz',plate:'UI 001',vin:'UI-VIN-001',tracker_id:'UI-TRACK-001',end_date:day,daily_lolc:'20',daily_gml:'5'}))await page.locator('#activateForm [name="'+k+'"]').fill(v);
   await page.locator('#activateForm [name="operating_days"]').check({force:true}).catch(async()=>{for(const box of await page.locator('#activateForm [name="operating_days"]').all())await box.check();});
   await page.locator('#activateForm input[type="checkbox"][required]').check();
   await page.getByRole('button',{name:'Activer le contrat et générer les échéances'}).click();
@@ -130,7 +131,7 @@ function fixture(){
   assert.equal(await page.evaluate(()=>window.rpcCalls[0].p.daily_gml),'5');
   const exportWait=page.waitForEvent('download');await page.getByRole('button',{name:'Exporter les contrats (CSV)'}).click();const exported=await exportWait;
   assert.match(exported.suggestedFilename(),/^GMFleet-chauffeurs-contrats-.*\.csv$/);const csv=fs.readFileSync(await exported.path(),'utf8');
-  assert.equal(csv.charCodeAt(0),0xFEFF);assert.ok(csv.includes('"UI-CONTRACT-01"'));assert.ok(csv.includes('"20.00";"5.00";"25.00"'));assert.ok(csv.includes('"Téléphone"'));assert.equal(csv.trim().split('\r\n').length,2);
+  assert.equal(csv.charCodeAt(0),0xFEFF);assert.ok(csv.includes('"GMF-CTR-2026-000001"'));assert.ok(csv.includes('"20.00";"5.00";"25.00"'));assert.ok(csv.includes('"Téléphone"'));assert.equal(csv.trim().split('\r\n').length,2);
   await page.evaluate(()=>{window.fixtureTables.drivers[0].full_name='=1+1;"Test"';});await page.locator('#refresh').click();
   const safeWait=page.waitForEvent('download');await page.getByRole('button',{name:'Exporter les contrats (CSV)'}).click();const safe=fs.readFileSync(await (await safeWait).path(),'utf8');assert.ok(safe.includes(`"'=1+1;""Test"""`));
 
