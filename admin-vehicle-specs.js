@@ -1,8 +1,9 @@
 (() => {
  'use strict';
- let selected='Swift',generation=0;
+ let selected=null,generation=0;
  async function render(ctx){
   const token=++generation,{db,escape:e,user,staff,notify}=ctx,content=document.getElementById('content');
+  if(!content.querySelector('#modelSpecsForm'))selected=null;
   const active=()=>token===generation&&ctx.isCurrent();
   if(!staff.some(s=>s.user_id===user.id&&s.active&&['admin','super_admin'].includes(s.role))){content.innerHTML='<p class="section-note">La modification des fiches est réservée aux administrateurs.</p>';return;}
   content.innerHTML='<p>Chargement des caractéristiques…</p>';
