@@ -1,26 +1,10 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
+import { sendTrackedSMS } from "../_shared/sms.ts";
 const origin='https://gmfleet.georgemichaellogistics.cd';
 const headers={'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type','Access-Control-Allow-Methods':'POST, OPTIONS','Content-Type':'application/json','Cache-Control':'no-store'};
 const reply=(status:number,data:unknown)=>new Response(JSON.stringify(data),{status,headers});
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-async function deliver(notification:{recipient:string;body:string}):Promise<{status:string;error?:string;messageId?:string}>{
- const username=Deno.env.get('AFRICASTALKING_USERNAME'),apiKey=Deno.env.get('AFRICASTALKING_API_KEY'),sender=Deno.env.get('AFRICASTALKING_SENDER_ID');
- if(!username||!apiKey)return {status:'not_configured',error:'Service SMS non configure'};
- const form=new URLSearchParams({username,to:notification.recipient,message:notification.body,enqueue:'true'});
- if(sender)form.set('from',sender);
- try{
-  const endpoint=username==='sandbox'?'https://api.sandbox.africastalking.com/version1/messaging':'https://api.africastalking.com/version1/messaging';
-  const response=await fetch(endpoint,{method:'POST',headers:{apiKey,'Content-Type':'application/x-www-form-urlencoded',Accept:'application/json'},body:form,signal:AbortSignal.timeout(15000)});
-  if(!response.ok)return {status:response.status>=500?'unknown':'failed',error:'Service SMS HTTP '+response.status};
-  const body=await response.json(),recipients=body?.SMSMessageData?.Recipients;
-  if(!Array.isArray(recipients)||recipients.length!==1)return {status:'unknown',error:'Reponse du service SMS a verifier'};
-  const result=recipients[0];
-  if(result.status==='Success'&&Number(result.statusCode)===101&&typeof result.messageId==='string')return {status:'sent',messageId:result.messageId};
-  if([100,102].includes(Number(result.statusCode)))return {status:'unknown',messageId:typeof result.messageId==='string'?result.messageId:undefined,error:'SMS accepté par le service ('+String(result.statusCode)+'), réception non confirmée. Vérifiez le rapport de livraison avant de renvoyer.'};
-  return {status:'failed',error:'SMS refuse par le service ('+String(result.statusCode||'inconnu')+')'};
- }catch{return {status:'unknown',error:'Envoi SMS a verifier avant toute nouvelle tentative'};}
-}
 
 Deno.serve(async req=>{
  if(req.method==='OPTIONS')return new Response('ok',{headers});
@@ -47,15 +31,10 @@ Deno.serve(async req=>{
    if(error)return reply(409,{error:error.message});confirmation=data;
   }
   const service=createClient(url,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,{auth:{persistSession:false,autoRefreshToken:false}});
-  const {data:claimed,error:claimError}=await service.rpc('claim_appointment_sms',{notification_id:confirmation.notification_id});
-  if(claimError)return reply(200,{success:true,...confirmation,sms_status:'pending',sms_error:'Rendez-vous enregistre. Envoi SMS a reprendre.'});
-  if(!claimed){
-   const {data:n}=await caller.from('operations_notifications').select('delivery_status').eq('id',confirmation.notification_id).maybeSingle();
-   return reply(200,{success:true,...confirmation,sms_status:n?.delivery_status||confirmation.sms_status});
-  }
-  const result=await deliver(claimed);
-  const {error:saveError}=await service.from('operations_notifications').update({delivery_status:result.status,sent_at:result.status==='sent'?new Date().toISOString():null,provider_message_id:result.messageId||null,delivery_error:result.error||null}).eq('id',confirmation.notification_id).eq('delivery_status','sending');
-  if(saveError)return reply(200,{success:true,...confirmation,sms_status:result.status==='sent'?'sent':'unknown',sms_error:'Etat SMS a verifier. Ne confirmez pas un second rendez-vous.'});
+  const {data:n,error:nError}=await service.from('operations_notifications').select('id,recipient,body,application_id,appointment_id,delivery_status').eq('id',confirmation.notification_id).single();
+  if(nError||!n)return reply(200,{success:true,...confirmation,sms_status:'pending',sms_error:'Rendez-vous enregistré. Envoi SMS à reprendre.'});
+  if(['accepted','sent','delivered','unknown','sending'].includes(n.delivery_status))return reply(200,{success:true,...confirmation,sms_status:n.delivery_status});
+  const result=await sendTrackedSMS(service,{event_key:'notification:'+n.id,kind:'appointment',recipient:n.recipient,body:n.body,application_id:n.application_id,appointment_id:n.appointment_id,notification_id:n.id,retry:!!p.appointment_id},n.body);
   return reply(200,{success:true,...confirmation,sms_status:result.status,sms_error:result.error||null});
  }catch{return reply(500,{error:'Confirmation interrompue. Reessayez sans modifier les informations.'});}
 });

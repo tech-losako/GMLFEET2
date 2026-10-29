@@ -1,10 +1,10 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
-const source=fs.readFileSync('supabase/functions/submit-application/index.ts','utf8').replace(/^import .*;\r?\n/,'').replace(/:\s*(?:number|string|unknown|BufferSource|Uint8Array\[\]|Uint8Array|Record<string,unknown>)/g,'').replaceAll(/Deno\.env\.get\(([^)]+)\)!/g,'Deno.env.get($1)');
+const source=require('./sms-source.cjs').load('submit-application');
 const png=new Uint8Array([137,80,78,71,13,10,26,10,1,2,3]);
 async function run({files=[{data:png,name:'photo.png',type:'image/png'}],storageFail=false,completed=false,duplicate=false,completeFail=false}={}){
  let handler,uploads=[],reserved,finalized=0;
  const client={rpc:async(name,args)=>{if(name==='reserve_public_submission'){reserved=args.p;return {data:{application_id:77,completed}};}finalized++;return {error:completeFail?{message:'DB failed'}:null};},storage:{from:bucket=>({upload:async(path,bytes,options)=>{uploads.push({bucket,path,bytes,options});return {error:storageFail?{statusCode:503}:duplicate?{statusCode:409}:null};}})}};
- vm.runInNewContext(source,{Deno:{env:{get:n=>n.startsWith('AFRICASTALKING_')?undefined:n},serve:f=>handler=f},Response,Blob,File,Uint8Array,TextDecoder,TextEncoder,crypto,createClient:()=>client,console});
+ vm.runInNewContext(source,{AbortSignal,URLSearchParams,crypto,TextEncoder,Uint8Array,Deno:{env:{get:n=>n.startsWith('AFRICASTALKING_')?undefined:n},serve:f=>handler=f},Response,Blob,File,Uint8Array,TextDecoder,TextEncoder,crypto,createClient:()=>client,console});
  const form=new FormData();form.set('request_id','11111111-1111-4111-8111-111111111111');form.set('application',JSON.stringify({name:'Candidate',phone:'+243810000000',vehicle:'Toyota',workflow_stage:'approved',assigned_to:'attacker',note:'injected'}));for(const f of files)form.append('files',new File([f.data],f.name,{type:f.type}));
  const response=await handler(new Request('https://test',{method:'POST',body:form}));return {status:response.status,data:await response.json(),uploads,reserved,finalized};
 }

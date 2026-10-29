@@ -119,7 +119,7 @@
   activeAppointments.forEach(p=>{
    const card=sections[3].querySelector(`[data-appointment-card="${CSS.escape(String(p.id))}"]`);if(!card)return;
    const notification=(c.notifications||[]).find(n=>n.appointment_id===p.id&&n.kind==='appointment');
-   const smsStatus=notification?.delivery_status||'pending',smsLabels={sent:'SMS transmis à l’opérateur (réception non confirmée)',pending:'SMS non envoyé',failed:'Échec de l’envoi SMS',not_configured:'Service SMS indisponible',sending:'Envoi SMS en cours / à vérifier',unknown:'Envoi SMS à vérifier'};
+   const smsStatus=notification?.delivery_status||'pending',smsLabels={accepted:'SMS accepté par le service · livraison attendue',delivered:'SMS livré au téléphone',cancelled:'SMS annulé',sent:'SMS transmis à l’opérateur (réception non confirmée)',pending:'SMS non envoyé',failed:'Échec de l’envoi SMS',not_configured:'Service SMS indisponible',sending:'Envoi SMS en cours / à vérifier',unknown:'Envoi SMS à vérifier'};
    card.insertAdjacentHTML('beforeend',`<div class="appointment-sms-state" data-sms-state="${e(smsStatus)}"><span>${e(smsLabels[smsStatus]||smsLabels.pending)}</span>${notification?.delivery_error?`<small>${e(notification.delivery_error)}</small>`:''}${['pending','failed','not_configured'].includes(smsStatus)?`<button type="button" class="secondary" data-retry-appointment-sms="${e(p.id)}"><i data-lucide="send" aria-hidden="true"></i>Envoyer le SMS</button>`:''}</div>`);
   });
   body.querySelectorAll('[data-retry-appointment-sms]').forEach(button=>button.onclick=async()=>{
@@ -127,7 +127,7 @@
    try{
     const result=await db.functions.invoke('schedule-appointment',{body:{appointment_id:button.dataset.retryAppointmentSms}});
     if(result.error||!result.data?.success)throw new Error('Envoi interrompu. Réessayez.');
-    if(result.data.sms_status==='sent'&&!result.data.sms_error){document.getElementById('caseDialog').close();await c.reload();notify('Rendez-vous fixé. SMS envoyé au candidat.');}
+    if(['sent','accepted','delivered'].includes(result.data.sms_status)&&!result.data.sms_error){document.getElementById('caseDialog').close();await c.reload();notify('Rendez-vous fixé. '+(result.data.sms_status==='delivered'?'SMS livré.':'SMS transmis au service ; livraison à confirmer.'));}
     else{await refreshCase(a.id);notify(result.data.sms_error||'Vérifiez l’état du SMS avant de réessayer.',true);}
    }catch(error){notify(error.message,true);}finally{button.disabled=false;}
   });

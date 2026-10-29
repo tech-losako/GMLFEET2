@@ -59,7 +59,7 @@ window.GMFleetRequestReceipt = (() => {
   const host=container.matches('dialog')?container:container.querySelector('.relative')||container;
   host.querySelector('.request-confirmation')?.remove();
   const panel=document.createElement('div');panel.className='request-confirmation';
-  const sms=data.smsStatus==='sent'?'Un SMS de confirmation a été envoyé au numéro indiqué.':'Votre demande est enregistrée. Conservez ce récépissé.';
+  const sms=data.smsStatus==='delivered'?'Le SMS de confirmation a été livré au numéro indiqué.':['sent','accepted'].includes(data.smsStatus)?'Le SMS a été transmis au service. Sa réception dépend de l’opérateur.':'Votre demande est enregistrée. Conservez ce récépissé même si le SMS tarde à arriver.';
   panel.innerHTML='<strong>Référence : '+clean(data.reference)+'</strong><p>'+sms+'</p><button type="button" class="pub-button primary">Télécharger mon récépissé PDF</button>';
   panel.querySelector('button').onclick=()=>download(data);
   const anchor=host.querySelector('a[href],.equipment-quote-close');

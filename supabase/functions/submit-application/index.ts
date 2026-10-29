@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
+import { sendTrackedSMS } from "../_shared/sms.ts";
 const headers={'Access-Control-Allow-Origin':'https://gmfleet.georgemichaellogistics.cd','Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type','Access-Control-Allow-Methods':'POST, OPTIONS','Content-Type':'application/json','Cache-Control':'no-store'};
 const reply=(status:number,data:unknown)=>new Response(JSON.stringify(data),{status,headers});
 const digest=async(bytes:BufferSource)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(b=>b.toString(16).padStart(2,'0')).join('');
@@ -7,34 +8,27 @@ const reference=(id:number,service:unknown,stamp=new Date())=>{
  return prefix+'-'+stamp.getUTCFullYear()+'-'+String(id).padStart(6,'0');
 };
 let firebaseTokenCache=null;
-async function sendSms(to,message,logPrefix){
- const username=Deno.env.get('AFRICASTALKING_USERNAME'),apiKey=Deno.env.get('AFRICASTALKING_API_KEY'),senderId=Deno.env.get('AFRICASTALKING_SENDER_ID');
- if(!username||!apiKey)return 'not_configured';
- try{
-  const form=new URLSearchParams({username,to,message,enqueue:'true'});
-  if(senderId)form.set('from',senderId);
-  const endpoint=username==='sandbox'?'https://api.sandbox.africastalking.com/version1/messaging':'https://api.africastalking.com/version1/messaging';
-  const response=await fetch(endpoint,{method:'POST',headers:{apiKey,'Content-Type':'application/x-www-form-urlencoded','Accept':'application/json'},body:form});
-  if(!response.ok)throw new Error(`Africa's Talking HTTP ${response.status}`);
-  return 'sent';
- }catch(error){console.error(logPrefix+' SMS failed',error);return 'failed';}
+async function sendSms(client,to,message,eventKey,kind){
+ const result=await sendTrackedSMS(client,{event_key:eventKey,kind,recipient:to},message);
+ return result.status;
 }
-async function sendConfirmationSms(phone:string,requestReference:string){
- return sendSms(phone,`GM Fleet : demande ${requestReference} reçue. Notre équipe l'examine et vous appellera dès que le traitement sera terminé. Conservez votre récépissé.`,'Application confirmation');
+async function sendConfirmationSms(client,phone:string,requestReference:string,eventKey:string){
+ return sendSms(client,phone,`GM Fleet : demande ${requestReference} reçue. Notre équipe l'examine et vous appellera dès que le traitement sera terminé. Conservez votre récépissé.`,eventKey,'application_received');
 }
 async function adminStaff(client){
- const {data,error}=await client.from('staff_members').select('user_id,phone').eq('active',true).in('role',['super_admin','admin']);
+ const {data,error}=await client.from('staff_members').select('user_id,phone').eq('active',true).is('deleted_at',null).in('role',['super_admin','admin']);
  if(error)throw error;
  return data||[];
 }
-async function sendAdminSms(client,message){
+async function sendAdminSms(client,message,eventKey){
  if(!Deno.env.get('AFRICASTALKING_USERNAME')||!Deno.env.get('AFRICASTALKING_API_KEY'))return 'not_configured';
  try{
   const recipients=(await adminStaff(client)).map(row=>row.phone).filter(Boolean);
+  const unique=[...new Set(recipients)];
   if(!recipients.length)return 'no_recipients';
   let sent=0,failed=0;
-  for(const phone of recipients){const status=await sendSms(phone,message,'Admin alert');if(status==='sent')sent++;else failed++;}
-  return sent&&failed?'partial':sent?'sent':'failed';
+  for(const phone of unique){const status=await sendSms(client,phone,message,eventKey+':admin:'+phone,'admin_intake');if(['sent','accepted','delivered'].includes(status))sent++;else failed++;}
+  return sent&&failed?'partial':sent?'accepted':'failed';
  }catch(error){console.error('Admin SMS lookup failed',error);return 'failed';}
 }
 const encodeBase64Url=value=>btoa(String.fromCharCode(...new Uint8Array(value))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
@@ -75,7 +69,7 @@ async function sendAdminPush(client,title,body,data){
    const response=await fetch(`https://fcm.googleapis.com/v1/projects/${encodeURIComponent(projectId)}/messages:send`,{method:'POST',headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},body:JSON.stringify({message:{token:row.token,notification:{title,body},data,webpush:{fcm_options:{link:data.url||'https://gmfleet.georgemichaellogistics.cd/admin.html'}}}})});
    if(response.ok)sent++;else{failed++;console.error('Firebase push failed',response.status,await response.text());}
   }
-  return sent&&failed?'partial':sent?'sent':'failed';
+  return sent&&failed?'partial':sent?'accepted':'failed';
  }catch(error){console.error('Firebase push failed',error);return 'failed';}
 }
 function fileType(b:Uint8Array){
@@ -136,10 +130,10 @@ Deno.serve(async req=>{
    if(/Le tarif a changé|seul plan proposé|modèle du catalogue/.test(completeError.message||''))return reply(409,{error:completeError.message});
    return reply(503,{error:'Enregistrement interrompu. Réessayez pour terminer la demande.'});
   }
-  const requestReference=reference(reservation.application_id,app.service,submittedAt),smsStatus=await sendConfirmationSms(String(app.phone),requestReference);
+  const requestReference=reference(reservation.application_id,app.service,submittedAt),smsStatus=await sendConfirmationSms(serviceClient,String(app.phone),requestReference,'application:'+reservation.application_id+':received');
   const adminBody=`Nouvelle candidature ${requestReference} : ${app.name} (${app.vehicle||app.service||'demande'}). Ouvrez l'espace opérations.`;
-  const adminSmsStatus=await sendAdminSms(serviceClient,'GM Fleet admin : '+adminBody);
-  const adminPushStatus=await sendAdminPush(serviceClient,'Nouvelle candidature GM Fleet',adminBody,{type:'application',application_id:String(reservation.application_id),reference:requestReference,url:'https://gmfleet.georgemichaellogistics.cd/admin.html'});
+  const adminSmsStatus=await sendAdminSms(serviceClient,'GM Fleet admin : '+adminBody,'application:'+reservation.application_id);
+  const adminPushStatus=await sendAdminPush(serviceClient,'Nouvelle candidature GM Fleet','Une nouvelle candidature est disponible dans les opérations.',{type:'application',url:'https://gmfleet.georgemichaellogistics.cd/admin.html'});
   return reply(200,{success:true,application_id:reservation.application_id,reference:requestReference,submitted_at:submittedAt.toISOString(),sms_status:smsStatus,admin_sms_status:adminSmsStatus,admin_push_status:adminPushStatus});
  }catch(error){return reply(400,{error:error instanceof Error?error.message:'Formulaire invalide'});}
 });

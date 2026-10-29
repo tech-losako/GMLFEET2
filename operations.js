@@ -58,6 +58,7 @@
    rows('staff_members',q=>q.order('display_name').order('user_id')),rows('operations_notifications',q=>q.order('created_at',{ascending:false}).order('id')),rows('equipment_quotes',q=>q.order('created_at',{ascending:false}).order('id'))]);
   const staff=staffDirectory.filter(s=>s.active&&!s.deleted_at);
   Object.assign(state,{apps,appointments,staff,staffDirectory,notifications,quotes});
+  $('smsNav').hidden=!staff.some(s=>s.user_id===state.user.id&&['admin','super_admin'].includes(s.role));
   $('usersNav').hidden=!staff.some(s=>s.user_id===state.user.id&&s.role==='super_admin');
   $('modelSpecsNav').hidden=!staff.some(s=>s.user_id===state.user.id&&['admin','super_admin'].includes(s.role));
   $('navCount').textContent=apps.filter(a=>workflow.review(a)==='pending').length+quotes.filter(q=>q.status==='new').length;
@@ -72,10 +73,11 @@
   if(state.view!=='overview')window.GMFleetDashboard.cancel();
   document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===state.view));
   $('newApplication').textContent=state.view==='appointments'?'＋ Programmer un rendez-vous':'＋ Nouvelle candidature';
-  $('pageTitle').textContent={overview:'Tableau de bord',applications:'Candidatures',appointments:'Rendez-vous',contracts:'Contrats & véhicules',payments:'Caisse / versements',reconciliation:'Bilan',users:'Utilisateurs',preparation:'Préparation & remises',fleet:'Flotte & partenaires',modelSpecs:'Véhicules & tarifs'}[state.view];
-  document.getElementById('newApplication').hidden=['users','contracts','payments','reconciliation','preparation','fleet','modelSpecs'].includes(state.view);
+  $('pageTitle').textContent={overview:'Tableau de bord',applications:'Candidatures',appointments:'Rendez-vous',contracts:'Contrats & véhicules',payments:'Caisse / versements',reconciliation:'Bilan',users:'Utilisateurs',sms:'SMS & notifications',preparation:'Préparation & remises',fleet:'Flotte & partenaires',modelSpecs:'Véhicules & tarifs'}[state.view];
+  document.getElementById('newApplication').hidden=['sms','users','contracts','payments','reconciliation','preparation','fleet','modelSpecs'].includes(state.view);
   if(['contracts','payments','reconciliation'].includes(state.view)) { const rendering=window.GMFleetFinance.render(state.view,{db,escape,date,person,notify,rows,staff:state.staff,user:state.user,apps:state.apps,openContract:state.dashboardContract});state.dashboardContract=null; return rendering; }
   if(state.view==='modelSpecs')return window.GMFleetModelAdmin.render({db,escape,notify,user:state.user,staff:state.staff,isCurrent:()=>state.view==='modelSpecs'});
+  if(state.view==='sms')return window.GMFleetSMS.render({db,rows,escape,date,staff:state.staff,user:state.user,isCurrent:()=>state.view==='sms'});
   if(state.view==='users') {window.GMFleetUsers.render({db,escape,notify,staff:state.staff,user:state.user});return;}
   if(state.view==='overview') return renderOverview();
   else if(state.view==='applications') renderApplications();
@@ -90,7 +92,7 @@
   }
   if(state.view==='overview'){
    const failed=(state.notifications||[]).filter(n=>['failed','not_configured','unknown'].includes(n.delivery_status));
-   if(failed.length)$('content').insertAdjacentHTML('afterbegin',`<details class="card"><summary>Notifications à vérifier · ${failed.length}</summary>${failed.map(n=>{const a=state.apps.find(a=>a.id===n.application_id);return `<div class="row"><div>${a?link(a):'Notification SMS'}<small>${escape(n.error_message||n.last_error||'Échec de livraison SMS — ouvrir le dossier pour réessayer.')}</small></div></div>`;}).join('')}</details>`);
+   if(failed.length)$('content').insertAdjacentHTML('afterbegin',`<details class="card"><summary>Notifications à vérifier · ${failed.length}</summary>${failed.map(n=>{const a=state.apps.find(a=>a.id===n.application_id);return `<div class="row"><div>${a?link(a):'Notification SMS'}<small>${escape(n.delivery_error||n.error_message||n.last_error||'Livraison non confirmée. Consultez SMS & notifications avant de renvoyer.')}</small></div></div>`;}).join('')}</details>`);
    if(state.smsAlert)notify(state.smsAlert,true);
   }
   if(state.view==='overview'){const host=document.createElement('section');$('content').append(host);window.GMFleetLolcFinance.overview(host,{db,rows,apps:state.apps,escape,isCurrent:()=>state.view==='overview'});}
@@ -229,7 +231,7 @@ const selectedProgram=state.preparationProgram||'';
    if(result.error){let message='Confirmation interrompue. Réessayez sans modifier les informations.';try{message=(await result.error.context.json()).error||message;}catch{}throw new Error(message);}
    if(!result.data?.success)throw new Error(result.data?.error||'Confirmation interrompue. Réessayez.');
    state.appointmentRequest=null;
-   if(result.data.sms_status==='sent'&&!result.data.sms_error){$('caseDialog').close();await reload();notify('Rendez-vous fixé. SMS envoyé au candidat.');}
+   if(['sent','accepted','delivered'].includes(result.data.sms_status)&&!result.data.sms_error){$('caseDialog').close();await reload();notify('Rendez-vous fixé. '+(result.data.sms_status==='delivered'?'SMS livré.':'SMS transmis au service ; livraison à confirmer.'));}
    else{await refreshCase(a.id);notify(result.data.sms_error||'Rendez-vous fixé. Vérifiez l’état du SMS avant de fermer.',true);}
   });
   $('caseBody').querySelectorAll('[data-appointment]').forEach(select=>select.addEventListener('change',async()=>{
