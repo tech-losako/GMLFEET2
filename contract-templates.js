@@ -1,33 +1,39 @@
 /* Supplied contract clauses. No applicant data is stored in this file. */
 window.GMFleetContractTemplates = {
  "PARTNER_DRIVER": {
-  "title": "Contrat de partenariat chauffeur et de mise à disposition d’un véhicule",
-  "version": "2026-10-23-v1",
-  "source": "Contrat_Partenariat_Chauffeur_GM_Fleet_v1 (2).pdf",
-  "sha256": "e87a7bc327ee3dfd05e248e7163614b5f9bc4a5cb49e4cc5ed0b855d792c8221",
+  "title": "Contrat de prestataire de service du chauffeur et de mise à disposition d’un véhicule",
+  "version": "2026-10-29-v4",
+  "source": "Contrat_Prestation_de_service_du_Chauffeur_GM_Fleet_v4.pdf",
+  "sha256": "e87e435ce2827bffc47ef12646c3fdf1e6938ccd264ff4c99f8520669f219fb3",
+  "notice": "Projet contractuel à soumettre à la validation du conseil juridique de GML avant mise en production ou signature.",
   "sections": [
    {
     "title": "ARTICLE 1 — Objet",
     "paragraphs": [
-     "Le présent contrat définit les conditions selon lesquelles GML intègre le Chauffeur-Partenaire dans son réseau GM Fleet et peut lui confier un véhicule appartenant à GML, à un propriétaire partenaire ou à tout véhicule légalement placé sous la gestion de GML, afin de l'exploiter dans le cadre des activités de transport via les plateformes partenaires, notamment Yango. L'affectation d'un véhicule est personnelle, temporaire et révocable. Elle ne confère au Chauffeur aucun droit de propriété sur le véhicule."
+     "Le présent contrat définit les conditions selon lesquelles GML intègre le Chauffeur-Partenaire dans son réseau GM Fleet et peut lui confier un véhicule appartenant à GML, à un propriétaire partenaire ou à tout véhicule légalement placé sous la gestion de GML, afin de l'exploiter dans le cadre des activités de transport via les plateformes partenaires, notamment Yango.",
+     "L'affectation d'un véhicule est personnelle, temporaire et révocable. Elle ne confère au Chauffeur aucun droit de propriété sur le véhicule."
     ]
    },
    {
     "title": "ARTICLE 2 — Statut du Chauffeur-Partenaire",
     "paragraphs": [
-     "Les parties entendent organiser leur relation comme un partenariat indépendant et non comme un contrat de travail. Le Chauffeur organise ses revenus à partir de l'activité autorisée dans le cadre GM Fleet et conserve, après respect de ses obligations envers GML, la part des recettes qui lui revient. Cette qualification demeure soumise aux dispositions impératives du droit congolais applicables. Aucune disposition du présent contrat ne peut avoir pour effet d'écarter une règle légale impérative."
+     "Les parties entendent organiser leur relation comme un partenariat indépendant et non comme un contrat de travail. Le Chauffeur organise ses revenus à partir de l'activité autorisée dans le cadre GM Fleet et conserve, après respect de ses obligations envers GML, la part des recettes qui lui revient.",
+     "Cette qualification demeure soumise aux dispositions impératives du droit congolais applicables. Aucune disposition du présent contrat ne peut avoir pour effet d'écarter une règle légale impérative.",
+     "En conséquence, GML n'a pas la qualité d'employeur du Chauffeur et ne répond pas des actes personnels de celui-ci, notamment de sa conduite, dans les limites des dispositions légales impératives applicables."
     ]
    },
    {
     "title": "ARTICLE 3 — Processus d'intégration",
     "paragraphs": [
-     "Création du profil chauffeur dans l'écosystème GML ; Dépôt des documents d'identité, permis de conduire et autres pièces demandées ; Vérification KYC et contrôle des références ou antécédents pertinents ; Entretien, évaluation de conduite et validation opérationnelle ; Acceptation du présent contrat et des règles GM Fleet ; Enregistrement ou rattachement du Chauffeur à la flotte Yangode GML, lorsque requis ; Affectation éventuelle d'un véhicule et établissement d'un état de remise. La signature du présent contrat ne garantit ni l'acceptation définitive du Chauffeur, ni l'affectation immédiate ou permanente d'un véhicule."
+     "- Création du profil chauffeur dans l'écosystème GML ; - Dépôt des documents d'identité, permis de conduire et autres pièces demandées ; - Vérification KYC et contrôle des références ou antécédents pertinents ; - Entretien, évaluation de conduite et validation opérationnelle ; - Acceptation du présent contrat et des règles GM Fleet ; - Enregistrement ou rattachement du Chauffeur à la flotte Yangode GML, lorsque requis ; Affectation éventuelle d'un véhicule et établissement d'un état de remise.",
+     "Le présent contrat ne saurait, en aucun cas être interprété, ou qualifié de contrat de travail ; il constitue un contrat de prestation de services."
     ]
    },
    {
     "title": "ARTICLE 4 — Affectation et remise du véhicule",
     "paragraphs": [
-     "Tout véhicule confié au Chauffeur fait l'objet d'un enregistrement dans les systèmes GML. Lors de la remise, GML peut établir un état du véhicule comprenant notamment son kilométrage, son état extérieur et intérieur, ses documents, accessoires, équipements de sécurité et équipements technologiques. Le Chauffeur reconnaît recevoir le véhicule uniquement pour l'activité autorisée par GML. GML peut remplacer, retirer ou réaffecter le véhicule lorsque les nécessités opérationnelles, techniques, contractuelles ou de sécurité l'exigent."
+     "Tout véhicule confié au Chauffeur fait l'objet d'un enregistrement dans les systèmes GML. Lors de la remise, GML peut établir un état du véhicule comprenant notamment son kilométrage, son état extérieur et intérieur, ses documents, accessoires, équipements de sécurité et équipements technologiques.",
+     "Le Chauffeur reconnaît recevoir le véhicule uniquement pour l'activité autorisée par GML. GML peut remplacer, retirer ou réaffecter le véhicule lorsque les nécessités opérationnelles, techniques, contractuelles ou de sécurité l'exigent."
     ]
    },
    {
@@ -39,55 +45,76 @@ window.GMFleetContractTemplates = {
    {
     "title": "ARTICLE 6 — Règles d'activité et plages opérationnelles",
     "paragraphs": [
-     "Le Chauffeur s'engage à respecter les plages d'activité, jours de service et objectifs opérationnels communiqués dans l'application ou dans la grille opérationnelle GM Fleet applicable à son programme. À titre de référence opérationnelle du programme actuel, les plages autorisées sont généralement comprises entre 06h00 et 21h00, avec une heure de pause, sur les jours de service définis par GML. Les obligations financières du programme sont calculées sur vingt-deux (22) jours d'activité par mois, sauf grille ou affectation particulière communiquée au Chauffeur. Les heures d'activité correspondent notamment aux périodes durant lesquelles le Chauffeur est effectivement disponible ou connecté sur la plateforme partenaire selon les règles GM Fleet."
+     "Le Chauffeur s'engage à respecter les plages d'activité, jours de service et objectifs opérationnels communiqués dans l'application ou dans la grille opérationnelle GM Fleet applicable à son programme.",
+     "À titre de référence opérationnelle du programme actuel, les plages autorisées sont généralement comprises entre 06h00 et 21h00, avec une heure de pause, sur les jours de service définis par GML.",
+     "Les obligations financières du programme sont calculées sur vingt-deux (22) jours d'activité par mois, sauf grille ou affectation particulière communiquée au Chauffeur.",
+     "Les heures d'activité correspondent notamment aux périodes durant lesquelles le Chauffeur est effectivement disponible ou connecté sur la plateforme partenaire selon les règles GM Fleet."
     ]
    },
    {
     "title": "ARTICLE 7 — Versement journalier et revenus du Chauffeur",
     "paragraphs": [
-     "Pour le programme standard de gestion de flotte, le Chauffeur effectue un versement de trente-et-un dollars américains (31 USD) par jour d'activité comptabilisé, pendant vingt-deux (22) jours par mois, sauf tarif différent expressément indiqué dans la grille applicable au véhicule ou au programme. Le Chauffeur conserve les recettes réalisées au-delà du versement dû et des autres sommes légalement ou contractuellement exigibles. Les jours non comptabilisés dans les vingt-deux (22) jours de versement constituent des jours sans versement standard à GML, sous réserve du respect des règles d'utilisation du véhicule et du planning communiqué. Les modalités de collecte, de paiement et de règlement peuvent être effectuées dans l'application GML, par Mobile Money ou par tout autre canal approuvé par GML."
+     "Pour le programme standard de gestion de flotte, le Chauffeur effectue un versement de trente-et-un dollars américains (31 USD) par jour d'activité comptabilisé, pendant vingt-deux (22) jours par mois, sauf tarif différent expressément indiqué dans la grille applicable au véhicule ou au programme.",
+     "Le Chauffeur conserve les recettes réalisées au-delà du versement dû et des autres sommes légalement ou contractuellement exigibles. Les jours non comptabilisés dans les vingt-deux (22) jours de versement constituent des jours sans versement standard à GML, sous réserve du respect des règles d'utilisation du véhicule et du planning communiqué.",
+     "Les modalités de collecte, de paiement et de règlement peuvent être effectuées dans l'application GML, par Mobile Money ou par tout autre canal approuvé par GML.",
+     "Jour non versé ou versement incomplet. Lorsqu'un versement journalier n'est pas effectué, ou ne l'est que partiellement, pour une cause autre qu'une maladie dûment justifiée ou un problème du véhicule non imputable au Chauffeur, le sixième (6e) jour de la semaine, normalement réservé au Chauffeur, devient un jour d'activité au profit de GML. Le Chauffeur est alors tenu d'exercer son activité ce jour-là et de verser le montant manquant de trente-et-un dollars américains (31 USD) ou le solde impayé. À défaut de régularisation, la somme reste due et est reportée sur les versements suivants.",
+     "Maladie. Le Chauffeur malade en informe GML le jour même et transmet, dans un délai de quarante-huit (48) heures, un certificat médical ou tout autre justificatif accepté par GML. Sur présentation de ce justificatif, le Chauffeur n'est pas tenu de travailler ce jour-là et aucun versement n'est exigé de lui pour cette journée ; le justificatif est communiqué au propriétaire du véhicule conformément au contrat de gestion conclu avec celui- ci. À défaut de justificatif dans ce délai, la journée est traitée comme un jour non versé au sens de l'alinéa précédent.",
+     "Problème du véhicule. Aucun versement n'est dû pour les jours d'immobilisation du véhicule résultant d'une cause non imputable au Chauffeur, et ces jours ne donnent lieu à aucune régularisation, conformément à l'Article 12."
     ]
    },
    {
     "title": "ARTICLE 8 — Utilisation autorisée du véhicule",
     "paragraphs": [
-     "Le véhicule ne peut être conduit que par le Chauffeur autorisé, sauf accord écrit de GML ; Toute course commerciale hors de la plateforme ou du circuit approuvé par GML est interdite lorsque le véhicule est placé sous l'exploitation GM Fleet ; L'utilisation du véhicule en dehors des plages ou conditions autorisées peut faire l'objet d'une alerte, d'une vérification et, en cas d'abus, d'une sanction ; Le Chauffeur ne peut louer, prêter, sous-louer, céder ou mettre le véhicule à disposition d'un tiers ; Toute modification du véhicule ou de ses équipements est interdite sans autorisation préalable de GML."
+     "Le véhicule ne peut être conduit que par le Chauffeur autorisé, sauf accord écrit de GML ; Toute course commerciale hors de la plateforme ou du circuit approuvé par GML est interdite lorsque le véhicule est placé sous l'exploitation GM Fleet ; L'utilisation du véhicule en dehors des plages ou conditions autorisées peut faire l'objet d'une alerte, d'une vérification et, en cas d'abus, d'une sanction ; Le Chauffeur ne peut louer, prêter, sous-louer, céder ou mettre le véhicule à disposition d'un tiers ;",
+     "Toute modification du véhicule ou de ses équipements est interdite sans autorisation préalable de GML."
     ]
    },
    {
     "title": "ARTICLE 9 — Contrôle hebdomadaire du véhicule",
     "paragraphs": [
-     "Le dimanche est réservé, selon le planning GM Fleet, au contrôle périodique du véhicule. Le Chauffeur doit rendre le véhicule disponible à l'heure et au lieu communiqués par GML. Ce contrôle peut porter notamment sur l'état mécanique, les pneumatiques, les niveaux, les éléments de sécurité, la carrosserie, l'habitacle, le kilométrage, les documents et les équipements technologiques. Une activité non autorisée pendant une période réservée au contrôle peut entraîner une mesure disciplinaire ou opérationnelle."
+     "Le dimanche est réservé, selon le planning GM Fleet, au contrôle périodique du véhicule. Le Chauffeur doit rendre le véhicule disponible à l'heure et au lieu communiqués par GML.",
+     "Ce contrôle peut porter notamment sur l'état mécanique, les pneumatiques, les niveaux, les éléments de sécurité, la carrosserie, l'habitacle, le kilométrage, les documents et les équipements technologiques.",
+     "Une activité non autorisée pendant une période réservée au contrôle peut entraîner une mesure disciplinaire ou opérationnelle."
     ]
    },
    {
     "title": "ARTICLE 10 — Tracker, DashCam et supervision",
     "paragraphs": [
-     "Le Chauffeur reconnaît que le véhicule peut être équipé notamment d'un dispositif GPS, d'outils télématiques, d'un système de diagnostic ou de maintenance préventive et d'une DashCam. Ces équipements servent à la sécurité, à la géolocalisation, au suivi des opérations, à la protection du véhicule, à l'analyse des incidents et, selon les capacités installées, au suivi technique du véhicule. Il est strictement interdit de désactiver, masquer, déplacer, débrancher, détériorer ou contourner ces équipements. Toute anomalie constatée doit être signalée immédiatement à GML."
+     "Le Chauffeur reconnaît que le véhicule peut être équipé notamment d'un dispositif GPS, d'outils télématiques, d'un système de diagnostic ou de maintenance préventive et d'une DashCam. Ces équipements servent à la sécurité, à la géolocalisation, au suivi des opérations, à la protection du véhicule, à l'analyse des incidents et, selon les capacités installées, au suivi technique du véhicule.",
+     "Il est strictement interdit de désactiver, masquer, déplacer, débrancher, détériorer ou contourner ces équipements. Toute anomalie constatée doit être signalée immédiatement à GML."
     ]
    },
    {
     "title": "ARTICLE 11 — Entretien courant et obligation de vigilance",
     "paragraphs": [
-     "Le Chauffeur doit utiliser le véhicule avec prudence et en prendre soin comme d'un bien qui lui est confié. Il effectue les vérifications quotidiennes raisonnables et signale sans délai toute alerte, bruit, voyant, panne, accident, détérioration ou comportement inhabituel du véhicule. Lorsqu'un système de maintenance préventive ou un contrôle GML détecte un risque mécanique, GML peut immobiliser temporairement le véhicule afin d'éviter une aggravation de la panne."
+     "Le Chauffeur doit utiliser le véhicule avec prudence et en prendre soin comme d'un bien qui lui est confié. Il effectue les vérifications quotidiennes raisonnables et signale sans délai toute alerte, bruit, voyant, panne, accident, détérioration ou comportement inhabituel du véhicule.",
+     "Lorsqu'un système de maintenance préventive ou un contrôle GML détecte un risque mécanique, GML peut immobiliser temporairement le véhicule afin d'éviter une aggravation de la panne."
     ]
    },
    {
     "title": "ARTICLE 12 — Pannes, réparations et immobilisation",
     "paragraphs": [
-     "En cas de panne ou de problème mécanique non imputable au Chauffeur, GML organise, dans la mesure du possible, le diagnostic et la remise en état du véhicule afin de réduire sa durée d'immobilisation. Le coût d'une réparation qui relève normalement du propriétaire du véhicule est traité conformément au contrat de gestion conclu avec ce propriétaire. Le Chauffeur n'est pas automatiquement responsable d'une panne résultant de l'usure normale ou d'un défaut qui ne lui est pas imputable."
+     "En cas de panne ou de problème mécanique non imputable au Chauffeur, GML organise, dans la mesure du possible, le diagnostic et la remise en état du véhicule afin de réduire sa durée d'immobilisation.",
+     "Le coût d'une réparation qui relève normalement du propriétaire du véhicule est traité conformément au contrat de gestion conclu avec ce propriétaire. Le Chauffeur n'est pas automatiquement responsable d'une panne résultant de l'usure normale ou d'un défaut qui ne lui est pas imputable.",
+     "Les jours d'immobilisation résultant d'une cause non imputable au Chauffeur ne sont pas comptabilisés dans les jours de versement et ne sont pas exigibles."
     ]
    },
    {
     "title": "ARTICLE 13 — Dommages imputables au Chauffeur",
     "paragraphs": [
-     "Lorsqu'un dommage résulte d'une faute, d'une utilisation interdite, d'une négligence grave, d'une conduite manifestement imprudente ou d'un défaut de signalement ayant aggravé une panne, GML établit un dossier comprenant les éléments disponibles et le coût estimé ou réel de la remise en état. Après information du Chauffeur et sous réserve des dispositions légales applicables, les sommes dont il est reconnu redevable peuvent être réglées directement ou récupérées progressivement sur ses règlements futurs selon un échéancier convenu."
+     "Lorsqu'un dommage résulte d'une faute, d'une utilisation interdite, d'une négligence grave, d'une conduite manifestement imprudente ou d'un défaut de signalement ayant aggravé une panne, GML établit un dossier comprenant les éléments disponibles et le coût estimé ou réel de la remise en état.",
+     "Après information du Chauffeur et sous réserve des dispositions légales applicables, les sommes dont il est reconnu redevable peuvent être réglées directement ou récupérées progressivement sur ses règlements futurs selon un échéancier convenu.",
+     "Lorsque GML est amenée à indemniser le propriétaire du véhicule pour un dommage imputable au Chauffeur, insuffisamment ou non couvert par l'assurance, le Chauffeur est tenu de rembourser à GML le montant ainsi versé, déterminé selon la méthode d'évaluation prévue au contrat de gestion conclu avec le propriétaire (état de remise, catégorie, ancienneté et dernier contrôle hebdomadaire du véhicule), selon un échéancier convenu."
     ]
    },
    {
     "title": "ARTICLE 14 — Accidents, infractions et incidents",
     "paragraphs": [
-     "Tout accident, saisie, contrôle ayant une incidence sur le véhicule, incident de sécurité ou immobilisation par une autorité doit être signalé immédiatement à GML. Le Chauffeur doit coopérer à l'établissement des constats, rapports et dossiers d'assurance. Les amendes ou sanctions personnellement imputables à son comportement restent à sa charge, sous réserve des règles légales applicables."
+     "Tout accident, saisie, contrôle ayant une incidence sur le véhicule, incident de sécurité ou immobilisation par une autorité doit être signalé immédiatement à GML.",
+     "Le Chauffeur doit coopérer à l'établissement des constats, rapports et dossiers d'assurance. Les amendes ou sanctions personnellement imputables à son comportement restent à sa charge, sous réserve des règles",
+     "légales applicables.",
+     "Accident grave ou mortel. En cas d'accident ayant entraîné un décès, y compris celui d'un tiers, des blessures ou des dommages causés à autrui, le Chauffeur assume l'entière responsabilité civile et pénale de ses actes de conduite. GML, partenaire prestataire et non employeur du Chauffeur, et qui n'est pas propriétaire du véhicule, ne répond pas des actes de conduite de celui-ci. La situation est traitée conformément à la loi par les autorités compétentes, l'assureur et, le cas échéant, les juridictions.",
+     "Par exception, lorsqu'il apparaît qu'une défaillance mécanique existait avant l'incident et a pu y contribuer, GML procède à un examen technique fondé notamment sur les données du tracker, les images de la DashCam et le rapport d'expertise. Selon ses conclusions, GML prend contact avec le propriétaire du véhicule afin de déterminer la suite à donner conformément au contrat de gestion. Dans tous les cas, le Chauffeur coopère pleinement avec les autorités et avec GML."
     ]
    },
    {
@@ -99,37 +126,47 @@ window.GMFleetContractTemplates = {
    {
     "title": "ARTICLE 16 — Programme d'accès futur à la propriété",
     "paragraphs": [
-     "Le Chauffeur ayant accompli une période continue d'au moins douze (12) mois dans le programme GM Fleet peut être évalué en vue d'un accompagnement vers l'acquisition de son propre véhicule. Sous réserve d'une évaluation finale favorable, GML peut proposer une contribution pouvant atteindre quarante pour cent (40 %) de l'apport initial applicable au programme de financement ou d'acquisition alors disponible. Cette contribution constitue un avantage conditionnel du programme et non une somme automatiquement acquise au Chauffeur. L'éligibilité est appréciée globalement, notamment sur la base de la régularité des versements, de la conduite, du respect des règles, de l'entretien du véhicule confié, des incidents, de l'intégrité des équipements et de la conformité opérationnelle. Le programme fonctionne selon une logique d'éligibilité complète : le Chauffeur est soit déclaré éligible à l'avantage applicable, soit déclaré non éligible. Il n'existe pas de droit automatique à un pourcentage partiel en fonction du nombre de mois accomplis."
+     "Le Chauffeur ayant accompli une période continue d'au moins douze (12) mois dans le programme GM Fleet peut être évalué en vue d'un accompagnement vers l'acquisition de son propre véhicule.",
+     "Sous réserve d'une évaluation finale favorable, GML peut proposer une contribution pouvant atteindre quarante pour cent (40 %) de l'apport initial applicable au programme de financement ou d'acquisition alors disponible. Cette contribution constitue un avantage conditionnel du programme et non une somme automatiquement acquise au Chauffeur.",
+     "L'éligibilité est appréciée globalement, notamment sur la base de la régularité des versements, de la conduite, du respect des règles, de l'entretien du véhicule confié, des incidents, de l'intégrité des équipements et de la conformité opérationnelle.",
+     "Le programme fonctionne selon une logique d'éligibilité complète : le Chauffeur est soit déclaré éligible à l'avantage applicable, soit déclaré non éligible. Il n'existe pas de droit automatique à un pourcentage partiel en fonction du nombre de mois accomplis."
     ]
    },
    {
     "title": "ARTICLE 17 — Perte d'éligibilité au programme d'accès à la propriété",
     "paragraphs": [
-     "Peuvent notamment entraîner la perte de l'éligibilité : fraude, falsification, détournement de recettes, manipulation des équipements de suivi, conduite non autorisée, dommages graves imputables au Chauffeur, mauvais entretien répété du véhicule, infractions graves ou répétées aux règles GM Fleet, ou tout comportement démontrant que le véhicule confié n'a pas été pris en charge avec la diligence attendue. Toute décision est prise après examen du dossier opérationnel disponible."
+     "Peuvent notamment entraîner la perte de l'éligibilité : fraude, falsification, détournement de recettes, manipulation des équipements de suivi, conduite non autorisée, dommages graves imputables au Chauffeur, mauvais entretien répété du véhicule, infractions graves ou répétées aux règles GM Fleet, ou tout comportement démontrant que le véhicule confié n'a pas été pris en charge avec la diligence attendue.",
+     "Toute décision est prise après examen du dossier opérationnel disponible."
     ]
    },
    {
     "title": "ARTICLE 18 — Sanctions, suspension et retrait du véhicule",
     "paragraphs": [
-     "En cas de manquement, GML peut, selon la gravité et la répétition des faits, adresser un avertissement, suspendre temporairement l'accès aux missions, demander la restitution immédiate du véhicule, suspendre le Chauffeur de la flotte ou mettre fin au partenariat. En cas de risque pour la sécurité du véhicule, du public, du propriétaire, de GML ou de ses partenaires, GML peut procéder immédiatement à la suspension opérationnelle et au retrait du véhicule."
+     "En cas de manquement, GML peut, selon la gravité et la répétition des faits, adresser un avertissement, suspendre temporairement l'accès aux missions, demander la restitution immédiate du véhicule, suspendre le Chauffeur de la flotte ou mettre fin au partenariat.",
+     "En cas de risque pour la sécurité du véhicule, du public, du propriétaire, de GML ou de ses partenaires, GML peut procéder immédiatement à la suspension opérationnelle et au retrait du véhicule.",
+     "Les jours non versés et non régularisés de manière répétée constituent un manquement exposant le Chauffeur aux mesures graduées prévues au présent article."
     ]
    },
    {
     "title": "ARTICLE 19 — Restitution du véhicule",
     "paragraphs": [
-     "À la fin d'une affectation ou du présent partenariat, le Chauffeur restitue immédiatement le véhicule, ses clés, documents, accessoires et équipements au lieu indiqué par GML. Un état de restitution peut être établi et comparé à l'état de remise, en tenant compte de l'usure normale."
+     "À la fin d'une affectation ou du présent partenariat, le Chauffeur restitue immédiatement le véhicule, ses clés, documents, accessoires et équipements au lieu indiqué par GML.",
+     "Un état de restitution peut être établi et comparé à l'état de remise, en tenant compte de l'usure normale."
     ]
    },
    {
     "title": "ARTICLE 20 — Paiements, compensations et relevés",
     "paragraphs": [
-     "Les paiements, versements, frais, réparations imputables et autres mouvements liés au Chauffeur peuvent être enregistrés dans l'écosystème numérique GML. Le Chauffeur peut recevoir un relevé ou consulter son historique selon les fonctionnalités disponibles. Toute compensation ou déduction opérée par GML doit correspondre à une obligation prévue par le présent contrat, une grille acceptée, un dommage établi ou un montant spécifiquement autorisé, sous réserve des dispositions légales applicables."
+     "Les paiements, versements, frais, réparations imputables et autres mouvements liés au Chauffeur peuvent être enregistrés dans l'écosystème numérique GML. Le Chauffeur peut recevoir un relevé ou consulter son historique selon les fonctionnalités disponibles.",
+     "Toute compensation ou déduction opérée par GML doit correspondre à une obligation prévue par le présent contrat, une grille acceptée, un dommage établi ou un montant spécifiquement autorisé, sous réserve des dispositions légales applicables.",
+     "Les montants non versés, les jours de régularisation et les jours justifiés pour maladie sont enregistrés dans le relevé du Chauffeur."
     ]
    },
    {
     "title": "ARTICLE 21 — Données, images et confidentialité",
     "paragraphs": [
-     "Dans le cadre de la gestion de flotte, GML peut traiter les données nécessaires à l'exploitation, notamment les données d'identification, de localisation, de trajet, de connexion, de véhicule, de paiement, de diagnostic et, lorsque le véhicule en est équipé, les enregistrements issus de la DashCam. Ces informations sont utilisées notamment pour la sécurité, l'exploitation, la maintenance, le règlement des incidents, le contrôle contractuel et les obligations envers les propriétaires, plateformes et partenaires concernés. Leur traitement doit respecter les exigences légales applicables."
+     "Dans le cadre de la gestion de flotte, GML peut traiter les données nécessaires à l'exploitation, notamment les données d'identification, de localisation, de trajet, de connexion, de véhicule, de paiement, de diagnostic et, lorsque le véhicule en est équipé, les enregistrements issus de la DashCam.",
+     "Ces informations sont utilisées notamment pour la sécurité, l'exploitation, la maintenance, le règlement des incidents, le contrôle contractuel et les obligations envers les propriétaires, plateformes et partenaires concernés. Leur traitement doit respecter les exigences légales applicables."
     ]
    },
    {
@@ -141,7 +178,9 @@ window.GMFleetContractTemplates = {
    {
     "title": "ARTICLE 23 — Durée et résiliation",
     "paragraphs": [
-     "Le présent contrat prend effet à compter de son acceptation et demeure applicable tant que le Chauffeur reste actif dans le programme, sauf durée particulière indiquée dans son affectation. Le Chauffeur peut demander à quitter le programme sous réserve de restituer le véhicule et les biens GML, de clôturer les courses en cours et d'apurer les sommes effectivement dues. GML peut mettre fin au partenariat notamment en cas de fraude, fausse déclaration, non-respect grave ou répété des règles, détournement, manipulation des équipements, refus de restituer le véhicule, perte des conditions d'éligibilité ou comportement compromettant la sécurité ou les intérêts légitimes de la flotte."
+     "Le présent contrat prend effet à compter de son acceptation et demeure applicable tant que le Chauffeur reste actif dans le programme, sauf durée particulière indiquée dans son affectation.",
+     "Le Chauffeur peut demander à quitter le programme sous réserve de restituer le véhicule et les biens GML, de clôturer les courses en cours et d'apurer les sommes effectivement dues.",
+     "GML peut mettre fin au partenariat notamment en cas de fraude, fausse déclaration, non-respect grave ou répété des règles, détournement, manipulation des équipements, refus de restituer le véhicule, perte des conditions d'éligibilité ou comportement compromettant la sécurité ou les intérêts légitimes de la flotte."
     ]
    },
    {
@@ -165,7 +204,8 @@ window.GMFleetContractTemplates = {
    {
     "title": "ARTICLE 27 — Acceptation",
     "paragraphs": [
-     "En signant le présent contrat, le Chauffeur reconnaît : avoir lu et compris le présent contrat ; avoir reçu ou pouvoir consulter les règles opérationnelles et la grille applicable à son programme ; accepter les conditions d'utilisation du véhicule qui lui est confié ; autoriser les traitements et contrôles nécessaires à l'exploitation de la flotte dans les limites prévues par le présent contrat et la loi ; s'engager à restituer le véhicule et les équipements à première demande légitime de GML conformément aux présentes dispositions."
+     "En signant le présent contrat, le Chauffeur reconnaît :",
+     "Avoir lu et compris le présent contrat ; Avoir reçu ou pouvoir consulter les règles opérationnelles et la grille applicable à son programme ; accepter les conditions d'utilisation du véhicule qui lui est confié ; Autoriser les traitements et contrôles nécessaires à l'exploitation de la flotte dans les limites prévues par le présent contrat et la loi ; s'engager à restituer le véhicule et les équipements à première demande légitime de GML conformément aux présentes dispositions."
     ]
    }
   ]
@@ -522,14 +562,15 @@ window.GMFleetContractTemplates = {
  },
  "FLEET_OWNER": {
   "title": "Contrat de partenariat et de gestion de véhicule",
-  "version": "2026-10-23-v1",
-  "source": "Contrat_Gestion_Vehicule_Proprietaire_GM_Fleet_v1.odt",
-  "sha256": "23e94c06f26d4b4c5c1e0bdb9b38ed2f33c2f1a46a3014b535f1edd77d131319",
+  "version": "2026-10-29-v3",
+  "source": "Contrat_Gestion_Vehicule_Proprietaire_GM_Fleet_v3.pdf",
+  "sha256": "ed841061aa6f59e42c05754b4112aaf9252439edcf45809d576a7ccbd3299e22",
+  "notice": "Projet contractuel à soumettre à la validation du conseil juridique de GML avant mise en production ou signature.",
   "sections": [
    {
     "title": "ARTICLE 1 — Objet",
     "paragraphs": [
-     "Le présent contrat a pour objet de définir les conditions dans lesquelles le Propriétaire confie son véhicule à GML afin que celui-ci soit intégré au programme GM Fleet, exploité dans le cadredes activités de transport autorisées, notamment via Yango,et administré par GML pendant la durée du partenariat.",
+     "Le présent contrat a pour objet de définir les conditions dans lesquelles le Propriétaire confie son véhicule à GML afin que celui-ci soit intégré au programme GM Fleet, exploité dans le cadre des activités de transport autorisées, notamment via Yango,et administré par GML pendant la durée du partenariat.",
      "Le Propriétaire demeure propriétaire du véhicule. Le présent contrat constitue un mandat de gestion et d'exploitation et n'opère aucun transfert de propriété au profit de GML."
     ]
    },
@@ -537,31 +578,28 @@ window.GMFleetContractTemplates = {
     "title": "ARTICLE 2 — Conditions d'admission du véhicule",
     "paragraphs": [
      "L'intégration du véhicule est subordonnée à une vérification documentaire et à une inspection physique et mécanique satisfaisante. Le véhicule doit notamment disposer des documents légalement requis et être dans un état compatible avec une exploitation commerciale régulière et sécurisée, il s’agit de :",
-     "Carte grise ou document équivalent établissant la propriété ou le droit de mise à disposition ; Assurance valide ;",
-     "Vignette,contrôle technique et autres documents Valides exigibles selon la réglementation applicable ;",
-     "État mécanique, carrosserie, pneumatiques, éclairage, habitacle et équipements de sécurité jugés acceptables par GML."
+     "Carte grise ou document équivalent établissant la propriété ou le droit de mise à disposition ; Assurance valide ; Vignette, contrôle technique et autres documents Valides exigibles selon la réglementation applicable ; État mécanique, carrosserie, pneumatiques, éclairage, habitacle et équipements de sécurité jugés acceptables par GML."
     ]
    },
    {
     "title": "ARTICLE 3 — Classification A, B ou C",
     "paragraphs": [
-     "Après inspection, GML classe le véhicule dans une catégorie opérationnelle servant notamment à déterminer le niveau de rémunération applicable au Propriétaire.",
-     "Catégorie A: véhicule récent, notamment immatriculé ou exploité à Kinshasa depuis au plus deux(2) ans.",
-     "Catégorie B: véhicule exploité depuis plus de deux (2) ans mais n'excédant pas quatre (4) ans.",
-     "Catégorie C: véhicule de plus de quatre (4) ans, sous réserve qu'il demeure admissible techniquement et commercialement.",
-     "La classification définitiveest constatée par GML après examen des documents, de l'année, de l'état réel du véhicule et des critères opérationnels du programme. Elle peut être réévaluée lors d'un renouvellement."
+     "Après inspection, GML classe le véhicule dans une catégorie opérationnelle servant notamment à déterminer le niveau de rémunération applicable au Propriétaire. Catégorie A : véhicule récent, notamment immatriculé ou exploité à Kinshasa depuis au plus deux (2) ans.",
+     "Catégorie B : véhicule exploité depuis plus de deux (2) ans mais n'excédant pas quatre (4) ans.",
+     "Catégorie C : véhicule de plus de quatre (4) ans, sous réserve qu'il demeure admissible techniquement et commercialement.",
+     "La classification définitive est constatée par GML après examen des documents, de l'année, de l'état réel du véhicule et des critères opérationnels du programme. Elle peut être réévaluée lors d'un renouvellement."
     ]
    },
    {
     "title": "ARTICLE 4 — Durée",
     "paragraphs": [
-     "Le présent contrat est conclu pour une duréeinitiale de douze (12) mois à compter de la mise en exploitation effective du véhicule. Tout renouvellement fait l'objet d'un accord entre les parties par voie d’avenant au contrat. Les conditions tarifaires du renouvellement peuvent être inférieures à celles de la première année lorsque les coûts initiaux d'équipement ont déjà été amortis."
+     "Le présent contrat est conclu pour une durée initiale de douze (12) mois à compter de la mise en exploitation effective du véhicule. Tout renouvellement fait l'objet d'un accord entre les parties par voie d’avenant au contrat. Les conditions tarifaires du renouvellement peuvent être inférieures à celles de la première année lorsque les coûts initiaux d'équipement ont déjà été amortis."
     ]
    },
    {
     "title": "ARTICLE 5 — Équipements technologiques GM Fleet",
     "paragraphs": [
-     "Pour être exploité dans le programme, le véhicule est équipé des technologies définies par GML, notamment d'un dispositif de géolocalisation et de télématiqueGML TrackerDevice X110et, selon le programme applicable, d'une DashCam.",
+     "Pour être exploité dans le programme, le véhicule est équipé des technologies définies par GML, notamment d'un dispositif de géolocalisation et de télématique GML TrackerDevice X110 et, selon le programme applicable, d'une DashCam.",
      "Ces équipements permettent notamment le suivi de la localisation, des trajets et de l'activité du véhicule, ainsi que les fonctions de sécurité, d'assistance au diagnostic, de maintenance préventive ou d'alerte disponibles selon le matériel installé. La DashCam contribue notamment à la sécurité, à la documentation des incidents et au contrôle opérationnel.",
      "Les équipements ne peuvent être désactivés, déplacés, démontés ou altérés sans autorisation expresse de GML."
     ]
@@ -571,27 +609,30 @@ window.GMFleetContractTemplates = {
     "paragraphs": [
      "Pendant la première année, la tarification applicable au véhicule peut inclure les coûts d'acquisition et d'installation des équipements, leur amortissement, les abonnements et services technologiques, ainsi que les frais de gestion de flotte prévus dans la grille acceptée par le Propriétaire.",
      "Lorsque le contrat est renouvelé et que les équipements initiaux sont déjà installés et amortis, les coûts de matériel ne sont pas facturés une seconde fois. La nouvelle tarification porte principalement sur les services récurrents, la gestion de flotte et les prestations applicables au nouveau cycle contractuel.",
-     "En cas de non renouvellement leséquipements installés sont considérer comme vendue et acheter par le propriétaire, l’accès à l’écosystème GML reste possible par un abonnement mensuel ; tout services solliciter par le propriétaire par la suite fera l’objet d’un autre contrat."
+     "En cas de non renouvellement les équipements installés sont considérer comme vendue et acheter par le propriétaire, l’accès à l’écosystème GML reste possible par un abonnement mensuel ; tout services solliciter par le propriétaire par la suite fera l’objet d’un autre contrat."
     ]
    },
    {
-    "title": "ARTICLE 7 —Affectation d'un Chauffeur-Partenaire",
+    "title": "ARTICLE 7 — Affectation d'un Chauffeur-Partenaire",
     "paragraphs": [
      "GML sélectionne et affecte au véhicule un Chauffeur-Partenaire admis dans son réseau. GML assure l'intégration opérationnelle du chauffeur, son rattachement à la flotte partenaire et le suivi de son activité.",
-     "Le Propriétaire n'est pas tenu d'assurer lui-mêmele recrutement, le suivi des courses ou la collecte des versements du chauffeur, ces fonctions relevant de la gestion confiée à GML."
+     "Le Propriétaire n'est pas tenu d'assurer lui-même le recrutement, le suivi des courses ou la collecte des versements du chauffeur, ces fonctions relevant de la gestion confiée à GML."
     ]
    },
    {
     "title": "ARTICLE 8 — Exploitation via Yango",
     "paragraphs": [
-     "Lorsque le véhicule est exploité via Yango,il est rattaché à la flotte ou au compte partenaire GM Fleet selon les conditions applicables. GML peut suivre les courses, périodes de connexion, recettes et autres informations opérationnelles mises à disposition du partenaire de flotte. Le véhicule reste soumis aux conditions d'admission, de qualité et d'exploitation de la plateforme partenaire."
+     "Lorsque le véhicule est exploité via Yango, il est rattaché à la flotte ou au compte partenaire GM Fleet selon les conditions applicables. GML peut suivre les courses, périodes de connexion, recettes et autres informations opérationnelles mises à disposition du partenaire de flotte. Le véhicule reste soumis aux conditions d'admission, de qualité et d'exploitation de la plateforme partenaire."
     ]
    },
    {
     "title": "ARTICLE 9 — Rémunération du Propriétaire",
     "paragraphs": [
-     "Le propriétaire reçoit la rémunération correspondant à la catégorie de son véhicule et à la grille tarifaire annexéeou acceptée dans l'application au moment de l'intégration.",
-     "Le montant convenu constitue la base de règlement du Propriétaire sous réserve des ajustements expressément prévus au présent contrat, notamment les réparations autorisées, avances, frais ou autres montants contractuellement dus. GML assure la gestion des recettes opérationnelles nécessaires à l'exécution du modèle de flotte et procède au règlement du Propriétaire selon la périodicité prévue dans la grille applicable."
+     "Le propriétaire reçoit la rémunération correspondant à la catégorie de son véhicule et à la grille tarifaire annexée ou acceptée dans l'application au moment de l'intégration.",
+     "Le montant convenu constitue la base de règlement du Propriétaire sous réserve des ajustements expressément prévus au présent contrat, notamment les réparations autorisées, avances, frais ou autres montants contractuellement dus. GML assure la gestion des recettes opérationnelles nécessaires à",
+     "l'exécution du modèle de flotte et procède au règlement du Propriétaire selon la périodicité prévue dans la grille applicable.",
+     "La rémunération du Propriétaire est liée à la mise en exploitation effective du véhicule. Les jours d'immobilisation consécutifs à un accident ou sinistre, visés à l'Article 17, ne donnent lieu à aucune rémunération.",
+     "Lorsque le Chauffeur-Partenaire est malade et en apporte la preuve, GML ne l'oblige pas à travailler ce jour- là. Le versement journalier de trente-et-un dollars américains (31 USD) correspondant à cette journée est alors déduit du règlement mensuel du Propriétaire, le justificatif de maladie étant joint au relevé de règlement."
     ]
    },
    {
@@ -609,7 +650,7 @@ window.GMFleetContractTemplates = {
    {
     "title": "ARTICLE 12 — Maintenance préventive et détection des anomalies",
     "paragraphs": [
-     "Grâce aux contrôles physiques et aux technologies installées, GML peut identifier certaines anomalies ou signes précurseurs d'une panne avant une défaillance majeure. Lorsqu'un risque est identifié, GML informe lePropriétaire et lui communique, dans la mesure du possible, un diagnostic ou une estimation de réparation.",
+     "Grâce aux contrôles physiques et aux technologies installées, GML peut identifier certaines anomalies ou signes précurseurs d'une panne avant une défaillance majeure. Lorsqu'un risque est identifié, GML informe le Propriétaire et lui communique, dans la mesure du possible, un diagnostic ou une estimation de réparation.",
      "Cette intervention préventive vise à limiter l'aggravation de la panne, la durée d'immobilisation et la perte de revenus."
     ]
    },
@@ -617,52 +658,61 @@ window.GMFleetContractTemplates = {
     "title": "ARTICLE 13 — Réparations et autorisation du Propriétaire",
     "paragraphs": [
      "Sauf urgence liée à la sécurité, à la protection immédiate du véhicule ou obligation légale, GML ne procède pas à une réparation importante à la charge du Propriétaire sans son approbation préalable.",
-     "GML peut proposer laréalisation des travaux dans un garage partenaire ou appartenant au même écosystème d'affaires, lorsque cela permet une réparation plus rapide ou à des conditions avantageuses. Le Propriétaire reste libre d'approuver le devis qui lui est soumis."
+     "GML peut proposer la réalisation des travaux dans un garage partenaire ou appartenant au même écosystème d'affaires, lorsque cela permet une réparation plus rapide ou à des conditions avantageuses. Le Propriétaire reste libre d'approuver le devis qui lui est soumis."
     ]
    },
    {
     "title": "ARTICLE 14 — Facilitation du coût des réparations",
     "paragraphs": [
-     "Lorsque le Propriétaire ne peut pas financer immédiatement une réparation nécessaire à la remise en exploitation du véhicule, GML peut, sans y être obligé, proposer une avance ou un plan de paiement. Dans ce cas, les modalités sont communiquées au Propriétaire avant les travaux. Après son acceptation, le montant financé peut être récupéré progressivement sur les règlements futurs du véhicule selon l'échéancier convenu."
+     "Lorsque le Propriétaire ne peut pas financer immédiatement une réparation nécessaire à la remise en exploitation du véhicule, GML peut, sans y être obligé, proposer une avance ou un plan de paiement. Dans ce cas, les modalités sont communiquées au Propriétaire avant les travaux. Après son acceptation, le montant financé peut être récupéré progressivement sur les règlements futurs du véhicule selon l'échéancier convenu.",
+     "Toute avance consentie par GML pour une réparation donne lieu à des frais de gestion de quinze pour cent (15 %) du montant avancé. Le montant avancé majoré de ces frais est récupéré par échéances sur les règlements mensuels du Propriétaire, selon l'échéancier communiqué et accepté avant les travaux."
     ]
    },
    {
     "title": "ARTICLE 15 — Dommages imputables au Chauffeur",
     "paragraphs": [
      "Lorsqu'un dommage est imputable à un Chauffeur-Partenaire, GML constitue le dossier opérationnel disponible et applique les mécanismes prévus dans son contrat avec le chauffeur, sans préjudice des droits du Propriétaire.",
-     "Les dommages résultant de l'usurenormale, d'un défaut propre au véhicule ou d'une panne non imputable au chauffeur restent traités conformément aux obligations du Propriétaire et aux éventuelles garanties ou assurances applicables."
+     "Les dommages résultant de l'usure normale, d'un défaut propre au véhicule ou d'une panne non imputable au chauffeur restent traités conformément aux obligations du Propriétaire et aux éventuelles garanties ou assurances applicables.",
+     "Indemnisation du Propriétaire. Lorsque GML est tenue d'indemniser le Propriétaire au titre d'un dommage causé au véhicule lors d'un incident, et que l'assurance ne couvre pas, ou ne couvre que partiellement, ce dommage en raison d'une faute du Chauffeur-Partenaire, le montant de l'indemnisation est déterminé en fonction de l'état réel du véhicule et en aucun cas sur la base de la valeur d'un véhicule neuf. À cet effet, GML se réfère : (i) à l'état et au kilométrage constatés lors de la remise du véhicule ; (ii) à la catégorie du véhicule (A, B ou C) au sens de l'Article 3 et à son ancienneté d'exploitation avant son intégration ; (iii) au dernier contrôle hebdomadaire du dimanche précédant l'incident, photographies à l'appui.",
+     "L'indemnisation correspond à la valeur estimée du véhicule dans cet état à la date de l'incident, déduction faite de toute indemnité d'assurance. Elle couvre soit la remise en état conforme à l'état de remise, soit, en cas de perte totale, la valeur vénale ainsi déterminée. L'usure normale n'est jamais mise à la charge de GML. Le montant versé est ensuite récupéré auprès du Chauffeur-Partenaire responsable, conformément au contrat qui le lie à GML."
     ]
    },
    {
     "title": "ARTICLE 16 — Assurance, documents et conformité",
     "paragraphs": [
-     "Le Propriétaire demeure responsable du maintien de la conformité administrative du véhicule, notamment de l'assurance, de la vignette et des documents légalement requis, sauf prestation particulière expressément prise en charge par GML. Il informe immédiatementGML de toute expiration, suspension, saisie, opposition ou autre situation susceptible d'empêcher l'exploitation régulière du véhicule."
+     "Le Propriétaire demeure responsable du maintien de la conformité administrative du véhicule, notamment de l'assurance, de la vignette et des documents légalement requis, sauf prestation particulière expressément prise en charge par GML. Il informe immédiatement GML de toute expiration, suspension, saisie, opposition ou autre situation susceptible d'empêcher l'exploitation régulière du véhicule.",
+     "Lorsqu'un document est manquant ou expiré (assurance, vignette, contrôle technique ou autre document légalement requis), GML peut, à la demande ou avec l'accord du Propriétaire, accomplir les démarches administratives nécessaires. GML avance les frais correspondants, majorés de frais de gestion de quinze pour cent (15 %), et le montant total est récupéré par échéances sur les règlements mensuels du Propriétaire."
     ]
    },
    {
     "title": "ARTICLE 17 — Accidents et sinistres",
     "paragraphs": [
-     "En cas d'accident ou de sinistre, GML coordonne les premières démarches opérationnelles avec le Chauffeur-Partenaire et informe le Propriétaire dans les meilleurs délais. Les déclarations d'assurance, constats, expertises, franchises et réparations sont traités selon la cause du sinistre, les responsabilités établies, la police d'assurance applicable et les dispositions du présent contrat."
+     "En cas d'accident ou de sinistre, GML coordonne les premières démarches opérationnelles avec le Chauffeur-Partenaire et informe le Propriétaire dans les meilleurs délais. Les déclarations d'assurance, constats, expertises, franchises et réparations sont traités selon la cause du sinistre, les responsabilités établies, la police d'assurance applicable et les dispositions du présent contrat.",
+     "Accident grave. En cas d'accident grave, quelle qu'en soit la cause, le véhicule cesse de générer des revenus. Aucune rémunération n'est due au Propriétaire pour les jours d'immobilisation, jusqu'à ce que GML ait mené son enquête et remis le véhicule en exploitation, ou jusqu'à la conclusion d'un arrangement adapté à la situation (indemnisation par l'assurance, réparation ou toute autre solution convenue).",
+     "Accident mortel ou dommages aux tiers. Le Chauffeur-Partenaire, prestataire indépendant, assume personnellement la responsabilité de ses actes de conduite conformément à la loi ; GML, qui n'est pas son employeur, ne répond pas de ces actes. Lorsqu'une défaillance mécanique antérieure à l'incident est suspectée, GML procède à un examen technique et prend contact avec le Propriétaire afin de déterminer la suite à donner, conformément aux Articles 13 et 16. Les dommages imputables au Chauffeur-Partenaire demeurent traités conformément à l'Article 15."
     ]
    },
    {
-    "title": "ARTICLE 18 —Disponibilité du véhicule",
+    "title": "ARTICLE 18 — Disponibilité du véhicule",
     "paragraphs": [
-     "Le Propriétaire s'engage à ne pas retirer ou utiliser personnellement le véhicule pendant les périodes où celui-ci est affecté à l'exploitation GM Fleet,sauf autorisation préalable de GML. L'objectif du programme est de maintenir le véhicule disponible et productif. Toute immobilisation planifiée par le Propriétaire doit être communiquée à GML à l'avance."
+     "Le Propriétaire s'engage à ne pas retirer ou utiliser personnellement le véhicule pendant les périodes où celui-ci est affecté à l'exploitation GM Fleet, sauf autorisation préalable de GML. L'objectif du programme est de maintenir le véhicule disponible et productif. Toute immobilisation planifiée par le Propriétaire doit être communiquée à GML à l'avance.",
+     "Toute immobilisation du véhicule pour accident ou réparation suspend la rémunération du Propriétaire pour les jours concernés, conformément aux Articles 9 et 17."
     ]
    },
    {
     "title": "ARTICLE 19 — Déductions et transparence des règlements",
     "paragraphs": [
      "Les retenues opérées sur les règlements du Propriétaire doivent correspondre à la grille tarifaire acceptée, aux frais récurrents applicables, aux coûts de première année convenus, aux réparations ou avances approuvées, ou à toute autre somme expressément autorisée par le présent contrat ou par le Propriétaire.",
-     "Les mouvements peuvent être consultés dans l'espace propriétaire ou communiqués sous forme de relevé selon les fonctionnalités disponibles."
+     "Les mouvements peuvent être consultés dans l'espace propriétaire ou communiqués sous forme de relevé selon les fonctionnalités disponibles.",
+     "Constituent notamment des retenues autorisées : les frais de gestion de quinze pour cent (15 %) sur les avances de réparation et les démarches administratives, les échéances de remboursement correspondantes, ainsi que les journées de maladie justifiées du Chauffeur-Partenaire visées à l'Article 9."
     ]
    },
    {
     "title": "ARTICLE 20 — Absence de garantie absolue de revenus",
     "paragraphs": [
      "GML organise l'exploitation du véhicule dans le but de générer les revenus permettant l'exécution du modèle de gestion convenu. Toutefois, les parties reconnaissent que l'activité de transport dépend notamment de la demande, de la disponibilité de la plateforme, de l'état du véhicule, des conditions de circulation, des restrictions réglementaires et d'autres facteurs externes.",
-     "Sauf engagement financier expressément prévu dans une grille ou annexe signée, GML ne garantit pas un nombre déterminé de coursesni un chiffre d'affaires brut précis."
+     "Sauf engagement financier expressément prévu dans une grille ou annexe signée, GML ne garantit pas un nombre déterminé de courses ni un chiffre d'affaires brut précis.",
+     "Les accidents et sinistres graves font partie de ces facteurs susceptibles d'interrompre la production de revenus du véhicule."
     ]
    },
    {
@@ -681,23 +731,22 @@ window.GMFleetContractTemplates = {
    {
     "title": "ARTICLE 23 — Résiliation anticipée du propriétaire",
     "paragraphs": [
-     "Le contrat peut être résilié d'un commun accord. Chaque partie peut également demander sa résiliation en cas de manquement grave de l'autre partie, après mise en demeurelorsque la nature du manquement permet sa régularisation.",
+     "Le contrat peut être résilié d'un commun accord. Chaque partie peut également demander sa résiliation en cas de manquement grave de l'autre partie, après mise en demeure lorsque la nature du manquement permet sa régularisation.",
      "GML peut suspendre immédiatement l'exploitation en cas de défaut documentaire, risque de sécurité, fraude, saisie du véhicule ou situation rendant son exploitation irrégulière."
     ]
    },
    {
     "title": "ARTICLE 24 — Données et supervision numérique",
     "paragraphs": [
-     "Le Propriétaire autorise le traitement des données nécessaires à la gestion du véhicule, notamment les données de géolocalisation, trajets, activité, recettes, diagnostic, maintenance et, lorsqu’applicable, les données issues dela DashCam.",
+     "Le Propriétaire autorise le traitement des données nécessaires à la gestion du véhicule, notamment les données de géolocalisation, trajets, activité, recettes, diagnostic, maintenance et, lorsqu’applicable, les données issues de la DashCam.",
      "Ces données peuvent être accessibles à GML, au Propriétaire selon son niveau d'accès, ainsi qu'aux partenaires techniques ou opérationnels strictement nécessaires à l'exécution du service, dans le respect des exigences légales applicables."
     ]
    },
    {
     "title": "ARTICLE 25 — Notifications électroniques",
     "paragraphs": [
-     "Le Propriétaire accepte de recevoir les notifications officielles relatives à son véhicule dans l'application GML notamment pour les règlements, alertes techniques, réparations, incidents, documents et renouvellements ; les parties pourront recevoir notification par voie électronique au numéro E-mail ou numéro WhatsApp.",
-     "Numéro E-mail : ……………………………",
-     "Numéro de Téléphone : …………………………...",
+     "Le Propriétaire accepte de recevoir les notifications officielles relatives à son véhicule dans l'application GML notamment pour les règlements, alertes techniques, réparations, incidents, documents et renouvellements ; les parties pourront recevoir notification par voie électronique au numéro E-mail ou numéro WhatsApp.",
+     "- Numéro E-mail : …………………………… - Numéro de Téléphone : …………………………...",
      "Tout modification doit être immédiatement signifier par avenant au contrat."
     ]
    },
@@ -705,7 +754,7 @@ window.GMFleetContractTemplates = {
     "title": "ARTICLE 26 — Modification des tarifs",
     "paragraphs": [
      "Les tarifs applicables pendant la période contractuelle sont ceux acceptés à l'intégration, sauf modification convenue entre les parties ou frais variables expressément prévus.",
-     "Lors d'un renouvellement, GML peutproposer une nouvelle grille tenant compte notamment de l'amortissement déjà réalisé des équipements, des coûts récurrents, des conditions de marché et des services maintenus."
+     "Lors d'un renouvellement, GML peut proposer une nouvelle grille tenant compte notamment de l'amortissement déjà réalisé des équipements, des coûts récurrents, des conditions de marché et des services maintenus."
     ]
    },
    {
@@ -715,7 +764,7 @@ window.GMFleetContractTemplates = {
     ]
    },
    {
-    "title": "ARTICLE 28 — Droitapplicable",
+    "title": "ARTICLE 28 — Droit applicable",
     "paragraphs": [
      "Pour son exécution ou son interprétation le présent contrat est soumis au droit positif congolais."
     ]
