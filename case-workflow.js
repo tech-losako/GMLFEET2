@@ -119,7 +119,7 @@
   activeAppointments.forEach(p=>{
    const card=sections[3].querySelector(`[data-appointment-card="${CSS.escape(String(p.id))}"]`);if(!card)return;
    const notification=(c.notifications||[]).find(n=>n.appointment_id===p.id&&n.kind==='appointment');
-   const smsStatus=notification?.delivery_status||'pending',smsLabels={accepted:'SMS accepté par le service · livraison attendue',delivered:'SMS livré au téléphone',cancelled:'SMS annulé',sent:'SMS transmis à l’opérateur (réception non confirmée)',pending:'SMS non envoyé',failed:'Échec de l’envoi SMS',not_configured:'Service SMS indisponible',sending:'Envoi SMS en cours / à vérifier',unknown:'Envoi SMS à vérifier'};
+   const smsStatus=p.sms_requested===false?'not_requested':notification?.delivery_status||'pending',smsLabels={not_requested:'Notification SMS non demandée',accepted:'SMS accepté par le service · livraison attendue',delivered:'SMS livré au téléphone',cancelled:'SMS annulé',sent:'SMS transmis à l’opérateur (réception non confirmée)',pending:'SMS non envoyé',failed:'Échec de l’envoi SMS',not_configured:'Service SMS indisponible',sending:'Envoi SMS en cours / à vérifier',unknown:'Envoi SMS à vérifier'};
    card.insertAdjacentHTML('beforeend',`<div class="appointment-sms-state" data-sms-state="${e(smsStatus)}"><span>${e(smsLabels[smsStatus]||smsLabels.pending)}</span>${notification?.delivery_error?`<small>${e(notification.delivery_error)}</small>`:''}${['pending','failed','not_configured'].includes(smsStatus)?`<button type="button" class="secondary" data-retry-appointment-sms="${e(p.id)}"><i data-lucide="send" aria-hidden="true"></i>Envoyer le SMS</button>`:''}</div>`);
   });
   body.querySelectorAll('[data-retry-appointment-sms]').forEach(button=>button.onclick=async()=>{

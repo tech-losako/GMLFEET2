@@ -19,9 +19,10 @@ Deno.serve(async req=>{
   const p=await req.json();let confirmation;
   if(p.appointment_id){
    if(!uuid.test(p.appointment_id))return reply(400,{error:'Rendez-vous invalide'});
-   const {data:ap,error}=await caller.from('appointments').select('id,application_id,status').eq('id',p.appointment_id).maybeSingle();
+   const {data:ap,error}=await caller.from('appointments').select('id,application_id,status,sms_requested').eq('id',p.appointment_id).maybeSingle();
    if(error||!ap)return reply(404,{error:'Rendez-vous introuvable'});
    if(!['scheduled','confirmed'].includes(ap.status))return reply(409,{error:'Ce rendez-vous est deja cloture'});
+   if(ap.sms_requested===false)return reply(200,{success:true,appointment_id:ap.id,application_id:ap.application_id,sms_requested:false,sms_status:'not_requested'});
    const {data:n,error:notificationError}=await caller.from('operations_notifications').select('id,delivery_status').eq('appointment_id',ap.id).eq('kind','appointment').maybeSingle();
    if(notificationError||!n)return reply(409,{error:'Invitation SMS introuvable'});
    confirmation={appointment_id:ap.id,application_id:ap.application_id,notification_id:n.id,sms_status:n.delivery_status||'pending'};
@@ -30,6 +31,7 @@ Deno.serve(async req=>{
    const {data,error}=await caller.rpc('schedule_case_appointment',{p});
    if(error)return reply(409,{error:error.message});confirmation=data;
   }
+  if(confirmation.sms_requested===false||confirmation.sms_status==='not_requested')return reply(200,{success:true,...confirmation,sms_status:'not_requested'});
   const service=createClient(url,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,{auth:{persistSession:false,autoRefreshToken:false}});
   const {data:n,error:nError}=await service.from('operations_notifications').select('id,recipient,body,application_id,appointment_id,delivery_status').eq('id',confirmation.notification_id).single();
   if(nError||!n)return reply(200,{success:true,...confirmation,sms_status:'pending',sms_error:'Rendez-vous enregistré. Envoi SMS à reprendre.'});
