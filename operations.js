@@ -19,7 +19,7 @@
  const sources = {website:'Site web',office:'Accueil au bureau',agent:'Agent',referral:'Recommandation'};
  const appointmentStates = {scheduled:'Programmé',confirmed:'Confirmé',completed:'Effectué',missed:'Absent',cancelled:'Annulé',rescheduled:'Reprogrammé'};
  const OFFICE_ADDRESS='Bureau GM Fleet, 01 Ngongo Lutete, Kinshasa, Gombe';
- const detailLabels = {email:'E-mail',idNumber:'Pièce d’identité',carBrand:'Marque',carModel:'Modèle',carPlate:'Plaque',carYear:'Année',carChassis:'Châssis',permisFileName:'Permis (nom déclaré)',carteRoseFileName:'Carte rose (nom déclaré)',photosCount:'Photos déclarées',cvFileName:'CV (nom déclaré)',licenseNumber:'Numéro de permis',yangoStatus:'Statut Yango'};
+ const detailLabels = {initialDeposit:'Apport / dépôt initial déclaré',email:'E-mail',idNumber:'Pièce d’identité',carBrand:'Marque',carModel:'Modèle',carPlate:'Plaque',carYear:'Année',carChassis:'Châssis',permisFileName:'Permis (nom déclaré)',carteRoseFileName:'Carte rose (nom déclaré)',photosCount:'Photos déclarées',cvFileName:'CV (nom déclaré)',licenseNumber:'Numéro de permis',yangoStatus:'Statut Yango'};
  const state = {apps:[],appointments:[],staff:[],user:null,view:'overview',current:null,detailToken:0,filters:{query:'',program:'',stage:'',queue:'pending'}};
  $('caseDialog').addEventListener('close',()=>{state.detailToken++;state.documentReview?.destroy();state.documentReview=null;if(state.documentUi)state.documentUi.selectedId=null;});
  const ADMIN_IDLE_MS=30*60*1000,ACTIVITY_KEY='gmfleet-admin-last-activity';let idleTimer,activityWrite=0;

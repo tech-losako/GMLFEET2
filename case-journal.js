@@ -53,7 +53,7 @@
     changes.push({label:[prefix||group,fieldLabels[key]||key.replaceAll('_',' ')].join(' \u00b7 '),before:insert?null:format(key,old[path]),after:format(key,next[path])});
    });
   };
-  let title='Dossier actualis\u00e9',context='';
+  let title='Dossier actualis\u00e9',context=event.changes?.reason||'';
   if(kind==='applications'){
    if(insert){title='Candidature re\u00e7ue';context=after.name||c.application.name;add('assigned_to');add('review_status');}
    else{
