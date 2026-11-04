@@ -1,0 +1,5 @@
+(()=>{
+ const token=new URLSearchParams(location.hash.slice(1)).get('token')||'';history.replaceState(null,'',location.pathname);const b=document.getElementById('download'),status=document.getElementById('status');
+ if(!/^[a-f0-9]{64}$/.test(token)){b.disabled=true;status.textContent='Lien invalide. Demandez une copie à GM Fleet.';return;}
+ b.onclick=async()=>{b.disabled=true;status.textContent='Préparation du téléchargement…';try{const config=window.GMFLEET_SUPABASE_CONFIG,r=await fetch(config.url+'/functions/v1/contract-copy',{method:'POST',headers:{apikey:config.anonKey,'Content-Type':'application/json'},body:JSON.stringify({action:'download',token}),referrerPolicy:'no-referrer'}),data=await r.json();if(!r.ok||!data.url)throw Error(data.error||'Contrat indisponible');const u=new URL(data.url);if(u.origin!==new URL(config.url).origin||!u.pathname.startsWith('/storage/v1/object/sign/contract-copies/'))throw Error('Lien de téléchargement invalide');location.assign(data.url);status.textContent='Téléchargement prêt.';}catch(e){status.textContent=e.message;}finally{b.disabled=false;}};
+})();

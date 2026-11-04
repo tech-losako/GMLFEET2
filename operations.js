@@ -275,13 +275,14 @@ const selectedProgram=state.preparationProgram||'';
    catch(error) {preview?.close();notify(fail(error),true);} finally {b.disabled=false;}
   }
  });
- const updateIntakeTerm=()=>{$('intakeTerm').hidden=$('intakeProgram').value!=='DRIVE_TO_OWN';};
+ window.GMFleetIntake.init($('intakeForm'));
+ const updateIntakeTerm=()=>window.GMFleetIntake.update($('intakeForm'));
  $('intakeProgram').addEventListener('change',updateIntakeTerm);
  $('newApplication').addEventListener('click',()=>{if(state.view==='appointments'){chooseAppointment();return;}$('intakeForm').reset();updateIntakeTerm();$('intakeForm').querySelector('.form-error').textContent='';$('intake').showModal();});
  submit($('intakeForm'),async f=>{
   const program=f.get('program'),service=services[program];
-  const payload={name:f.get('name').trim(),phone:f.get('phone').trim(),source:f.get('source'),vehicle:f.get('vehicle').trim()||service||'À préciser',service,application_type:service?'service':'vehicle',assigned_to:state.user.id,service_details:{licenseNumber:f.get('licenseNumber').trim(),carPlate:f.get('carPlate').trim(),carModel:f.get('vehicle').trim(),yangoStatus:f.get('yangoStatus').trim()}};
-  ['whatsapp','email','birth_date','address','experience','co_borrower_name','co_borrower_phone','co_borrower_address'].forEach(k=>payload[k]=f.get(k).trim()||null);
+  const payload={name:f.get('name').trim(),phone:f.get('phone').trim(),source:f.get('source'),vehicle:String(f.get('vehicle')||'').trim()||service||'À préciser',service,application_type:service?'service':'vehicle',assigned_to:state.user.id,service_details:Object.fromEntries(['licenseNumber','carPlate','carBrand','carYear','carChassis','kinshasaRegisteredOn','idNumber','yangoStatus','initialDeposit'].filter(k=>f.has(k)&&String(f.get(k)).trim()).map(k=>[k,String(f.get(k)).trim()]).concat(f.has('vehicle')?[['carModel',String(f.get('vehicle')||'').trim()]]:[]))};
+  ['whatsapp','email','birth_date','address','experience','co_borrower_name','co_borrower_phone','co_borrower_address'].forEach(k=>payload[k]=String(f.get(k)||'').trim()||null);
   payload.plan_duration_months=program==='DRIVE_TO_OWN'?12:null;
   const data=await check(await db.from('applications').insert(payload).select('id').single());
   $('intake').close();await reload();await openCase(data.id);notify('Candidature créée. Vous pouvez ajouter les pièces et planifier le rendez-vous.');
