@@ -592,6 +592,8 @@ async function submitServiceForm(e) {
         specificData.photosCount = ['flottePhotoAvant','flottePhotoArriere','flottePhotoGauche','flottePhotoDroite','flottePhotoInterieur'].filter(id=>fleetFileName(id)).length;
     } else if (serviceName === 'Recrutement' || serviceName === 'Recrutement Chauffeur') {
         specificData.experience = document.getElementById('recrutementExperience')?.value || document.getElementById('applicantExperience')?.value || '';
+        for(const key of ['birthPlace','birthDate','nationality','idNumber','licenseNumber','licenseCategory','addressNumber','addressAvenue','addressQuarter'])specificData[key]=document.getElementById('legal_'+key)?.value.trim()||'';
+        specificData.addressCommune=document.getElementById('applicantCommune')?.value.trim()||'';
         specificData.permisRectoFileName = document.getElementById('recrutementPermisRecto')?.files[0]?.name || '';
         specificData.permisVersoFileName = document.getElementById('recrutementPermisVerso')?.files[0]?.name || '';
         specificData.permisFileName = specificData.permisRectoFileName || document.getElementById('applicantDocument')?.files[0]?.name || '';
@@ -601,7 +603,7 @@ async function submitServiceForm(e) {
     const newApp = {
         name: document.getElementById('applicantName')?.value.trim() || [document.getElementById('applicantFirstName')?.value.trim(), document.getElementById('applicantLastName')?.value.trim()].filter(Boolean).join(' '),
         phone: congolesePhone(document.getElementById('applicantPhone')?.value),
-        address: document.getElementById('applicantAddress')?.value.trim() || document.getElementById('applicantCommune')?.value.trim() || '',
+        address: document.getElementById('applicantAddress')?.value.trim() || [specificData.addressNumber,specificData.addressAvenue,specificData.addressQuarter,specificData.addressCommune||document.getElementById('applicantCommune')?.value.trim()].filter(Boolean).join(', '),
         service: serviceName,
         ...specificData,
         date: new Date().toLocaleDateString('fr-FR'),

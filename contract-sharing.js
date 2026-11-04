@@ -7,7 +7,7 @@ window.GMFleetContractSharing=(()=>{
   if(!request.uploaded){
    const [contracts,vehicles,mandates]=await Promise.all([c.rows('contracts',q=>q.eq('application_id',a.id)),c.rows('vehicles'),a.program_type==='FLEET_OWNER'?c.rows('fleet_mandates',q=>q.eq('owner_application_id',a.id)):Promise.resolve([])]);
    const ct=contracts.filter(x=>x.status==='active').sort((x,y)=>String(y.start_date).localeCompare(String(x.start_date)))[0],m=mandates.slice().sort((x,y)=>String(y.created_at).localeCompare(String(x.created_at)))[0],v=vehicles.find(x=>x.id===(ct?.vehicle_id||m?.vehicle_id))||vehicles.find(x=>x.owner_application_id===a.id);
-   const pdf=window.GMFleetContracts.create(a,ct,v,m).output('blob');
+   const pdf=(await window.GMFleetContracts.create(a,ct,v,m)).output('blob');
    const {error}=await c.db.storage.from('contract-copies').upload(path,pdf,{contentType:'application/pdf',upsert:false});if(error)throw error;request.uploaded=true;
   }
   const {data,error}=await c.db.functions.invoke('contract-copy',{body:{action:'send',application_id:a.id,request_id:request.id,object_path:path}});

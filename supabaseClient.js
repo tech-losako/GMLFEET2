@@ -28,7 +28,7 @@
         return new Date(`${value}T00:00:00`).toLocaleDateString('fr-FR');
     };
 
-    const serviceFields = ['email', 'idNumber', 'carBrand', 'carModel', 'carPlate',
+    const serviceFields = ['birthPlace','birthDate','nationality','licenseNumber','licenseCategory','addressNumber','addressAvenue','addressQuarter','addressCommune','email', 'idNumber', 'carBrand', 'carModel', 'carPlate',
         'carYear', 'carChassis', 'permisFileName', 'permisRectoFileName', 'permisVersoFileName', 'carteRoseFileName',
         'transportAuthorizationFileName', 'vignetteFileName', 'insuranceFileName',
         'technicalInspectionFileName', 'frontPhotoFileName', 'rearPhotoFileName',
@@ -59,6 +59,7 @@
 
     const appToDb = (app) => ({
         name: app.name,
+        birth_date: app.birthDate || null,
         phone: app.phone,
         address: app.address || null,
         experience: app.experience || null,
