@@ -23,12 +23,20 @@ Deno.serve(async req=>{
   }
   if(!worker&&p.action==='retry'){
    const {data:n,error}=await service.from('sms_dispatches').select('*').eq('id',p.id).maybeSingle();if(error||!n||n.sensitive||!['failed','not_configured'].includes(n.status))return reply(409,{error:'Ce message ne peut pas être renvoyé. Un état accepté ou inconnu exige une vérification préalable.'});
-   const result=await sendReservedSMS(service,n,undefined,true);return reply(200,{success:true,sms_status:result.status,sms_error:result.error||null});
+   const text=n.kind==='mobile_owner_invite'?await smsRpc(service,'mobile_owner_invite_sms',{invite_id:n.event_key.replace(/^mobile_invite:/,'')}):undefined;
+   if(n.kind==='mobile_owner_invite'&&!text)return reply(409,{error:'Invitation utilisée, bloquée, révoquée ou expirée. Créez une nouvelle invitation depuis le dossier.'});
+   const result=await sendReservedSMS(service,n,text,true);return reply(200,{success:true,sms_status:result.status,sms_error:result.error||null});
   }
   if(worker||p.action==='dispatch'){
    if(!config.enabled)return reply(200,{success:true,paused:true});
-   const {data,error}=await service.from('sms_dispatches').select('id,status,body,sensitive').eq('status','pending').eq('sensitive',false).order('created_at').limit(10);if(error)throw error;
-   const results=[];for(const n of data||[])results.push((await sendReservedSMS(service,n)).status);
+   const {data,error}=await service.from('sms_dispatches').select('id,status,body,sensitive,kind,event_key').eq('status','pending').eq('sensitive',false).order('created_at').limit(10);if(error)throw error;
+   const results=[];for(const n of data||[]){
+    if(n.kind==='mobile_owner_invite'){
+     const text=await smsRpc(service,'mobile_owner_invite_sms',{invite_id:n.event_key.replace(/^mobile_invite:/,'')});
+     if(!text){await service.from('sms_dispatches').update({status:'cancelled',body:null}).eq('id',n.id).eq('status','pending');continue;}
+     results.push((await sendReservedSMS(service,n,text)).status);
+    }else results.push((await sendReservedSMS(service,n)).status);
+   }
    return reply(200,{success:true,processed:results.length,statuses:results});
   }
   return reply(400,{error:'Action inconnue'});

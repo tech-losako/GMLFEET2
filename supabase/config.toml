@@ -1,2 +1,5 @@
 [functions.araka-payments]
 verify_jwt = false
+
+[functions.gml-mobile-bridge]
+verify_jwt = false
