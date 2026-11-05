@@ -63,12 +63,12 @@
     <details class="document-replacement"><summary>${icon('replace')}Remplacer le fichier</summary><form id="documentReplacementForm" class="document-upload-form">${uploadFields(d)}</form></details>`}
     ${versions(d).length>1?`<details class="document-version-history"><summary>Versions précédentes (${versions(d).length-1})</summary>${versions(d).slice(1).map(previous=>`<button type="button" class="document-version" data-open-version="${e(previous.id)}"><span>${e(previous.name)}<small>${date(previous.created_at,true)}</small></span>${icon('external-link')}</button>`).join('')}</details>`:''}
     ${old?'<button type="button" class="secondary document-command" data-current-version>Retour à la pièce actuelle</button>':''}`;
-   const rejectForm=viewer.querySelector('#documentRejectForm');
+   const rejectForm=viewer.querySelector('#documentRejectForm');if(rejectForm)rejectForm.dataset.draftEntity='document:'+d.id;
    viewer.querySelector('[data-reject-document]')?.addEventListener('click',()=>{rejectForm.hidden=false;rejectForm.elements.review_reason.focus();});
    viewer.querySelector('[data-cancel-reject]')?.addEventListener('click',()=>rejectForm.hidden=true);
    if(rejectForm)rejectForm.onsubmit=event=>{event.preventDefault();reviewDocument(d,'rejected',rejectForm.elements.review_reason.value.trim(),rejectForm);};
    viewer.querySelectorAll('[data-review-document]').forEach(button=>button.onclick=()=>reviewDocument(d,button.dataset.reviewDocument,null));
-   const replaceForm=viewer.querySelector('#documentReplacementForm');if(replaceForm)replaceForm.onsubmit=event=>saveUpload(event,d);
+   const replaceForm=viewer.querySelector('#documentReplacementForm');if(replaceForm)replaceForm.dataset.draftEntity='document:'+d.id;if(replaceForm)replaceForm.onsubmit=event=>saveUpload(event,d);
    viewer.querySelectorAll('[data-open-version]').forEach(button=>button.onclick=()=>openDocument(byId(button.dataset.openVersion)));
    viewer.querySelector('[data-current-version]')?.addEventListener('click',()=>{let latest=d;while(documents.some(next=>next.replaces_document_id===latest.id))latest=documents.find(next=>next.replaces_document_id===latest.id);openDocument(latest);});
    paintIcons();
@@ -81,7 +81,7 @@
    try{
     const changed=await check(await db.from('documents').update({review_status:value,review_reason:reason}).eq('id',d.id).eq('revision',d.revision||1).select('*'));
     if(!changed.length)throw new Error('Cette pièce a changé. Fermez le document et actualisez le dossier.');
-    ui.selectedId=d.id;
+    ui.selectedId=d.id;await window.GMFleetDrafts?.complete(form);
     await refreshCase(application.id);
     notify(value==='approved'?'Pièce validée.':value==='rejected'?'Pièce refusée. Motif enregistré.':'Pièce remise à vérifier.');
    }catch(error){if(!disposed)target.textContent=errorMessage(error);}
@@ -106,7 +106,7 @@
     await check(await db.storage.from('application-documents').upload(path,file,{contentType:file.type,upsert:false}));
     button.textContent='Enregistrement en cours…';
     const added=await check(await db.from('documents').insert({application_id:application.id,name:file.name.slice(0,250),storage_path:path,mime_type:file.type,size_bytes:file.size,category:replaced?.category||data.get('category')||'other',replaces_document_id:replaced?.id||null,replacement_note:String(data.get('replacement_note')||'').trim()||null}).select('*').single());
-    registered=true;ui.selectedId=added.id;
+    registered=true;ui.selectedId=added.id;await window.GMFleetDrafts?.complete(form);
     await refreshCase(application.id);
     notify(replaced?'Nouvelle version enregistrée, à vérifier.':'Pièce ajoutée au dossier, à vérifier.');
    }catch(failure){

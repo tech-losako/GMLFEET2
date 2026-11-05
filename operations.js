@@ -34,7 +34,7 @@
  function link(app) { return `<button class="link-button" data-case="${app.id}">${escape(app.name)}</button>`; }
  const reference=app=>app.case_reference||`DOSSIER-${app.id}`;
  function fail(error) { console.error(error); return error.message || 'Une erreur est survenue. Réessayez.'; }
- async function expireSession(){clearTimeout(idleTimer);try{await db?.auth.signOut();}finally{localStorage.removeItem(ACTIVITY_KEY);location.replace('/login.html?reason=inactivity');}}
+ async function expireSession(){clearTimeout(idleTimer);try{await window.GMFleetDrafts?.purge();await db?.auth.signOut();}finally{localStorage.removeItem(ACTIVITY_KEY);location.replace('/login.html?reason=inactivity');}}
  function armIdleTimer(){clearTimeout(idleTimer);const last=Number(localStorage.getItem(ACTIVITY_KEY)||Date.now()),remaining=ADMIN_IDLE_MS-(Date.now()-last);if(remaining<=0){expireSession();return;}idleTimer=setTimeout(expireSession,remaining+250);}
  function noteActivity(){if(document.hidden)return;const now=Date.now();if(now-activityWrite<15000)return;activityWrite=now;localStorage.setItem(ACTIVITY_KEY,String(now));armIdleTimer();}
  function enforceIdle(){const last=Number(localStorage.getItem(ACTIVITY_KEY)||0);if(last&&Date.now()-last>=ADMIN_IDLE_MS){expireSession();return false;}return true;}
@@ -206,7 +206,7 @@ const selectedProgram=state.preparationProgram||'';
   form.addEventListener('submit',async event=>{
    event.preventDefault();const btn=form.querySelector('button[type="submit"],button:not([type])'); const error=form.querySelector('.form-error');
    btn.disabled=true;error.textContent='';
-   try {await action(new FormData(form));} catch(e) {error.textContent=fail(e);} finally {btn.disabled=false;}
+   try {await action(new FormData(form));await window.GMFleetDrafts?.complete(form);} catch(e) {error.textContent=fail(e);} finally {btn.disabled=false;}
   });
  }
  async function check(result) {if(result.error) throw result.error;return result.data;}
@@ -288,10 +288,11 @@ const selectedProgram=state.preparationProgram||'';
   if(program==='PARTNER_DRIVER')payload.address=['addressNumber','addressAvenue','addressQuarter','addressCommune'].map(k=>payload.service_details[k]).filter(Boolean).join(', ');
   payload.plan_duration_months=program==='DRIVE_TO_OWN'?12:null;
   const data=await check(await db.from('applications').insert(payload).select('id').single());
+  await window.GMFleetDrafts?.complete($('intakeForm'));
   $('intake').close();await reload();await openCase(data.id);notify('Candidature créée. Vous pouvez ajouter les pièces et planifier le rendez-vous.');
  });
  $('refresh').addEventListener('click',async()=>{try{await reload();if(!$('syncStatus').textContent.includes('partielle'))notify('Données actualisées.');}catch(e){notify(fail(e),true);}});
- $('logout').addEventListener('click',async()=>{await db.auth.signOut();location.href='/login.html';});
+ $('logout').addEventListener('click',async()=>{await window.GMFleetDrafts?.purge();await db.auth.signOut();location.href='/login.html';});
  async function init() {
   try {
    if(!db) throw new Error('Le service de connexion est indisponible. Réessayez plus tard.');
@@ -301,12 +302,28 @@ const selectedProgram=state.preparationProgram||'';
    const staff=await check(await db.from('staff_members').select('*').eq('user_id',data.user.id).eq('active',true).maybeSingle());
    if(!staff) {$('access').innerHTML='<h1>Accès réservé au personnel</h1><p>Ce compte ne dispose pas d’un accès aux opérations GM Fleet.</p><button id="accessLogout" class="secondary">Changer de compte</button>';$('accessLogout').onclick=async()=>{await db.auth.signOut();location.replace('/login.html');};return;}
    $('staffName').textContent=staff.display_name;
+   await window.GMFleetDrafts?.init({userId:state.user.id,notify,context:()=>({view:state.view,fleet_tab:state.fleetTab||'vehicles',case_id:$('caseDialog').open?state.current?.id:null,case_label:$('caseDialog').open?state.current?.name+' · '+reference(state.current):'',case_tab:state.caseTab||'summary',revision:$('caseDialog').open?state.current?.revision:null,process_step:$('caseDialog').open?state.current?.process_step:null}),resume:async saved=>{
+    const target=selector=>new Promise(resolve=>{const ready=document.querySelector(selector);if(ready){resolve(ready);return;}const watch=new MutationObserver(()=>{const node=document.querySelector(selector);if(node){clearTimeout(timer);watch.disconnect();resolve(node);}}),timer=setTimeout(()=>{watch.disconnect();resolve(null);},4000);watch.observe(document.body,{childList:true,subtree:true});});
+    document.querySelectorAll('dialog[open]').forEach(d=>d.close());state.view=saved.view||'applications';state.fleetTab=saved.fleet_tab||'vehicles';await render();
+    if(saved.case_id){await openCase(saved.case_id);$('case-tab-'+(saved.case_tab||'summary'))?.click();}
+    if(saved.form_id==='intakeForm')$('newApplication').click();
+    else if(saved.form_id==='activateForm')document.querySelector('[data-finance="activate"]')?.click();
+    else if(saved.form_id==='paymentForm'){document.querySelector('[data-cash-view="cash"]')?.click();document.querySelector('[data-finance="payment"]')?.click();}
+    else if(saved.form_id==='repairWizard'){if(saved.case_id)(await target('[data-case-cost-tab="repairs"]'))?.click();(await target('[data-new-repair]'))?.click();}
+    else if(saved.dialog_id==='fleetDialog'&&/mandat/i.test(saved.dialog_title))document.getElementById('newMandate')?.click();
+    else if(saved.dialog_id==='fleetDialog'&&/document/i.test(saved.dialog_title)){if(saved.case_id)(await target('[data-case-cost-tab="documents"]'))?.click();(await target('[data-new-advance]'))?.click();}
+    else if(saved.entity?.startsWith('mandate:'))[...document.querySelectorAll('[data-owner-pay]')].find(b=>b.dataset.ownerPay===saved.entity.slice(8))?.click();
+    else if(saved.entity?.startsWith('contract:'))[...document.querySelectorAll('[data-contract]')].find(b=>b.dataset.contract===saved.entity.slice(9))?.click();
+    else if(saved.dialog_id==='documentUpload')(await target('[data-add-document]'))?.click();
+    else if(saved.dialog_id==='documentViewer'&&saved.entity?.startsWith('document:')){await target('[data-open-document]');[...document.querySelectorAll('[data-open-document]')].find(b=>b.dataset.openDocument===saved.entity.slice(9))?.click();await target('#documentViewer form');}
+    else if(saved.entity?.startsWith('vehicle:'))[...document.querySelectorAll('[data-inspect]')].find(b=>b.dataset.inspect===saved.entity.slice(8))?.click();
+   }});
    window.GMFleetAdminNotifications?.mount({db,user:state.user,staff,notify});
    localStorage.setItem(ACTIVITY_KEY,String(Date.now()));activityWrite=Date.now();armIdleTimer();
    ['pointerdown','keydown','touchstart'].forEach(event=>window.addEventListener(event,noteActivity,{passive:true}));
    $('today').textContent=new Intl.DateTimeFormat('fr-FR',{dateStyle:'full',timeZone:'Africa/Kinshasa'}).format(new Date());
    await reload();$('access').hidden=true;$('workspace').hidden=false;
-   db.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT')location.replace('/login.html');});
+   db.auth.onAuthStateChange(async event=>{if(event==='SIGNED_OUT'){await window.GMFleetDrafts?.purge();location.replace('/login.html');}});
    const refreshVisible=async()=>{if(!enforceIdle()||document.hidden||!['overview','payments','reconciliation'].includes(state.view)||document.querySelector('dialog[open]')||document.activeElement?.matches('input,select,textarea'))return;try{await reload();}catch(e){notify('Actualisation interrompue. '+fail(e),true);}};
    setInterval(refreshVisible,60000);window.addEventListener('focus',refreshVisible);window.addEventListener('online',refreshVisible);document.addEventListener('visibilitychange',refreshVisible);
   } catch(e) {$('access').innerHTML=`<h1>Connexion indisponible</h1><p>${escape(fail(e))}</p><button class="secondary" id="retry">Réessayer</button>`;$('retry').onclick=()=>location.reload();}

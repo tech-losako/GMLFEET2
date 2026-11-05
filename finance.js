@@ -190,7 +190,7 @@ window.GMFleetFinance = (() => {
     if(rpc==='activate_contract')Object.assign(p,window.GMFleetServiceSetup?.payload(form,store)||{});
     if(rpc==='activate_contract'){const app=ctx.apps.find(a=>a.id===p.application_id);if(app?.program_type==='PARTNER_DRIVER')p.condition_report_id=await window.GMFleetVehicleCondition.saveHandover(form,app,ctx,p.start_date);}
     if(f.has('proof'))p.proof_path=await submitProof(form,form.elements.proof.files[0]);
-    const result=await ctx.db.rpc(rpc,{p});if(result.error)throw result.error;committed=true;
+    const result=await ctx.db.rpc(rpc,{p});if(result.error)throw result.error;committed=true;await window.GMFleetDrafts?.complete(form);
     if(rpc==='activate_contract'&&window.GMFleetContractSharing){const a=ctx.apps.find(a=>a.id===p.application_id);if(a?.program_type==='PARTNER_DRIVER'){const v=store.vehicles.find(v=>v.plate?.trim().toUpperCase()===p.plate.trim().toUpperCase());delivery=await window.GMFleetContractSharing.sendAll([a,ctx.apps.find(x=>x.id===v?.owner_application_id)].filter(Boolean),ctx);}}
     $('financeDialog').close();await load();paint();ctx.notify('Opération enregistrée et confirmée.'+(delivery?' '+delivery.message:''),!!delivery?.failed);
    }catch(e){if(committed)ctx.notify('Opération enregistrée, mais actualisation indisponible. Cliquez sur Actualiser avant de continuer.',true);else error.textContent=e.message||'Impossible d’enregistrer. Réessayez.';}finally{button.disabled=false;}
