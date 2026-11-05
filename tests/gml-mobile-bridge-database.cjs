@@ -22,12 +22,14 @@ const {PGlite}=require('../work/dbtest/node_modules/@electric-sql/pglite'),fs=re
  insert into fleet_mandates values('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',1,1,'MANDATE-A','active','A',500,64,44,'2026-11-05','2027-11-04',now());`);
  const recap=fs.readFileSync('supabase/migrations/20261104113843_owner_debt_recap_on_vehicle_activation.sql','utf8').split('create function private.get_owner_financial_recap')[0];await db.exec(recap+'commit;');
  await db.exec(fs.readFileSync(process.env.MOBILE_BRIDGE_MIGRATION||'supabase/migrations/20261105125140_gml_mobile_owner_bridge.sql','utf8'));
+ await db.exec(fs.readFileSync('supabase/migrations/20261105175149_short_mobile_owner_invite_sms.sql','utf8'));
  const admin='11111111-1111-1111-1111-111111111111',agent='22222222-2222-2222-2222-222222222222',u=randomUUID(),other=randomUUID();
  async function staff(name,p,actor=admin){await db.exec('reset role');await db.query("select set_config('request.jwt.claim.sub',$1,false)",[actor]);await db.exec('set role authenticated');return (await db.query('select '+name+'($1::jsonb) result',[JSON.stringify(p)])).rows[0].result;}
  async function root(sql,args=[]){await db.exec('reset role');return db.query(sql,args);}
  async function bridge(p){await db.exec('reset role;set role service_role');return (await db.query('select mobile_bridge_call($1::jsonb) result',[JSON.stringify({gml_user_id:u,...p})])).rows[0].result;}
  async function invite(id=1){const p={application_id:id,request_id:randomUUID()},r=await staff('create_mobile_owner_invite',p,agent);const code=(await root('select private.mobile_invite_code($1) c',[r.invite_id])).rows[0].c;return {...r,code,p};}
  let i=await invite();assert.ok(!JSON.stringify(i).includes('code_hash'));assert.equal((await staff('create_mobile_owner_invite',i.p,agent)).invite_id,i.invite_id);assert.equal((await root('select count(*)::int n from sms_dispatches where kind=\'mobile_owner_invite\'')).rows[0].n,1);
+ const shortSms=(await root('select private.mobile_owner_invite_sms($1::jsonb) text',[JSON.stringify({invite_id:i.invite_id})])).rows[0].text;assert.ok(shortSms.length<=160);assert.match(shortSms,/^[\x20-\x7e]+$/);assert.match(shortSms,/code GML Mobile [0-9]{4}-[0-9]{4}\. Valable 72 h/);
  // 1. Two proofs, one owner, idempotent redemption and no duplicate SMS.
  const redeem={action:'redeem_invite',code:i.code,gml_phone:'+243810000001'};
  assert.equal((await bridge(redeem)).linked,true);assert.equal((await bridge(redeem)).linked,true);assert.equal((await bridge({...redeem,gml_user_id:other})).error,'invalid_code');
