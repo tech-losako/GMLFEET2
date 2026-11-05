@@ -15,6 +15,11 @@ window.GMFleetContractSharing=(()=>{
   return data;
  }
  function status(result){return result?.skipped?'Modèle de contrat à fournir.':['accepted','sent','delivered'].includes(result?.sms_status)?'Copie du contrat transmise par SMS · lien valable 7 jours.':'Contrat enregistré ; SMS '+(result?.sms_status||'à vérifier')+'. '+(result?.sms_error||'Consultez SMS & notifications.');}
+ async function sendAll(applications,c){
+  const messages=[],failures=[];
+  for(const a of applications){try{const result=await send(a,c);if(!['accepted','sent','delivered'].includes(result?.sms_status))failures.push(a.name+' : '+status(result));else messages.push(a.name);}catch(error){failures.push(a.name+' : '+error.message);}}
+  return {message:(messages.length?'Copie SMS transmise pour '+messages.join(', ')+'. ':'')+(failures.length?'Copie à compléter / renvoyer : '+failures.join(' · '):''),failed:failures.length>0};
+ }
  function mount(host,a,c){if(!['FLEET_OWNER','PARTNER_DRIVER','YANGO'].includes(a.program_type))return;const b=document.createElement('button'),p=document.createElement('p');b.type='button';b.className='secondary';b.textContent='Envoyer une copie à signer par SMS';p.className='muted';p.setAttribute('role','status');host.append(b,p);let request={};b.onclick=async()=>{b.disabled=true;try{const result=await send(a,c,request);p.textContent=status(result);if(['accepted','sent','delivered'].includes(result?.sms_status))b.textContent='Copie transmise par SMS';else if(result?.sms_status==='failed'||result?.sms_status==='not_configured'){request={};b.disabled=false;}}catch(e){p.textContent=e.message;b.disabled=false;}};}
- return {send,status,mount};
+ return {send,status,mount,sendAll};
 })();

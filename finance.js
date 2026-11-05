@@ -140,6 +140,7 @@ window.GMFleetFinance = (() => {
   };
   form.addEventListener('input',preview);form.addEventListener('change',preview);preview();
   submit(form,'activate_contract',f=>({application_id:Number(f.get('application_id')),currency:f.get('currency'),model:f.get('model').trim(),plate:f.get('plate').trim(),vin:f.get('vin').trim(),tracker_id:f.get('tracker_id').trim(),start_date:f.get('start_date'),end_date:f.get('end_date'),first_payment_date:f.get('first_payment_date'),daily_lolc:f.get('daily_lolc'),daily_gml:f.get('daily_gml'),operating_days:f.getAll('operating_days').map(Number),excluded_dates:f.get('excluded_dates').split(/[\s,;]+/).filter(Boolean)}));
+  window.GMFleetServiceSetup?.activation(form,store,ctx);
  }
  function payment(id){
   const active=store.contracts.filter(c=>c.status==='active'&&balances(c).total>0);
@@ -183,14 +184,15 @@ window.GMFleetFinance = (() => {
  function submit(form,rpc,payload){
   form.dataset.requestId=crypto.randomUUID();
   form.addEventListener('submit',async e=>{
-   e.preventDefault();const button=form.querySelector('[type="submit"]'),error=form.querySelector('.form-error');button.disabled=true;error.textContent='';let committed=false;
+   e.preventDefault();const button=form.querySelector('[type="submit"]'),error=form.querySelector('.form-error');button.disabled=true;error.textContent='';let committed=false,delivery=null;
    try{
     const f=new FormData(form),p={...payload(f),request_id:form.dataset.requestId};
+    if(rpc==='activate_contract')Object.assign(p,window.GMFleetServiceSetup?.payload(form,store)||{});
     if(rpc==='activate_contract'){const app=ctx.apps.find(a=>a.id===p.application_id);if(app?.program_type==='PARTNER_DRIVER')p.condition_report_id=await window.GMFleetVehicleCondition.saveHandover(form,app,ctx,p.start_date);}
     if(f.has('proof'))p.proof_path=await submitProof(form,form.elements.proof.files[0]);
     const result=await ctx.db.rpc(rpc,{p});if(result.error)throw result.error;committed=true;
-    if(rpc==='activate_contract'&&window.GMFleetContractSharing){const a=ctx.apps.find(a=>a.id===p.application_id);try{if(a?.program_type==='PARTNER_DRIVER'){const v=store.vehicles.find(v=>v.plate?.trim().toUpperCase()===p.plate.trim().toUpperCase());for(const app of [a,ctx.apps.find(x=>x.id===v?.owner_application_id)].filter(Boolean)){const sent=await window.GMFleetContractSharing.send(app,ctx);ctx.notify(window.GMFleetContractSharing.status(sent));}}}catch(error){ctx.notify('Contrat activé. Copie SMS à vérifier : '+error.message,true);}}
-    $('financeDialog').close();await load();paint();ctx.notify('Opération enregistrée et confirmée.');
+    if(rpc==='activate_contract'&&window.GMFleetContractSharing){const a=ctx.apps.find(a=>a.id===p.application_id);if(a?.program_type==='PARTNER_DRIVER'){const v=store.vehicles.find(v=>v.plate?.trim().toUpperCase()===p.plate.trim().toUpperCase());delivery=await window.GMFleetContractSharing.sendAll([a,ctx.apps.find(x=>x.id===v?.owner_application_id)].filter(Boolean),ctx);}}
+    $('financeDialog').close();await load();paint();ctx.notify('Opération enregistrée et confirmée.'+(delivery?' '+delivery.message:''),!!delivery?.failed);
    }catch(e){if(committed)ctx.notify('Opération enregistrée, mais actualisation indisponible. Cliquez sur Actualiser avant de continuer.',true);else error.textContent=e.message||'Impossible d’enregistrer. Réessayez.';}finally{button.disabled=false;}
   });
  }

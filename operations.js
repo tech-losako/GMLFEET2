@@ -27,10 +27,10 @@
  const todayKey = () => new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Kinshasa',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
  const staffMember = id => state.staffDirectory?.find(s=>s.user_id===id);
  const person = id => staffMember(id)?.display_name || (id?'Agent non identifié':'Équipe GM Fleet');
- const isOpen = app => !['rejected','withdrawn','handed_over'].includes(app.workflow_stage);
+ const isOpen = app => !app._active_contract&&!['rejected','withdrawn','handed_over'].includes(app.workflow_stage);
  const options = (map,selected) => Object.entries(map).map(([v,l])=>`<option value="${escape(v)}" ${v===selected?'selected':''}>${escape(l)}</option>`).join('');
- function notify(message,error=false) { if(/SMS/i.test(message)){state.smsAlert=message;if(state.view!=='overview')return;} $('notice').hidden=false; $('notice').textContent=message; $('notice').className=error?'error':''; }
- function tag(app) { const tone=['approved','ready','handed_over','available'].includes(app.workflow_stage)?'green':['rejected','withdrawn'].includes(app.workflow_stage)?'red':''; return `<span class="tag ${tone}">${escape(stages[app.workflow_stage]||app.workflow_stage)}</span>`; }
+ function notify(message,error=false) { if(/SMS/i.test(message))state.smsAlert=message; $('notice').hidden=false; $('notice').textContent=message; $('notice').className=error?'error':''; }
+ function tag(app) { if(app._active_contract)return '<span class="tag green">En service · contrat actif</span>';const tone=['approved','ready','handed_over','available'].includes(app.workflow_stage)?'green':['rejected','withdrawn'].includes(app.workflow_stage)?'red':''; return `<span class="tag ${tone}">${escape(stages[app.workflow_stage]||app.workflow_stage)}</span>`; }
  function link(app) { return `<button class="link-button" data-case="${app.id}">${escape(app.name)}</button>`; }
  const reference=app=>app.case_reference||`DOSSIER-${app.id}`;
  function fail(error) { console.error(error); return error.message || 'Une erreur est survenue. Réessayez.'; }
@@ -52,10 +52,12 @@
   $('refresh').disabled=true;
   $('syncStatus').textContent='Synchronisation en cours…';
   try {
-  const [apps,appointments,staffDirectory,notifications,quotes] = await Promise.all([
+  const [apps,appointments,staffDirectory,notifications,quotes,activeContracts,serviceVehicles] = await Promise.all([
    rows('applications',q=>q.order('created_at',{ascending:false}).order('id')),
    rows('appointments',q=>q.order('starts_at').order('id')),
-   rows('staff_members',q=>q.order('display_name').order('user_id')),rows('operations_notifications',q=>q.order('created_at',{ascending:false}).order('id')),rows('equipment_quotes',q=>q.order('created_at',{ascending:false}).order('id'))]);
+   rows('staff_members',q=>q.order('display_name').order('user_id')),rows('operations_notifications',q=>q.order('created_at',{ascending:false}).order('id')),rows('equipment_quotes',q=>q.order('created_at',{ascending:false}).order('id')),rows('contracts',q=>q.eq('status','active').order('id')),rows('vehicles',q=>q.order('id'))]);
+  const ownerVehicles=new Map(serviceVehicles.filter(v=>v.owner_application_id).map(v=>[v.owner_application_id,v.id]));
+  apps.forEach(a=>{a._active_contract=activeContracts.find(ct=>ct.application_id===a.id||a.program_type==='FLEET_OWNER'&&ct.vehicle_id===ownerVehicles.get(a.id))||null;});
   const staff=staffDirectory.filter(s=>s.active&&!s.deleted_at);
   Object.assign(state,{apps,appointments,staff,staffDirectory,notifications,quotes});
   $('smsNav').hidden=!staff.some(s=>s.user_id===state.user.id&&['admin','super_admin'].includes(s.role));

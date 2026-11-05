@@ -37,7 +37,7 @@
   const {escape:e,date,apps,appointments,programs,stages}=ctx,today=day(new Date()),m=last?summarize(last,today):null;
   const money=(n,c)=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:c}).format(n/100);
   const moneyList=key=>m?Object.entries(m.buckets).sort(([a],[b])=>a.localeCompare(b)).map(([c,v])=>'<span>'+money(v[key],c)+'</span>').join('')||'<span>Aucun contrat</span>':'<span>Indisponible</span>';
-  const open=apps.filter(a=>!['rejected','withdrawn','handed_over'].includes(a.workflow_stage));
+  const open=apps.filter(a=>!a._active_contract&&!['rejected','withdrawn','handed_over'].includes(a.workflow_stage));
   const newApps=open.filter(a=>a.workflow_stage==='new'),followups=open.filter(a=>a.follow_up_on&&a.follow_up_on<=today).sort((a,b)=>a.follow_up_on.localeCompare(b.follow_up_on));
   const incomplete=open.filter(a=>a.lolc_status==='information_required'),waiting=open.filter(a=>a.lolc_status==='pending');
   const queue=[...new Map([...incomplete,...followups,...newApps.slice().sort((a,b)=>a.created_at.localeCompare(b.created_at))].map(a=>[a.id,a])).values()];

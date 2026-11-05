@@ -9,11 +9,12 @@
  };
  const purposes={account:'Ouverture du compte LOLC',driving_test:'Entretien et test de conduite',vehicle_inspection:'Inspection du véhicule propriétaire',vehicle_purchase:'Achat et réception du véhicule',handover:'Remise du véhicule',installation:'Installation des équipements',meeting:'Échange / accompagnement'};
  const review=a=>a.review_status||(['rejected','withdrawn'].includes(a.workflow_stage)?'rejected':['new','to_contact','contacted','screening'].includes(a.workflow_stage)?'pending':'accepted');
- const step=a=>flows[a.program_type]?.steps[a.process_step]||'Suivi existant';
+ const step=a=>a._active_contract?'En service · contrat actif':flows[a.program_type]?.steps[a.process_step]||'Suivi existant';
  const nextPurpose=a=>a.process_step==='appointment'?flows[a.program_type]?.purpose:null;
  function form(a,{escape:e,options,staffOptions,lolc}){
   const f=flows[a.program_type],accepted=review(a)==='accepted';
   if(a.lifecycle_version!==1&&accepted){
+   if(a._active_contract)return '<h3>Service activé</h3><p>Le contrat et l’affectation sont actifs. Retrouvez les dates et le premier versement dans Informations du candidat.</p>';
    if(a.program_type==='DRIVE_TO_OWN'&&a.process_step==='handover')return '<h3>Véhicule remis</h3><button class="primary" data-case-contracts>Activer le contrat signé</button>';
    if(a.program_type==='PARTNER_DRIVER'&&a.process_step==='allocation')return '<h3>Chauffeur prêt pour affectation</h3><button class="primary" data-case-contracts>Ouvrir les contrats et affectations</button>';
    if(a.program_type==='YANGO'&&a.process_step==='joined')return '<h3>Rattachement Yango confirmé</h3>';
@@ -49,7 +50,7 @@
  const current=a=>{
   const steps=Object.keys(flows[a.program_type]?.steps||{}).filter(k=>a.program_type!=='DRIVE_TO_OWN'||!['lolc_inspection','client_validation'].includes(k)),key=a.program_type==='DRIVE_TO_OWN'&&['lolc_inspection','client_validation'].includes(a.process_step)?'gml_inspection':a.process_step,index=steps.indexOf(key);
   const actions={sourcing:'Identifier le véhicule',gml_inspection:'Contrôler et décider du véhicule',lolc_inspection:'Contrôler et décider du véhicule',client_validation:'Contrôler et décider du véhicule',custody:'Confirmer la réception du véhicule',equipment:'Suivre l’installation',documents:'Préparer la remise',handover:'Ouvrir le contrat signé',account:'Vérifier le financement LOLC',appointment:'Traiter le rendez-vous'};
-  return {total:steps.length,index:index+1,title:decisionSpec(a)?.title||step(a),position:index>=0?'Étape '+(index+1)+' sur '+steps.length:'Étape à préciser',stages:steps.map((key,n)=>({key,number:n+1,label:a.program_type==='DRIVE_TO_OWN'?driveStageLabels[key]:flows[a.program_type].steps[key],state:n===index?'current':index>=0&&n<index?'done':'upcoming'})),action:a.next_action||'Ouvrir le dossier pour poursuivre',button:a.program_type==='DRIVE_TO_OWN'?actions[a.process_step]||'Ouvrir le dossier':'Traiter : '+(decisionSpec(a)?.title||step(a))};
+  return {total:steps.length,index:index+1,title:a._active_contract?'Service en cours · contrat actif':decisionSpec(a)?.title||step(a),position:a._active_contract?'En service':index>=0?'Étape '+(index+1)+' sur '+steps.length:'Étape à préciser',stages:steps.map((key,n)=>({key,number:n+1,label:a.program_type==='DRIVE_TO_OWN'?driveStageLabels[key]:flows[a.program_type].steps[key],state:a._active_contract?'done':n===index?'current':index>=0&&n<index?'done':'upcoming'})),action:a._active_contract?'Suivre les versements, les frais et les contrôles.':a.next_action||'Ouvrir le dossier pour poursuivre',button:a.program_type==='DRIVE_TO_OWN'?actions[a.process_step]||'Ouvrir le dossier':'Traiter : '+(decisionSpec(a)?.title||step(a))};
  };
  const kinshasaDay=value=>new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Kinshasa',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(value));
  function vehicleReviewForm(a,e){
@@ -93,11 +94,12 @@
   window.GMFleetClientInformation?.mount(sections[0],a,c);
   window.GMFleetVehicleCondition?.mountCase(sections[0],a,c);
   window.GMFleetMobileOwnerAccess?.mount(sections[0],a,c);
+  window.GMFleetServiceSetup?.mountCase(sections[0],a,c);
   const nav=document.createElement('div');nav.className='case-tabs';nav.setAttribute('role','tablist');nav.setAttribute('aria-label','Dossier candidat');
   const container=document.createElement('div');container.className='case-panels';
   panels.forEach(p=>{const panel=document.createElement('section');panel.id='case-panel-'+p.id;panel.setAttribute('role','tabpanel');panel.setAttribute('aria-labelledby','case-tab-'+p.id);panel.append(...p.nodes);container.append(panel);const b=document.createElement('button');b.type='button';b.id='case-tab-'+p.id;b.dataset.caseTab=p.id;b.textContent=p.label;b.setAttribute('role','tab');b.setAttribute('aria-controls',panel.id);nav.append(b);});
   const statusBanner=document.createElement('section');statusBanner.className='case-current-status';statusBanner.setAttribute('aria-label','État actuel du dossier');
-  if(status==='accepted'){const statusInfo=current(a);if(a.program_type==='FLEET_OWNER'&&a.preparation?.fleet_joined_on){statusInfo.title='Véhicule intégré à la flotte';statusInfo.action='Suivre le contrat, les réparations et les documents.';}statusBanner.innerHTML=`<div class="current-stage-meta"><span>ÉTAPE ACTUELLE</span><strong>${e(statusInfo.position)}</strong></div><h3>${e(future&&activeAppointments.length?'Rendez-vous programmé':statusInfo.title)}</h3><p><strong>À faire :</strong> ${e(future&&activeAppointments.length?'Attendre le rendez-vous pour enregistrer son résultat.':statusInfo.action)}</p>`;body.querySelector('.case-grid').replaceWith(statusBanner,nav,container);}else body.querySelector('.case-grid').replaceWith(nav,container);
+  if(status==='accepted'){const statusInfo=current(a);if(!a._active_contract&&a.program_type==='FLEET_OWNER'&&a.preparation?.fleet_joined_on){statusInfo.title='Véhicule intégré à la flotte';statusInfo.action='Suivre le contrat, les réparations et les documents.';}statusBanner.innerHTML=`<div class="current-stage-meta"><span>ÉTAPE ACTUELLE</span><strong>${e(statusInfo.position)}</strong></div><h3>${e(future&&activeAppointments.length?'Rendez-vous programmé':statusInfo.title)}</h3><p><strong>À faire :</strong> ${e(future&&activeAppointments.length?'Attendre le rendez-vous pour enregistrer son résultat.':statusInfo.action)}</p>`;body.querySelector('.case-grid').replaceWith(statusBanner,nav,container);}else body.querySelector('.case-grid').replaceWith(nav,container);
   c.selectTab=id=>{c.state.caseTab=id;nav.querySelectorAll('button').forEach(b=>{const on=b.dataset.caseTab===id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1;});[...container.children].forEach(p=>p.hidden=p.id!=='case-panel-'+id);};
   nav.onclick=ev=>{const b=ev.target.closest('[data-case-tab]');if(b)c.selectTab(b.dataset.caseTab);};
   nav.onkeydown=ev=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(ev.key))return;ev.preventDefault();const bs=[...nav.children],i=bs.indexOf(document.activeElement),n=ev.key==='Home'?0:ev.key==='End'?bs.length-1:(i+(ev.key==='ArrowRight'?1:-1)+bs.length)%bs.length;bs[n].click();bs[n].focus();};
