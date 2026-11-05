@@ -17,7 +17,7 @@
  };
  const lolc = {not_submitted:'Non soumis',pending:'En attente de décision',information_required:'Complément demandé',approved:'Approuvé par LOLC',rejected:'Refusé par LOLC'};
  const sources = {website:'Site web',office:'Accueil au bureau',agent:'Agent',referral:'Recommandation'};
- const appointmentStates = {scheduled:'Programmé',confirmed:'Confirmé',completed:'Effectué',missed:'Absent',cancelled:'Annulé',rescheduled:'Reprogrammé'};
+ const appointmentStates = {scheduled:'Programmé',confirmed:'Confirmé',completed:'Effectué',missed:'Manqué',cancelled:'Annulé',rescheduled:'Reprogrammé'};
  const OFFICE_ADDRESS='Bureau GM Fleet, 01 Ngongo Lutete, Kinshasa, Gombe';
  const detailLabels = {birthPlace:'Lieu de naissance',birthDate:'Date de naissance',nationality:'Nationalité',licenseCategory:'Catégorie du permis',addressNumber:'Numéro de résidence',addressAvenue:'Avenue / rue',addressQuarter:'Quartier',addressCommune:'Commune',initialDeposit:'Apport / dépôt initial déclaré',email:'E-mail',idNumber:'Pièce d’identité',carBrand:'Marque',carModel:'Modèle',carPlate:'Plaque',carYear:'Année',carChassis:'Châssis',permisFileName:'Permis (nom déclaré)',carteRoseFileName:'Carte rose (nom déclaré)',photosCount:'Photos déclarées',cvFileName:'CV (nom déclaré)',licenseNumber:'Numéro de permis',yangoStatus:'Statut Yango'};
  const state = {apps:[],appointments:[],staff:[],user:null,view:'overview',current:null,detailToken:0,filters:{query:'',program:'',stage:'',queue:'pending'}};
@@ -71,13 +71,15 @@
  }
  function render() {
   $('notice').hidden=true;
-  document.querySelector('.notification-toggle')?.toggleAttribute('hidden',state.view!=='overview');
+  document.querySelector('.notification-toggle')?.toggleAttribute('hidden',state.view!=='settings');
   if(state.view!=='overview')window.GMFleetDashboard.cancel();
   document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===state.view));
   $('newApplication').textContent=state.view==='appointments'?'＋ Programmer un rendez-vous':'＋ Nouvelle candidature';
-  $('pageTitle').textContent={overview:'Tableau de bord',applications:'Candidatures',appointments:'Rendez-vous',contracts:'Contrats & véhicules',payments:'Caisse / versements',reconciliation:'Bilan',users:'Utilisateurs',sms:'SMS & notifications',preparation:'Préparation & remises',fleet:'Flotte & partenaires',modelSpecs:'Véhicules & tarifs'}[state.view];
-  document.getElementById('newApplication').hidden=['sms','users','contracts','payments','reconciliation','preparation','fleet','modelSpecs'].includes(state.view);
+  $('pageTitle').textContent={overview:'À faire',owners:'Propriétaires',drivers:'Chauffeurs',deposits:'Dépôts LOLC',settings:'Paramètres',templates:'Modèles de contrats',applications:'Candidatures',appointments:'Rendez-vous',contracts:'Contrats',payments:'Caisse / versements',reconciliation:'Bilan',users:'Utilisateurs',sms:'SMS & notifications',preparation:'Préparation & remises',fleet:'Véhicules',modelSpecs:'Véhicules & tarifs'}[state.view];
+  document.getElementById('newApplication').hidden=['sms','users','contracts','payments','reconciliation','preparation','fleet','modelSpecs','owners','drivers','settings','templates','deposits','overview'].includes(state.view);
+  window.GMFleetWorkspace?.navigation(state.view);
   if(['contracts','payments','reconciliation'].includes(state.view)) { const rendering=window.GMFleetFinance.render(state.view,{db,escape,date,person,notify,rows,staff:state.staff,user:state.user,apps:state.apps,openContract:state.dashboardContract});state.dashboardContract=null; return rendering; }
+  if(['owners','drivers','settings','templates','deposits'].includes(state.view))return window.GMFleetWorkspace.render(state.view,{db,rows,escape,date,apps:state.apps,staff:state.staff,user:state.user,isCurrent:()=>['owners','drivers','settings','templates','deposits'].includes(state.view)});
   if(state.view==='modelSpecs')return window.GMFleetModelAdmin.render({db,escape,notify,user:state.user,staff:state.staff,isCurrent:()=>state.view==='modelSpecs'});
   if(state.view==='sms')return window.GMFleetSMS.render({db,rows,escape,date,staff:state.staff,user:state.user,isCurrent:()=>state.view==='sms'});
   if(state.view==='users') {window.GMFleetUsers.render({db,escape,notify,staff:state.staff,user:state.user});return;}
@@ -87,17 +89,8 @@
   else renderAppointments();
  }
  async function renderOverview(){
-  const result=await window.GMFleetDashboard.render({db,escape,date,apps:state.apps,appointments:state.appointments,programs,stages,person,isCurrent:()=>state.view==='overview'});
-  if(state.view==='overview'){
-   const pending=state.apps.filter(a=>workflow.review(a)==='pending');
-   $('content').insertAdjacentHTML('afterbegin',`<section class="intake-notice"><div><span class="eyebrow">À EXAMINER</span><h3>${pending.length} candidature${pending.length!==1?'s':''} en attente de décision</h3><p>Demandes du site et de l’agence · alertes internes, SMS admin et notifications push selon configuration</p></div><button class="secondary" data-view="applications">Ouvrir les candidatures →</button></section>`);
-  }
-  if(state.view==='overview'){
-   const failed=(state.notifications||[]).filter(n=>['failed','not_configured','unknown'].includes(n.delivery_status));
-   if(failed.length)$('content').insertAdjacentHTML('afterbegin',`<details class="card"><summary>Notifications à vérifier · ${failed.length}</summary>${failed.map(n=>{const a=state.apps.find(a=>a.id===n.application_id);return `<div class="row"><div>${a?link(a):'Notification SMS'}<small>${escape(n.delivery_error||n.error_message||n.last_error||'Livraison non confirmée. Consultez SMS & notifications avant de renvoyer.')}</small></div></div>`;}).join('')}</details>`);
-   if(state.smsAlert)notify(state.smsAlert,true);
-  }
-  if(state.view==='overview'){const host=document.createElement('section');$('content').append(host);window.GMFleetLolcFinance.overview(host,{db,rows,apps:state.apps,escape,isCurrent:()=>state.view==='overview'});}
+  const result=await window.GMFleetDashboard.render({db,escape,date,apps:state.apps,appointments:state.appointments,programs,stages,person,notifications:state.notifications,isCurrent:()=>state.view==='overview'});
+  if(state.view==='overview'&&state.smsAlert)notify(state.smsAlert,true);
   return result;
  }
  async function renderFleetQueues(){
@@ -107,7 +100,7 @@
    if(state.view!==selected)return;
    if(selected==='preparation'){
     const bookedCases=new Set(state.appointments.filter(p=>['scheduled','confirmed'].includes(p.status)).map(p=>p.application_id));
-    const apps=state.apps.filter(a=>workflow.review(a)==='accepted'&&!bookedCases.has(a.id)&&!contracts.some(c=>c.application_id===a.id&&c.status==='active')&&!vehicles.some(v=>v.owner_application_id===a.id)&&!(a.program_type==='YANGO'&&a.process_step==='joined'));
+    const apps=state.apps.filter(a=>workflow.review(a)==='accepted'&&window.GMFleetWorkspace.readyForPreparation(a)&&!bookedCases.has(a.id)&&!contracts.some(c=>c.application_id===a.id&&c.status==='active')&&!vehicles.some(v=>v.owner_application_id===a.id)&&!(a.program_type==='YANGO'&&a.process_step==='joined'));
 const selectedProgram=state.preparationProgram||'';
     const group=apps.filter(a=>!selectedProgram||a.program_type===selectedProgram);
     $('content').innerHTML=`<div class="workspace-toolbar"><label>Catégorie<select id="preparationProgram">${options({'':'Toutes les catégories',...programs},selectedProgram)}</select></label><span class="muted">${group.length} dossier(s) en cours</span></div><section class="card"><h3>Préparation & remise</h3>${group.map(a=>{const current=workflow.current(a);return `<article class="row preparation-case"><div class="preparation-case-main"><div class="preparation-case-identity">${link(a)}<span>${escape(programs[a.program_type])}</span></div><div class="preparation-current-stage"><div class="current-stage-meta"><span>ÉTAPE ACTUELLE</span><strong>${escape(current.position)}</strong></div><h3>${escape(current.title)}</h3><p><strong>À faire :</strong> ${escape(current.action)}</p></div></div><button class="secondary preparation-action" data-case="${a.id}" data-open-tab="appointments">${escape(current.button)} →</button></article>`;}).join('')||'<p class="compact-empty">Aucun dossier en préparation pour cette catégorie.</p>'}</section>`;
@@ -130,24 +123,24 @@ const selectedProgram=state.preparationProgram||'';
   target.querySelectorAll('[data-quote-status]').forEach(select=>select.onchange=async()=>{select.disabled=true;const q=state.quotes.find(q=>q.id===select.dataset.quoteStatus);const {error}=await db.from('equipment_quotes').update({status:select.value}).eq('id',q.id);if(error){select.value=q.status;notify(fail(error),true);}else{q.status=select.value;notify('Suivi du devis enregistré.');}select.disabled=false;});
  }
  function renderApplications() {
-  $('content').innerHTML=`<div class="workspace-toolbar"><label>Catégorie<select id="programFilter">${options({'':'Toutes les catégories',...programs,equipment:'Équipements · devis'},state.filters.program)}</select></label><label>Afficher<select id="queueFilter">${options({pending:'À examiner',accepted:'Retenues · suivi',rejected:'Refusées',all:'Historique complet'},state.filters.queue||'pending')}</select></label></div><div class="filters"><input id="search" type="search" placeholder="Nom, téléphone ou numéro de dossier…" aria-label="Rechercher" value="${escape(state.filters.query)}"><select id="stageFilter" aria-label="Étape"><option value="">Toutes les étapes</option>${options(stages,state.filters.stage)}</select></div><section class="card"><div id="applicationTable"></div></section><section id="quoteInbox" class="card" hidden></section>`;
+  $('content').innerHTML=`<div class="workspace-toolbar"><label>Catégorie<select id="programFilter">${options({'':'Toutes les catégories',...programs,equipment:'Équipements · devis'},state.filters.program)}</select></label><label>Afficher<select id="queueFilter">${options({pending:'À examiner',accepted:'Retenues · suivi',rejected:'Refusées',all:'Historique complet'},state.filters.queue||'pending')}</select></label></div><div class="filters"><input id="search" type="search" placeholder="Nom, téléphone ou numéro de dossier…" aria-label="Rechercher" value="${escape(state.filters.query)}"><select id="stageFilter" aria-label="Étape" ${!state.filters.program?'disabled':''}><option value="">${state.filters.program?'Toutes les étapes':'Choisissez un programme'}</option>${options(window.GMFleetWorkspace.stageOptions(state.filters.program,stages,workflow),state.filters.stage)}</select></div><section class="card"><div id="applicationTable"></div></section><section id="quoteInbox" class="card" hidden></section>`;
   $('queueFilter').onchange=e=>{state.filters.queue=e.target.value;renderTable();};
   $('search').addEventListener('input',e=>{state.filters.query=e.target.value;renderTable();});
-  $('programFilter').addEventListener('change',e=>{state.filters.program=e.target.value;const equipment=e.target.value==='equipment';$('quoteInbox').hidden=!equipment;$('applicationTable').parentElement.hidden=equipment;$('queueFilter').parentElement.hidden=equipment;$('content').querySelector('.filters').hidden=equipment;if(equipment)renderQuotes();else renderTable();});
+  $('programFilter').addEventListener('change',e=>{state.filters.program=e.target.value;state.filters.stage='';$('stageFilter').disabled=!e.target.value;$('stageFilter').innerHTML='<option value="">'+(e.target.value?'Toutes les étapes':'Choisissez un programme')+'</option>'+options(window.GMFleetWorkspace.stageOptions(e.target.value,stages,workflow),'');const equipment=e.target.value==='equipment';$('quoteInbox').hidden=!equipment;$('applicationTable').parentElement.hidden=equipment;$('queueFilter').parentElement.hidden=equipment;$('content').querySelector('.filters').hidden=equipment;if(equipment)renderQuotes();else renderTable();});
   $('stageFilter').addEventListener('change',e=>{state.filters.followups=false;state.filters.stage=e.target.value;renderTable();});
   if(state.filters.program==='equipment')$('programFilter').dispatchEvent(new Event('change'));else renderTable();
  }
  function renderTable() {
   const q=state.filters.query.toLocaleLowerCase('fr').trim();
-  const apps=state.apps.filter(a=>((state.filters.queue||'pending')==='all'||workflow.review(a)===(state.filters.queue||'pending'))&&(!state.filters.followups||(isOpen(a)&&a.follow_up_on&&a.follow_up_on<=todayKey()))&&(!state.filters.program||a.program_type===state.filters.program)&&(!state.filters.stage||a.workflow_stage===state.filters.stage)&&(!q||`${a.id} ${a.case_reference||''} ${a.name} ${a.phone}`.toLocaleLowerCase('fr').includes(q)));
-  $('applicationTable').innerHTML=`<div class="card-heading"><h3>${apps.length} candidature${apps.length!==1?'s':''}</h3><span class="muted">${state.filters.followups?'Relances dues aujourd’hui ou avant · changez le filtre Étape pour tout voir':'Cliquez sur un nom pour ouvrir le dossier'}</span></div>${apps.length?`<div class="table-wrap"><table><thead><tr><th>Candidat</th><th>Programme</th><th>Étape</th><th>Suivi</th><th>Origine</th></tr></thead><tbody>${apps.map(a=>`<tr><td>${link(a)}<small>${escape(reference(a))} · ${escape(a.phone)}</small></td><td>${escape(programs[a.program_type])}<small>${date(a.created_on)}</small></td><td>${tag(a)}</td><td>${escape(a.assigned_to?person(a.assigned_to):'Attribué à la première ouverture')}<small>${a.follow_up_on?'Relance : '+date(a.follow_up_on):'Aucune relance planifiée'}</small></td><td>${escape(sources[a.source])}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Aucun dossier ne correspond à ces filtres.</div>'}`;
+  const apps=state.apps.filter(a=>((state.filters.queue||'pending')==='all'||workflow.review(a)===(state.filters.queue||'pending'))&&(!state.filters.followups||(isOpen(a)&&a.follow_up_on&&a.follow_up_on<=todayKey()))&&(!state.filters.program||a.program_type===state.filters.program)&&(!state.filters.stage||window.GMFleetWorkspace.matchesStage(a,state.filters.stage))&&(!q||`${a.id} ${a.case_reference||''} ${a.name} ${a.phone} ${a.service_details?.carPlate||''}`.toLocaleLowerCase('fr').includes(q)));
+  $('applicationTable').innerHTML=`<div class="card-heading"><h3>${apps.length} candidature${apps.length!==1?'s':''}</h3><span class="muted">${state.filters.followups?'Relances dues aujourd’hui ou avant · changez le filtre Étape pour tout voir':'Cliquez sur un nom pour ouvrir le dossier'}</span></div>${apps.length?`<div class="table-wrap"><table><thead><tr><th>Candidat</th><th>Programme</th><th>Étape</th><th>Suivi</th><th>Origine</th></tr></thead><tbody>${apps.map(a=>`<tr><td>${link(a)}<small>${escape(reference(a))} · ${escape(a.phone)}</small></td><td>${escape(programs[a.program_type])}<small>${date(a.created_on)}</small></td><td>${a._active_contract?tag(a):escape(workflow.review(a)==='pending'?'À examiner':workflow.step(a))}</td><td>${escape(a.assigned_to?person(a.assigned_to):'Attribué à la première ouverture')}<small>${a.follow_up_on?'Relance : '+date(a.follow_up_on):'Aucune relance planifiée'}</small></td><td>${escape(sources[a.source])}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Aucun dossier ne correspond à ces filtres.</div>'}`;
  }
  function appointmentRow(a) {
   const app=state.apps.find(x=>x.id===a.application_id);
-  return `<div class="appointment"><div class="grow">${app?link(app):'Dossier #'+a.application_id}<time>${date(a.starts_at,true)}</time><small class="muted">${a.sequence_no?'Rendez-vous n° '+a.sequence_no+' · ':''}${escape(workflow.purposes[a.purpose]||'Rendez-vous')} · ${escape(a.location)} · ${escape(person(a.assigned_to))}</small>${app&&['scheduled','confirmed'].includes(a.status)?`<small class="muted">Dossier : ${escape(workflow.current(app).position)} · ${escape(workflow.current(app).title)}</small>`:''}<p class="muted">${escape(a.outcome_notes||a.instructions)}</p></div><span class="tag">${escape(appointmentStates[a.status])}</span>${app&&['scheduled','confirmed'].includes(a.status)?`<button class="secondary" data-case="${app.id}" data-open-tab="appointments">Traiter</button>`:''}</div>`;
+  return `<div class="appointment"><div class="grow">${app?link(app):'Dossier #'+a.application_id}<time>${date(a.starts_at,true)}</time><small class="muted">${a.sequence_no?'Rendez-vous n° '+a.sequence_no+' · ':''}${escape(workflow.purposes[a.purpose]||'Rendez-vous')} · ${escape(a.location)} · ${escape(person(a.assigned_to))}</small>${app&&['scheduled','confirmed'].includes(a.status)?`<small class="muted">Dossier : ${escape(workflow.current(app).position)} · ${escape(workflow.current(app).title)}</small>`:''}<p class="muted">${escape(a.outcome_notes||a.instructions)}</p></div><span class="tag">${escape(appointmentStates[a.status])}</span>${a.result?.auto_closed&&a.status==='missed'?`<button class="secondary" data-reopen-appointment="${escape(a.id)}">A eu lieu · corriger</button>`:''}${app&&['scheduled','confirmed'].includes(a.status)?`<button class="secondary" data-case="${app.id}" data-open-tab="appointments">Traiter</button>`:''}</div>`;
  }
  function caseAppointmentsHTML(appointments,a){
-  const outcomeLabels={lolc_approved:'Crédit approuvé',lolc_rejected:'Crédit refusé',information_required:'Complément demandé',vehicle_bought:'Véhicule acheté',delayed:'Reporté',installed:'Installation terminée',installation_incomplete:'Installation incomplète',handed_over:'Véhicule remis',completed:'Effectué',missed:'Absent',cancelled:'Annulé'};
+  const outcomeLabels={lolc_approved:'Crédit approuvé',lolc_rejected:'Crédit refusé',information_required:'Complément demandé',vehicle_bought:'Véhicule acheté',delayed:'Reporté',installed:'Installation terminée',installation_incomplete:'Installation incomplète',handed_over:'Véhicule remis',completed:'Effectué',missed:'Manqué',cancelled:'Annulé'};
   const expectedPurpose=workflow.nextPurpose(a);
   const cards=appointments.map(p=>`<div class="appointment-card" data-appointment-card="${escape(p.id)}"><div class="appointment-card-head"><div><span class="eyebrow">RENDEZ-VOUS ${p.sequence_no||''}</span><h4>${escape(workflow.purposes[p.purpose]||'Rendez-vous')}</h4><p>${date(p.starts_at,true)} · ${escape(p.location)}</p><small>${escape(person(p.assigned_to))}${p.instructions?' · '+escape(p.instructions):''}</small></div><span class="tag ${p.status==='completed'?'green':''}">${escape(appointmentStates[p.status])}</span></div>${p.sms_requested===false?'<p class="muted">Notification SMS non demandée</p>':''}${p.outcome?`<p class="appointment-result"><strong>${escape(outcomeLabels[p.outcome]||p.outcome)}</strong>${p.outcome_notes?' · '+escape(p.outcome_notes):''}</p>`:''}</div>`).join('');
   const active=appointments.some(p=>['scheduled','confirmed'].includes(p.status));
@@ -166,7 +159,7 @@ const selectedProgram=state.preparationProgram||'';
   $('content').querySelectorAll('[data-appointment-tab]').forEach(b=>b.onclick=()=>{state.appointmentTab=b.dataset.appointmentTab;renderAppointments();});
  }
  function detailsHTML(a) {
-  const fields=[['Téléphone',a.phone],['WhatsApp',a.whatsapp],['E-mail',a.email],['Date de naissance',a.birth_date?date(a.birth_date):null],['Adresse',a.address],['Expérience',a.experience],['Véhicule',a.vehicle],['Durée souhaitée',a.plan_duration_months?`${a.plan_duration_months} mois`:null],['Co-emprunteur',a.co_borrower_name],['Téléphone co-emprunteur',a.co_borrower_phone],['Adresse co-emprunteur',a.co_borrower_address],['Permis déclaré',a.license_file_name],...Object.entries(a.service_details||{}).map(([k,v])=>[detailLabels[k]||k,v])];
+  const fields=[['Téléphone',a.phone],['WhatsApp',a.whatsapp],['E-mail',a.email||a.service_details?.email],['Date de naissance',(a.birth_date||a.service_details?.birthDate)?date(a.birth_date||a.service_details.birthDate):null],['Adresse',a.address],['Expérience',a.experience],['Durée souhaitée',a.plan_duration_months?`${a.plan_duration_months} mois`:null],['Co-emprunteur',a.co_borrower_name],['Téléphone co-emprunteur',a.co_borrower_phone],['Adresse co-emprunteur',a.co_borrower_address],['Numéro de permis',a.service_details?.licenseNumber],['Permis déclaré',a.license_file_name],...Object.entries(a.service_details||{}).filter(([k])=>!['birthDate','email','licenseNumber','carBrand','carModel','carPlate','carYear','carChassis'].includes(k)).map(([k,v])=>[detailLabels[k]||k,v])];
   return `<dl class="details">${fields.filter(([,v])=>v!==null&&v!==undefined&&v!=='').map(([k,v])=>`<div><dt>${escape(k)}</dt><dd>${escape(typeof v==='object'?JSON.stringify(v):v)}</dd></div>`).join('')}</dl>`;
  }
  async function openCase(id) {
@@ -253,22 +246,24 @@ const selectedProgram=state.preparationProgram||'';
   const awaiting=state.apps.filter(a=>workflow.review(a)==='accepted'&&workflow.nextPurpose(a)&&!state.appointments.some(p=>p.application_id===a.id&&['scheduled','confirmed'].includes(p.status)));
   dialog.innerHTML='<div class="dialog-title"><h2>Programmer un rendez-vous</h2><button class="icon" data-close="appointmentPicker" aria-label="Fermer">×</button></div>'+(awaiting.length?'<form id="chooseAppointmentForm"><label>Candidat<select name="application_id">'+awaiting.map(a=>'<option value="'+a.id+'">'+escape(a.name)+' · '+escape(a.phone)+'</option>').join('')+'</select></label><button class="primary">Continuer</button></form>':'<p>Aucun rendez-vous à programmer.</p>');
   dialog.showModal();
-  if($('chooseAppointmentForm'))$('chooseAppointmentForm').onsubmit=async event=>{event.preventDefault();const id=event.currentTarget.elements.application_id.value;dialog.close();state.current=null;await openCase(id);$('case-tab-appointments')?.click();const form=$('appointmentForm');if(form){form.scrollIntoView({block:'center'});form.elements.meeting_date.focus();}};
+  if($('chooseAppointmentForm'))$('chooseAppointmentForm').onsubmit=async event=>{event.preventDefault();const id=event.currentTarget.elements.application_id.value;dialog.close();state.current=null;await openCase(id);state.selectCaseTab?.('appointments');const form=$('appointmentForm');if(form){form.scrollIntoView({block:'center'});form.elements.meeting_date.focus();}};
  }
  document.addEventListener('click',async e=>{
   const b=e.target.closest('button');if(!b) return;
+  if(b.dataset.reopenAppointment){const reason=prompt('Motif : ce rendez-vous a-t-il eu lieu ? Indiquez la correction à enregistrer.');if(!reason)return;b.disabled=true;try{await check(await db.rpc('reopen_auto_missed_appointment',{p:{appointment_id:b.dataset.reopenAppointment,reason,request_id:crypto.randomUUID()}}));await reload();const ap=state.appointments.find(p=>p.id===b.dataset.reopenAppointment);if(ap){await openCase(ap.application_id);state.selectCaseTab?.('appointments');}notify('Rendez-vous rétabli. Enregistrez maintenant sa décision réelle.');}catch(error){notify(fail(error),true);}finally{b.disabled=false;}return;}
   if(b.dataset.openFleetTab){document.querySelectorAll('dialog[open]').forEach(d=>d.close());state.fleetTab=b.dataset.openFleetTab;state.view='fleet';render();return;}
   if(b.hasAttribute('data-dashboard-refresh')){try{await reload();}catch(error){notify(fail(error),true);}return;}
   if(b.dataset.dashboardContract){state.dashboardContract=b.dataset.dashboardContract;state.view='contracts';render();return;}
   if(b.hasAttribute('data-program-key')){state.filters.program=b.dataset.programKey;renderApplications();return;}
   if(b.dataset.queue){state.filters.queue=b.dataset.queue;renderApplications();return;}
-  if(b.dataset.view) {
+  const targetView=b.dataset.view||b.dataset.mobileView;
+  if(targetView) {
    state.filters.followups=b.hasAttribute('data-followups');
-   if(b.dataset.view==='applications')state.filters={query:'',program:'',stage:b.dataset.stageFilter||'',followups:state.filters.followups,queue:b.hasAttribute('data-followups')?'all':'pending'};
-   state.view=b.dataset.view;
+   if(targetView==='applications')state.filters={query:'',program:'',stage:b.dataset.stageFilter||'',followups:state.filters.followups,queue:b.hasAttribute('data-followups')?'all':'pending'};
+   if(b.dataset.program){state.filters.program=b.dataset.program;state.filters.queue='all';}state.view=targetView;
    if(state.view==='overview'){try{if(reloadPending)await reloadPending;await reload();}catch(error){notify(fail(error),true);}}else render();
   }
-  if(b.dataset.case){await openCase(b.dataset.case);if(b.dataset.openTab)$('case-tab-'+b.dataset.openTab)?.click();}
+  if(b.dataset.case){await openCase(b.dataset.case);if(b.dataset.openTab)state.selectCaseTab?.(b.dataset.openTab);}
   if(b.dataset.close) $(b.dataset.close).close();
   if(b.dataset.document) {
    const preview=window.open('about:blank','_blank'); if(preview) preview.opener=null;
@@ -277,7 +272,7 @@ const selectedProgram=state.preparationProgram||'';
    catch(error) {preview?.close();notify(fail(error),true);} finally {b.disabled=false;}
   }
  });
- window.GMFleetIntake.init($('intakeForm'));
+ window.GMFleetIntake.init($('intakeForm'));window.GMFleetWorkspace.bindDates($('intakeForm'));
  const updateIntakeTerm=()=>window.GMFleetIntake.update($('intakeForm'));
  $('intakeProgram').addEventListener('change',updateIntakeTerm);
  $('newApplication').addEventListener('click',()=>{if(state.view==='appointments'){chooseAppointment();return;}$('intakeForm').reset();updateIntakeTerm();$('intakeForm').querySelector('.form-error').textContent='';$('intake').showModal();});
@@ -305,7 +300,7 @@ const selectedProgram=state.preparationProgram||'';
    await window.GMFleetDrafts?.init({userId:state.user.id,notify,context:()=>({view:state.view,fleet_tab:state.fleetTab||'vehicles',case_id:$('caseDialog').open?state.current?.id:null,case_label:$('caseDialog').open?state.current?.name+' · '+reference(state.current):'',case_tab:state.caseTab||'summary',revision:$('caseDialog').open?state.current?.revision:null,process_step:$('caseDialog').open?state.current?.process_step:null}),resume:async saved=>{
     const target=selector=>new Promise(resolve=>{const ready=document.querySelector(selector);if(ready){resolve(ready);return;}const watch=new MutationObserver(()=>{const node=document.querySelector(selector);if(node){clearTimeout(timer);watch.disconnect();resolve(node);}}),timer=setTimeout(()=>{watch.disconnect();resolve(null);},4000);watch.observe(document.body,{childList:true,subtree:true});});
     document.querySelectorAll('dialog[open]').forEach(d=>d.close());state.view=saved.view||'applications';state.fleetTab=saved.fleet_tab||'vehicles';await render();
-    if(saved.case_id){await openCase(saved.case_id);$('case-tab-'+(saved.case_tab||'summary'))?.click();}
+    if(saved.case_id){await openCase(saved.case_id);state.selectCaseTab?.(saved.case_tab||'summary');}
     if(saved.form_id==='intakeForm')$('newApplication').click();
     else if(saved.form_id==='activateForm')document.querySelector('[data-finance="activate"]')?.click();
     else if(saved.form_id==='paymentForm'){document.querySelector('[data-cash-view="cash"]')?.click();document.querySelector('[data-finance="payment"]')?.click();}

@@ -15,7 +15,7 @@ Deno.serve(async req=>{
    if(!staff?.active||staff.deleted_at||!['admin','super_admin'].includes(staff.role))return reply(403,{error:'Accès administrateur requis'});
   }
   const p=await req.json();
-  if(!worker&&p.action==='configuration')return reply(200,{configured:!!(Deno.env.get('AFRICASTALKING_USERNAME')&&Deno.env.get('AFRICASTALKING_API_KEY')),mode:Deno.env.get('AFRICASTALKING_USERNAME')==='sandbox'?'sandbox':'production',sender:Deno.env.get('AFRICASTALKING_SENDER_ID')||'Expéditeur par défaut du fournisseur',enabled:config.enabled,callback_url:staff.role==='super_admin'?url+'/functions/v1/africastalking-delivery?key='+config.callback_token:undefined});
+  if(!worker&&p.action==='configuration')return reply(200,{configured:!!(Deno.env.get('AFRICASTALKING_USERNAME')&&Deno.env.get('AFRICASTALKING_API_KEY')),mode:Deno.env.get('AFRICASTALKING_USERNAME')==='sandbox'?'sandbox':'production',sender:Deno.env.get('AFRICASTALKING_SENDER_ID')||'Expéditeur par défaut du fournisseur',enabled:config.enabled,delivery_health:config.delivery_health,callback_url:staff.role==='super_admin'?url+'/functions/v1/africastalking-delivery?key='+config.callback_token:undefined});
   if(!worker&&p.action==='test'){
    const phone=smsPhone(p.phone);if(!phone||!/^[0-9a-f-]{36}$/i.test(String(p.request_id||'')))return reply(400,{error:'Numéro +243 et identifiant de test requis'});
    const {count,error}=await service.from('sms_dispatches').select('id',{head:true,count:'exact'}).eq('kind','sms_test').eq('actor_id',actor).gte('created_at',new Date(Date.now()-3600000).toISOString());if(error)throw error;if((count||0)>=5)return reply(429,{error:'Limite de cinq tests par heure atteinte'});

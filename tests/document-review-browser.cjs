@@ -70,8 +70,8 @@ function documentFixture(){
   await page.route('**/fixture/broken.pdf',route=>route.fulfill({contentType:'application/pdf',body:'Not a PDF'}));
   await page.goto((process.env.DOCUMENT_REVIEW_BASE_URL||'http://127.0.0.1:'+server.address().port)+'/admin.html');
   await page.locator('nav [data-view=applications]').click();await page.locator('[data-case="1"]').click();
-  assert.equal(await page.locator('#case-tab-summary').textContent(),'Informations du candidat');
-  await page.locator('#case-tab-documents').click();assert.equal(await page.locator('.document-item').count(),3);
+  assert.equal(await page.locator('#case-tab-summary').textContent(),'Identité');
+  await page.locator('#case-tab-summary').click();assert.equal(await page.locator('.document-item').count(),3);
   await page.locator('#caseDialog').screenshot({path:path.join(__dirname,'documents-list-desktop.png')});
   await page.locator('[data-open-document="pdf-1"]').click();
   await page.waitForFunction(()=>document.querySelector('.document-surface canvas')?.width>0);
@@ -134,7 +134,7 @@ function documentFixture(){
   await page.locator('#documentViewer').screenshot({path:path.join(__dirname,'documents-review-mobile.png')});
   await page.keyboard.press('Escape');assert.equal(await page.locator('#documentViewer').evaluate(dialog=>dialog.open),false);
   await page.locator('[data-close=caseDialog]').click();
-  assert.equal(await page.locator('#documentViewer').count(),0);
+  await page.locator('#documentViewer').waitFor({state:'detached'});assert.equal(await page.locator('#documentViewer').count(),0);
   assert.deepEqual(errors,[]);
   console.log('PASS: candidate tab, real PDF and image previews, PDF pages, zoom, independent decisions, refusal reason, replacement history, stale update warning, unreadable files, upload validation and cleanup, new uploads, mobile review and keyboard dismissal.');
  }finally{if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}
