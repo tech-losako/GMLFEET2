@@ -21,11 +21,12 @@ export async function sendTrackedSMS(db:any,p:any,message:string|(()=>Promise<st
  const saved=await smsRpc(db,'reserve_sms_dispatch',{...p,body:p.sensitive?null:typeof message==='string'?message:null});
  return sendReservedSMS(db,saved,message,!!p.retry);
 }
-export async function sendReservedSMS(db:any,saved:any,message?:string|(()=>Promise<string>),retry=false){
+export async function sendReservedSMS(db:any,saved:any,message?:string|(()=>Promise<string|null>),retry=false){
  const claimed=await smsRpc(db,'claim_sms_dispatch',{id:saved.id,retry});
  if(!claimed)return {id:saved.id,status:saved.status,error:saved.error,replayed:true};
- let text:string;
+ let text:string|null;
  try{text=typeof message==='function'?await message():claimed.body||message||'';}catch(error){await smsRpc(db,'finish_sms_dispatch',{id:claimed.id,status:'failed',error:'Préparation du message interrompue'});throw error;}
+ if(text===null)return {id:claimed.id,status:'cancelled'};
  const result=await providerSMS(claimed.recipient,text);
  try{const finished=await smsRpc(db,'finish_sms_dispatch',{id:claimed.id,...result});return {...result,...finished,id:claimed.id};}
  catch{return {id:claimed.id,status:'unknown',error:'État SMS non enregistré : vérifier avant de renvoyer'};}

@@ -61,6 +61,7 @@
   const staff=staffDirectory.filter(s=>s.active&&!s.deleted_at);
   Object.assign(state,{apps,appointments,staff,staffDirectory,notifications,quotes});
   $('smsNav').hidden=!staff.some(s=>s.user_id===state.user.id&&['admin','super_admin'].includes(s.role));
+  $('remindersNav').hidden=$('smsNav').hidden;
   $('usersNav').hidden=!staff.some(s=>s.user_id===state.user.id&&s.role==='super_admin');
   $('modelSpecsNav').hidden=!staff.some(s=>s.user_id===state.user.id&&['admin','super_admin'].includes(s.role));
   $('navCount').textContent=apps.filter(a=>workflow.review(a)==='pending').length+quotes.filter(q=>q.status==='new').length;
@@ -75,12 +76,13 @@
   if(state.view!=='overview')window.GMFleetDashboard.cancel();
   document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===state.view));
   $('newApplication').textContent=state.view==='appointments'?'＋ Programmer un rendez-vous':'＋ Nouvelle candidature';
-  $('pageTitle').textContent={overview:'À faire',owners:'Propriétaires',drivers:'Chauffeurs',deposits:'Dépôts LOLC',settings:'Paramètres',templates:'Modèles de contrats',applications:'Candidatures',appointments:'Rendez-vous',contracts:'Contrats',payments:'Caisse / versements',reconciliation:'Bilan',users:'Utilisateurs',sms:'SMS & notifications',preparation:'Préparation & remises',fleet:'Véhicules',modelSpecs:'Véhicules & tarifs'}[state.view];
-  document.getElementById('newApplication').hidden=['sms','users','contracts','payments','reconciliation','preparation','fleet','modelSpecs','owners','drivers','settings','templates','deposits','overview'].includes(state.view);
+  $('pageTitle').textContent={reminders:'Rappels de paiement',overview:'À faire',owners:'Propriétaires',drivers:'Chauffeurs',deposits:'Dépôts LOLC',settings:'Paramètres',templates:'Modèles de contrats',applications:'Candidatures',appointments:'Rendez-vous',contracts:'Contrats',payments:'Caisse / versements',reconciliation:'Bilan',users:'Utilisateurs',sms:'SMS & notifications',preparation:'Préparation & remises',fleet:'Véhicules',modelSpecs:'Véhicules & tarifs'}[state.view];
+  document.getElementById('newApplication').hidden=['reminders','sms','users','contracts','payments','reconciliation','preparation','fleet','modelSpecs','owners','drivers','settings','templates','deposits','overview'].includes(state.view);
   window.GMFleetWorkspace?.navigation(state.view);
   if(['contracts','payments','reconciliation'].includes(state.view)) { const rendering=window.GMFleetFinance.render(state.view,{db,escape,date,person,notify,rows,staff:state.staff,user:state.user,apps:state.apps,openContract:state.dashboardContract});state.dashboardContract=null; return rendering; }
   if(['owners','drivers','settings','templates','deposits'].includes(state.view))return window.GMFleetWorkspace.render(state.view,{db,rows,escape,date,apps:state.apps,staff:state.staff,user:state.user,isCurrent:()=>['owners','drivers','settings','templates','deposits'].includes(state.view)});
   if(state.view==='modelSpecs')return window.GMFleetModelAdmin.render({db,escape,notify,user:state.user,staff:state.staff,isCurrent:()=>state.view==='modelSpecs'});
+  if(state.view==='reminders')return window.GMFleetPaymentReminders.render({db,escape,date,notify,staff:state.staff,user:state.user,isCurrent:()=>state.view==='reminders'});
   if(state.view==='sms')return window.GMFleetSMS.render({db,rows,escape,date,staff:state.staff,user:state.user,isCurrent:()=>state.view==='sms'});
   if(state.view==='users') {window.GMFleetUsers.render({db,escape,notify,staff:state.staff,user:state.user});return;}
   if(state.view==='overview') return renderOverview();

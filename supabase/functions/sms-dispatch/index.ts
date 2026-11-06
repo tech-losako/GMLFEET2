@@ -1,3 +1,4 @@
+import { sendDriverPaymentReminder } from '../_shared/driver-payment-reminders.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
 import { smsRpc, sendReservedSMS, sendTrackedSMS, smsPhone, sameSecret } from '../_shared/sms.ts';
 const origin='https://gmfleet.georgemichaellogistics.cd';
@@ -11,11 +12,16 @@ Deno.serve(async req=>{
   let staff:any,actor:string|undefined;
   if(!worker){
    const caller=createClient(url,Deno.env.get('SUPABASE_ANON_KEY')!,{global:{headers:{Authorization:authorization}},auth:{persistSession:false,autoRefreshToken:false}}),{data,error}=await caller.auth.getUser();if(error||!data.user)return reply(401,{error:'Reconnectez-vous'});actor=data.user.id;
-   const member=await caller.from('staff_members').select('active,deleted_at,role').eq('user_id',actor).maybeSingle();staff=member.data;
+   const member=await caller.from('staff_members').select('active,deleted_at,role,phone').eq('user_id',actor).maybeSingle();staff=member.data;
    if(!staff?.active||staff.deleted_at||!['admin','super_admin'].includes(staff.role))return reply(403,{error:'Accès administrateur requis'});
   }
   const p=await req.json();
   if(!worker&&p.action==='configuration')return reply(200,{configured:!!(Deno.env.get('AFRICASTALKING_USERNAME')&&Deno.env.get('AFRICASTALKING_API_KEY')),mode:Deno.env.get('AFRICASTALKING_USERNAME')==='sandbox'?'sandbox':'production',sender:Deno.env.get('AFRICASTALKING_SENDER_ID')||'Expéditeur par défaut du fournisseur',enabled:config.enabled,delivery_health:config.delivery_health,callback_url:staff.role==='super_admin'?url+'/functions/v1/africastalking-delivery?key='+config.callback_token:undefined});
+  if(!worker&&p.action==='driver-reminder-test'){
+   const phone=smsPhone(staff.phone);if(!phone||!/^[0-9a-f-]{36}$/i.test(String(p.request_id||'')))return reply(400,{error:'Un téléphone +243 valide doit être enregistré sur votre compte équipe.'});
+   const {count,error}=await service.from('sms_dispatches').select('id',{head:true,count:'exact'}).eq('kind','driver_payment_reminder_test').eq('actor_id',actor).gte('created_at',new Date(Date.now()-3600000).toISOString());if(error)throw error;if((count||0)>=5)return reply(429,{error:'Limite de cinq tests par heure atteinte'});
+   const result=await sendTrackedSMS(service,{event_key:'pay-reminder-test:'+actor+':'+p.request_id,kind:'driver_payment_reminder_test',recipient:phone,actor_id:actor},'TEST GM Fleet : rappel de versement. Exemple 31.00 USD avant 21h. Paiement digital : https://gmfleet.georgemichaellogistics.cd/payer.html Aucun debit ni rappel client declenche.');return reply(200,{success:true,sms_status:result.status,sms_error:result.error||null});
+  }
   if(!worker&&p.action==='test'){
    const phone=smsPhone(p.phone);if(!phone||!/^[0-9a-f-]{36}$/i.test(String(p.request_id||'')))return reply(400,{error:'Numéro +243 et identifiant de test requis'});
    const {count,error}=await service.from('sms_dispatches').select('id',{head:true,count:'exact'}).eq('kind','sms_test').eq('actor_id',actor).gte('created_at',new Date(Date.now()-3600000).toISOString());if(error)throw error;if((count||0)>=5)return reply(429,{error:'Limite de cinq tests par heure atteinte'});
@@ -29,8 +35,9 @@ Deno.serve(async req=>{
   }
   if(worker||p.action==='dispatch'){
    if(!config.enabled)return reply(200,{success:true,paused:true});
-   const {data,error}=await service.from('sms_dispatches').select('id,status,body,sensitive,kind,event_key').eq('status','pending').eq('sensitive',false).order('created_at').limit(10);if(error)throw error;
+   const {data,error}=await service.from('sms_dispatches').select('id,status,body,sensitive,kind,event_key').eq('status','pending').or('sensitive.eq.false,kind.eq.driver_payment_reminder').order('created_at').limit(10);if(error)throw error;
    const results=[];for(const n of data||[]){
+    if(n.kind==='driver_payment_reminder'){results.push((await sendDriverPaymentReminder(service,n)).status);continue;}
     if(n.kind==='mobile_owner_invite'){
      const text=await smsRpc(service,'mobile_owner_invite_sms',{invite_id:n.event_key.replace(/^mobile_invite:/,'')});
      if(!text){await service.from('sms_dispatches').update({status:'cancelled',body:null}).eq('id',n.id).eq('status','pending');continue;}
