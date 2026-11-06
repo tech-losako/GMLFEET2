@@ -1,3 +1,4 @@
+import { whatsappOptions } from '../_shared/whatsapp.ts';
 import { sendDriverPaymentReminder } from '../_shared/driver-payment-reminders.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
 import { smsRpc, sendReservedSMS, sendTrackedSMS, smsPhone, sameSecret } from '../_shared/sms.ts';
@@ -16,6 +17,7 @@ Deno.serve(async req=>{
    if(!staff?.active||staff.deleted_at||!['admin','super_admin'].includes(staff.role))return reply(403,{error:'Accès administrateur requis'});
   }
   const p=await req.json();
+  if(p.action==='whatsapp-health'){const config=await whatsappOptions(true),state=await smsRpc(service,'whatsapp_health');return reply(200,{enabled:config.enabled,configured:config.configured,missing:config.missing,approved:config.approved,mismatched:config.mismatched,meta_error_code:config.meta_error_code||null,meta_http_status:config.meta_http_status||null,...state});}
   if(!worker&&p.action==='configuration')return reply(200,{configured:!!(Deno.env.get('AFRICASTALKING_USERNAME')&&Deno.env.get('AFRICASTALKING_API_KEY')),mode:Deno.env.get('AFRICASTALKING_USERNAME')==='sandbox'?'sandbox':'production',sender:Deno.env.get('AFRICASTALKING_SENDER_ID')||'Expéditeur par défaut du fournisseur',enabled:config.enabled,delivery_health:config.delivery_health,callback_url:staff.role==='super_admin'?url+'/functions/v1/africastalking-delivery?key='+config.callback_token:undefined});
   if(!worker&&p.action==='driver-reminder-test'){
    const phone=smsPhone(staff.phone);if(!phone||!/^[0-9a-f-]{36}$/i.test(String(p.request_id||'')))return reply(400,{error:'Un téléphone +243 valide doit être enregistré sur votre compte équipe.'});
@@ -35,8 +37,9 @@ Deno.serve(async req=>{
   }
   if(worker||p.action==='dispatch'){
    if(!config.enabled)return reply(200,{success:true,paused:true});
-   const {data,error}=await service.from('sms_dispatches').select('id,status,body,sensitive,kind,event_key').eq('status','pending').or('sensitive.eq.false,kind.eq.driver_payment_reminder').order('created_at').limit(10);if(error)throw error;
+   const {data,error}=await service.from('sms_dispatches').select('id,status,body,sensitive,kind,event_key,whatsapp_template,fallback_of').eq('status','pending').or('sensitive.eq.false,kind.eq.driver_payment_reminder,fallback_of.not.is.null').order('created_at').limit(10);if(error)throw error;
    const results=[];for(const n of data||[]){
+    if(n.fallback_of){results.push((await sendReservedSMS(service,n)).status);continue;}
     if(n.kind==='driver_payment_reminder'){results.push((await sendDriverPaymentReminder(service,n)).status);continue;}
     if(n.kind==='mobile_owner_invite'){
      const text=await smsRpc(service,'mobile_owner_invite_sms',{invite_id:n.event_key.replace(/^mobile_invite:/,'')});

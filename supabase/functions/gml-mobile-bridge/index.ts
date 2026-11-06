@@ -19,6 +19,11 @@ Deno.serve(async req=>{
   }
   if(!valid){await log('bad_signature');return bad(401,'bad_signature','Authentification invalide. Réessayez depuis GML Mobile.');}
   let p:any;try{p=JSON.parse(raw);}catch{await log('bad_request');return bad(400,'bad_request','Demande invalide.');}
+  if(p?.action==='whatsapp_status'){
+   if(!Array.isArray(p.statuses)||p.statuses.length>100||p.statuses.some((s:any)=>!s||typeof s.wamid!=='string'||!/^wamid\.[A-Za-z0-9_:.=+\/-]{2,290}$/.test(s.wamid)||!['sent','delivered','read','failed'].includes(s.status)||typeof s.recipient!=='string'||!/^\+?[1-9][0-9]{7,14}$/.test(s.recipient)||typeof s.at!=='string'||!Number.isFinite(Date.parse(s.at))||Date.parse(s.at)>Date.now()+300000||(s.error_code!==undefined&&(!Number.isSafeInteger(s.error_code)||s.error_code<0)))){await log('bad_request');return bad(400,'bad_request','Rapports WhatsApp invalides.');}
+   const {data:updated,error}=await service.rpc('record_whatsapp_statuses',{p:{statuses:p.statuses.map((s:any)=>({wamid:s.wamid,status:s.status,at:s.at,recipient:s.recipient,error_code:s.error_code}))}});if(error)return reply(503,{error:'status_unavailable'});
+   return reply(200,{ok:true,updated:updated||0});
+  }
   if(!p||typeof p!=='object'||Array.isArray(p)||!uuid.test(String(p.gml_user_id||''))){await log('bad_request');return bad(400,'bad_request','Demande invalide.');}
   // Explicit allow-list: the bridge cannot call arbitrary GM Fleet commands.
   const fields:Record<string,string[]>={redeem_invite:['gml_phone','code'],owner_overview:[],vehicle_settlements:['vehicle_id','limit'],vehicle_receipts:['vehicle_id','month'],vehicle_advances:['vehicle_id']};

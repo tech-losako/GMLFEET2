@@ -1,3 +1,4 @@
+import { whatsappOptions, providerWhatsApp, encryptWhatsAppRuntime, decryptWhatsAppRuntime, whatsappRuntimeParameters } from './whatsapp.ts';
 // One provider adapter and persisted, atomic claim for every SMS sender.
 export const smsPhone=(v:unknown)=>{const s=String(v??'').replace(/[\s()-]/g,'');const d=s.replace(/^\+?243/,'').replace(/^0/,'');return /^[0-9]{9}$/.test(d)?'+243'+d:'';};
 export async function smsRpc(db:any,name:string,p?:unknown){const {data,error}=await db.rpc(name,p===undefined?{}:{p});if(error)throw Error('Journal SMS indisponible : '+error.message);return data;}
@@ -22,11 +23,26 @@ export async function sendTrackedSMS(db:any,p:any,message:string|(()=>Promise<st
  return sendReservedSMS(db,saved,message,!!p.retry);
 }
 export async function sendReservedSMS(db:any,saved:any,message?:string|(()=>Promise<string|null>),retry=false){
- const claimed=await smsRpc(db,'claim_sms_dispatch',{id:saved.id,retry});
+ const isTest=saved.kind==='whatsapp_test',options=saved.whatsapp_template?await whatsappOptions(isTest):null;
+ if(isTest&&(!options?.configured||(saved.whatsapp_template!=='GMFLEET_INVALID_TEMPLATE_TEST'&&!options.approved.includes(saved.whatsapp_template)))){await smsRpc(db,'cancel_whatsapp_notification',{id:saved.id,reason:'Configuration ou modèle WhatsApp non vérifié'});return {id:saved.id,status:'not_configured',error:'Configuration ou modèle WhatsApp non vérifié'};}
+ const claimed=await smsRpc(db,'claim_sms_dispatch',{id:saved.id,retry,whatsapp_enabled:!!options?.enabled,approved_templates:options?.approved||[],whatsapp_test:isTest&&!!options?.configured});
  if(!claimed)return {id:saved.id,status:saved.status,error:saved.error,replayed:true};
  let text:string|null;
- try{text=typeof message==='function'?await message():claimed.body||message||'';}catch(error){await smsRpc(db,'finish_sms_dispatch',{id:claimed.id,status:'failed',error:'Préparation du message interrompue'});throw error;}
+ try{if(claimed.fallback_of&&claimed.sensitive&&!message){const envelope=await smsRpc(db,'get_whatsapp_payload',{id:claimed.id});if(!envelope?.ciphertext||Date.parse(envelope.expires_at)<=Date.now()){await smsRpc(db,'cancel_whatsapp_notification',{id:claimed.id,reason:'Lien privé expiré : renouveler depuis le dossier'});return {id:claimed.id,status:'cancelled'};}text=(await decryptWhatsAppRuntime(envelope.source_id,envelope.ciphertext)).sms;}else text=typeof message==='function'?await message():claimed.body||message||'';}catch(error){await smsRpc(db,'finish_sms_dispatch',{id:claimed.id,status:'failed',error:'Préparation du message interrompue'});throw error;}
  if(text===null)return {id:claimed.id,status:'cancelled'};
+ if(claimed.channel==='whatsapp'){
+  let result:any;
+  try{
+   const payload=await smsRpc(db,'get_whatsapp_payload',{id:claimed.id});
+   const envelope=await encryptWhatsAppRuntime(claimed.id,{sms:text});
+   const expires_at=new Date(Date.now()+(claimed.kind==='staff_invitation'?30*60*1000:48*3600000)).toISOString();
+   if(!await smsRpc(db,'save_whatsapp_runtime',{id:claimed.id,ciphertext:envelope,expires_at}))throw Error('Private transport unavailable');
+   const parameters=whatsappRuntimeParameters(payload,text);
+   result=await providerWhatsApp(claimed.recipient,payload.template,parameters);
+  }catch{result={status:'failed',error_code:0};}
+  try{const finished=await smsRpc(db,'finish_whatsapp_dispatch',{id:claimed.id,...result});return {...finished,id:claimed.id,channel:'whatsapp',error:finished.fallback?'WhatsApp refusé ; repli SMS mis en file':finished.error};}
+  catch{return {id:claimed.id,status:'unknown',channel:'whatsapp',error:'État WhatsApp non enregistré : vérifier avant de renvoyer'};}
+ }
  const result=await providerSMS(claimed.recipient,text);
  try{const finished=await smsRpc(db,'finish_sms_dispatch',{id:claimed.id,...result});return {...result,...finished,id:claimed.id};}
  catch{return {id:claimed.id,status:'unknown',error:'État SMS non enregistré : vérifier avant de renvoyer'};}

@@ -1,0 +1,110 @@
+{
+  "gml_alerte_encaissement_direction_fr": {
+    "body": "GM Fleet — paiement confirmé.\nClient : {{1}}.\nContrat : {{2}}.\nMontant reçu : {{3}} {{4}}.\nPart GML : {{5}} {{4}}. Part LOLC : {{6}} {{4}}.\nMode : {{7}}. Date : {{8}}.\nRéférence : {{9}}.\nCet avis correspond à un encaissement enregistré.",
+    "count": 9
+  },
+  "gml_equipement_encaisse_direction_fr": {
+    "body": "GM Fleet — règlement équipements Car na ngai enregistré.\nClient : {{1}}. Montant encaissé : {{2}} USD.\nForfait prévu : 240 USD, soit tracker 130 USD + installation 20 USD + service 7,50 USD par mois × 12 = 90 USD.\nDate : {{3}}. Référence : {{4}}.\nLe montant encaissé ci-dessus est le paiement réel, même en cas de règlement partiel.",
+    "count": 4
+  },
+  "gml_depot_lolc_direction_fr": {
+    "body": "GM Fleet — dépôt client LOLC enregistré.\nClient : {{1}}. Dossier : {{2}}.\nMontant du dépôt : {{3}} USD.\nDate : {{4}}. Référence : {{5}}.\nPart GML sur cette écriture : 0 USD. Les équipements GML sont suivis dans leur règlement séparé.",
+    "count": 5
+  },
+  "gml_versement_confirme_fr": {
+    "body": "Bonjour {{1}}, votre versement GM Fleet de {{2}} {{3}} est confirmé.\nContrat : {{4}}. Date : {{5}}.\nMode : {{6}}. Référence du reçu : {{7}}.\nLe paiement a été enregistré dans votre dossier.",
+    "count": 7
+  },
+  "gml_versement_annule_fr": {
+    "body": "GM Fleet — annulation comptable de versement.\nClient : {{1}}. Contrat : {{2}}.\nMontant annulé : {{3}} {{4}}, dont GML {{5}} {{4}} et LOLC {{6}} {{4}}.\nRéférence initiale : {{7}}. Référence d’annulation : {{8}}.\nDate : {{9}}. Contactez GM Fleet pour toute question sur cette correction.",
+    "count": 9
+  },
+  "gml_depot_lolc_confirme_fr": {
+    "body": "Bonjour {{1}}, votre dépôt client LOLC de {{2}} USD a été enregistré le {{3}}.\nDossier : {{4}}. Référence : {{5}}.\nCet avis confirme l’enregistrement du dépôt ; la suite du financement dépend de la décision LOLC.",
+    "count": 5
+  },
+  "gml_proprietaire_mise_exploitation_fr": {
+    "body": "Bonjour {{1}}, votre véhicule {{2}}, plaque {{3}}, est confié au chauffeur {{11}} à partir du {{4}}.\nMandat : {{5}}.\nDette restante : {{6}} USD. Prochaine retenue prévue : {{7}} USD pour la période {{8}}.\nMontant propriétaire cible : {{9}} USD. Net prévisionnel : {{10}} USD.\nCette prévision dépend des encaissements et des ajustements convenus. Le paiement mensuel sera confirmé séparément.",
+    "count": 11
+  },
+  "gml_proprietaire_recap_avance_fr": {
+    "body": "GM Fleet — récapitulatif de votre avance approuvée.\nPrestation : {{1}}.\nCoût initial : {{2}} USD. Frais uniques de 15 % : {{3}} USD. Total : {{4}} USD.\nSolde restant : {{5}} USD. Durée convenue : {{6}} mois.\nFin du remboursement : {{7}}. Accord : {{8}}.\nLes retenues suivent l’échéancier enregistré avec votre accord.",
+    "count": 8
+  },
+  "gml_proprietaire_paiement_mensuel_fr": {
+    "body": "Bonjour {{1}}, votre règlement propriétaire GM Fleet a été enregistré comme payé.\nVéhicule : {{2}}, plaque {{3}}. Période : {{4}}.\nMontant propriétaire avant retenues : {{5}} USD. Remboursement des avances : {{6}} USD.\nNet payé : {{7}} USD le {{8}}.\nRéférence : {{9}}. Cet avis correspond au paiement confirmé par notre caisse.",
+    "count": 9
+  },
+  "gml_copie_contrat_fr": {
+    "body": "Bonjour {{1}}, votre copie du contrat GM Fleet {{2}} est disponible.\nTéléchargement privé : {{3}}\nLe lien est valable 7 jours. Vérifiez vos informations, signez le document puis remettez la copie signée à votre agent GM Fleet. Le téléchargement ne constitue pas une signature.",
+    "count": 3
+  },
+  "gml_contrat_active_fr": {
+    "body": "Bonjour {{1}}, votre contrat GM Fleet {{2}} est activé.\nVéhicule : {{3}}, plaque {{4}}. Début : {{5}}.\nPremier règlement : {{6}}. Rythme convenu : {{7}}. Montant habituel par règlement : {{8}} {{9}}.\nLes dates et montants enregistrés au contrat font référence.",
+    "count": 9
+  },
+  "gml_rendez_vous_confirmation_fr": {
+    "body": "Bonjour {{1}}, votre rendez-vous GM Fleet est confirmé.\nObjet : {{2}}.\nDate : {{3}} à {{4}}, heure de Kinshasa.\nLieu : {{5}}. Dossier : {{6}}.\nPour une modification, contactez votre agent GM Fleet.",
+    "count": 6
+  },
+  "gml_rendez_vous_annule_fr": {
+    "body": "Bonjour {{1}}, votre rendez-vous GM Fleet pour {{2}}, prévu le {{3}} à {{4}} heure de Kinshasa, est annulé.\nDossier : {{5}}. Contactez votre agent pour convenir d’une nouvelle date.",
+    "count": 5
+  },
+  "gml_candidature_recue_fr": {
+    "body": "Bonjour {{1}}, GM Fleet a reçu votre candidature au programme {{2}}.\nRéférence du dossier : {{3}}.\nNotre équipe examine les informations transmises et vous contactera pour la suite. Conservez cette référence.",
+    "count": 3
+  },
+  "gml_candidature_admin_fr": {
+    "body": "GM Fleet — nouvelle candidature reçue.\nDossier : {{1}}. Nom : {{2}}.\nProgramme : {{3}}. Véhicule ou besoin déclaré : {{4}}.\nOuvrez l’espace opérations pour examiner les informations et les documents.",
+    "count": 4
+  },
+  "gml_dossier_retenu_fr": {
+    "body": "Bonjour {{1}}, votre candidature GM Fleet {{2}} au programme {{3}} a été retenue pour poursuivre les étapes de traitement.\nVotre agent vous indiquera la prochaine étape. Cette décision ne crée pas encore de contrat actif.",
+    "count": 3
+  },
+  "gml_dossier_refuse_fr": {
+    "body": "Bonjour {{1}}, l’examen de votre candidature GM Fleet {{2}} est terminé. Le dossier n’a pas été retenu.\nObservation communiquée : {{3}}.\nVous pouvez contacter votre agent pour obtenir des précisions.",
+    "count": 3
+  },
+  "gml_lolc_accord_fr": {
+    "body": "Bonjour {{1}}, l’accord LOLC a été enregistré pour votre dossier GM Fleet {{2}}.\nGML poursuit la sélection et les contrôles du véhicule. Votre agent vous informera des prochaines étapes de votre financement.",
+    "count": 2
+  },
+  "gml_lolc_complement_fr": {
+    "body": "Bonjour {{1}}, LOLC demande un complément pour votre dossier GM Fleet {{2}}.\nÉléments demandés : {{3}}.\nContactez votre agent pour transmettre ces éléments et poursuivre le traitement.",
+    "count": 3
+  },
+  "gml_lolc_refus_fr": {
+    "body": "Bonjour {{1}}, LOLC n’a pas approuvé le financement de votre dossier GM Fleet {{2}}.\nContactez votre agent GM Fleet pour les explications et les suites possibles concernant votre dossier.",
+    "count": 2
+  },
+  "gml_equipements_installes_fr": {
+    "body": "Bonjour {{1}}, l’installation des équipements {{2}} est terminée pour le véhicule de votre dossier GM Fleet {{3}}.\nNotre équipe prépare les documents et la remise du véhicule. Votre agent vous communiquera les modalités.",
+    "count": 3
+  },
+  "gml_vehicule_remis_fr": {
+    "body": "Bonjour {{1}}, la remise de votre véhicule {{2}}, plaque {{3}}, a été enregistrée le {{4}} pour le dossier {{5}}.\nLes photos de l’état initial et le kilométrage sont conservés dans votre dossier. Les versements suivent les dates de votre contrat activé.",
+    "count": 5
+  },
+  "gml_chauffeur_pret_affectation_fr": {
+    "body": "Bonjour {{1}}, votre intégration chauffeur GM Fleet est terminée pour le dossier {{2}}.\nVotre affectation sera confirmée selon les véhicules disponibles. Aucun versement ne commence avant l’activation de votre contrat et la date convenue.",
+    "count": 2
+  },
+  "gml_yango_rattachement_fr": {
+    "body": "Bonjour {{1}}, votre rattachement à GM Fleet sur Yango a été confirmé pour le dossier {{2}}.\nVotre agent reste votre contact pour le suivi de ce partenariat.",
+    "count": 2
+  },
+  "gml_devis_recu_fr": {
+    "body": "Bonjour {{1}}, GM Fleet a reçu votre demande de devis pour {{2}}.\nRéférence : {{3}}.\nNotre équipe vous contactera pour confirmer le besoin, le prix et la planification de l’installation.",
+    "count": 3
+  },
+  "gml_devis_admin_fr": {
+    "body": "GM Fleet — nouvelle demande de devis équipements.\nRéférence : {{1}}. Client : {{2}}.\nBesoin : {{3}}.\nOuvrez l’espace opérations pour examiner la demande et préparer la réponse.",
+    "count": 3
+  },
+  "gml_compte_equipe_invitation_fr": {
+    "body": "Bonjour {{1}}, votre compte équipe GM Fleet a été créé avec le rôle {{2}}.\nPour terminer la configuration de votre accès, utilisez le lien personnel suivant : {{3}}\nNe partagez pas ce lien. Contactez votre administrateur s’il est expiré.",
+    "count": 3
+  }
+}

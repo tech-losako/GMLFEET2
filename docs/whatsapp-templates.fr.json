@@ -1,0 +1,2150 @@
+{
+  "prepared_on": "2026-11-04",
+  "brand": "GM Fleet",
+  "language": "fr",
+  "live_transport": "sms",
+  "whatsapp_connected": false,
+  "classification": "UTILITY proposée ; Meta décide de la catégorie et de l’approbation.",
+  "templates": [
+    {
+      "name": "gml_alerte_encaissement_direction_fr",
+      "title": "Paiement confirmé · direction",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Eric Ebabi",
+      "events": [
+        "boss_payment:payment"
+      ],
+      "priority": 1,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "GM Fleet — paiement confirmé.\nClient : {{1}}.\nContrat : {{2}}.\nMontant reçu : {{3}} {{4}}.\nPart GML : {{5}} {{4}}. Part LOLC : {{6}} {{4}}.\nMode : {{7}}. Date : {{8}}.\nRéférence : {{9}}.\nCet avis correspond à un encaissement enregistré.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom du client",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Référence du contrat",
+          "example": "GMF-CTR-2026-000099"
+        },
+        {
+          "position": 3,
+          "meaning": "Montant hors frais de transaction",
+          "example": "177,00"
+        },
+        {
+          "position": 4,
+          "meaning": "Devise",
+          "example": "USD"
+        },
+        {
+          "position": 5,
+          "meaning": "Part GML réelle de ce paiement",
+          "example": "15,00"
+        },
+        {
+          "position": 6,
+          "meaning": "Part LOLC réelle de ce paiement",
+          "example": "162,00"
+        },
+        {
+          "position": 7,
+          "meaning": "Mode",
+          "example": "Espèces"
+        },
+        {
+          "position": 8,
+          "meaning": "Date du paiement",
+          "example": "08/11/2026"
+        },
+        {
+          "position": 9,
+          "meaning": "Référence du reçu",
+          "example": "CAISSE-20261108-EXEMPLE"
+        }
+      ],
+      "example": "GM Fleet — paiement confirmé.\nClient : Jean Exemple.\nContrat : GMF-CTR-2026-000099.\nMontant reçu : 177,00 USD.\nPart GML : 15,00 USD. Part LOLC : 162,00 USD.\nMode : Espèces. Date : 08/11/2026.\nRéférence : CAISSE-20261108-EXEMPLE.\nCet avis correspond à un encaissement enregistré.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_equipement_encaisse_direction_fr",
+      "title": "Équipements encaissés · direction",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Eric Ebabi",
+      "events": [
+        "boss_payment:equipment_received"
+      ],
+      "priority": 1,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "GM Fleet — règlement équipements Car na ngai enregistré.\nClient : {{1}}. Montant encaissé : {{2}} USD.\nForfait prévu : 240 USD, soit tracker 130 USD + installation 20 USD + service 7,50 USD par mois × 12 = 90 USD.\nDate : {{3}}. Référence : {{4}}.\nLe montant encaissé ci-dessus est le paiement réel, même en cas de règlement partiel.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Client",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Montant réellement reçu",
+          "example": "240,00"
+        },
+        {
+          "position": 3,
+          "meaning": "Date",
+          "example": "04/11/2026"
+        },
+        {
+          "position": 4,
+          "meaning": "Référence",
+          "example": "EQUIPEMENT-EXEMPLE"
+        }
+      ],
+      "example": "GM Fleet — règlement équipements Car na ngai enregistré.\nClient : Jean Exemple. Montant encaissé : 240,00 USD.\nForfait prévu : 240 USD, soit tracker 130 USD + installation 20 USD + service 7,50 USD par mois × 12 = 90 USD.\nDate : 04/11/2026. Référence : EQUIPEMENT-EXEMPLE.\nLe montant encaissé ci-dessus est le paiement réel, même en cas de règlement partiel.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_depot_lolc_direction_fr",
+      "title": "Dépôt LOLC enregistré · direction",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Eric Ebabi",
+      "events": [
+        "boss_payment:client_deposit_lolc"
+      ],
+      "priority": 1,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "GM Fleet — dépôt client LOLC enregistré.\nClient : {{1}}. Dossier : {{2}}.\nMontant du dépôt : {{3}} USD.\nDate : {{4}}. Référence : {{5}}.\nPart GML sur cette écriture : 0 USD. Les équipements GML sont suivis dans leur règlement séparé.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Client",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Dossier",
+          "example": "CNG-2026-000099"
+        },
+        {
+          "position": 3,
+          "meaning": "Dépôt réellement confirmé",
+          "example": "1400,00"
+        },
+        {
+          "position": 4,
+          "meaning": "Date",
+          "example": "04/11/2026"
+        },
+        {
+          "position": 5,
+          "meaning": "Référence",
+          "example": "DEPOT-EXEMPLE"
+        }
+      ],
+      "example": "GM Fleet — dépôt client LOLC enregistré.\nClient : Jean Exemple. Dossier : CNG-2026-000099.\nMontant du dépôt : 1400,00 USD.\nDate : 04/11/2026. Référence : DEPOT-EXEMPLE.\nPart GML sur cette écriture : 0 USD. Les équipements GML sont suivis dans leur règlement séparé.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_versement_confirme_fr",
+      "title": "Reçu de versement · client",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Chauffeur",
+      "events": [
+        "payment_receipt:payment"
+      ],
+      "priority": 1,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, votre versement GM Fleet de {{2}} {{3}} est confirmé.\nContrat : {{4}}. Date : {{5}}.\nMode : {{6}}. Référence du reçu : {{7}}.\nLe paiement a été enregistré dans votre dossier.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Chauffeur",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Montant hors frais de transaction",
+          "example": "177,00"
+        },
+        {
+          "position": 3,
+          "meaning": "Devise",
+          "example": "USD"
+        },
+        {
+          "position": 4,
+          "meaning": "Contrat",
+          "example": "GMF-CTR-2026-000099"
+        },
+        {
+          "position": 5,
+          "meaning": "Date",
+          "example": "08/11/2026"
+        },
+        {
+          "position": 6,
+          "meaning": "Mode",
+          "example": "Mobile Money"
+        },
+        {
+          "position": 7,
+          "meaning": "Référence",
+          "example": "RECU-EXEMPLE"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, votre versement GM Fleet de 177,00 USD est confirmé.\nContrat : GMF-CTR-2026-000099. Date : 08/11/2026.\nMode : Mobile Money. Référence du reçu : RECU-EXEMPLE.\nLe paiement a été enregistré dans votre dossier.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_versement_annule_fr",
+      "title": "Contre-écriture · client et direction",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Chauffeur / Eric, avec envois distincts",
+      "events": [
+        "payment_receipt:reversal",
+        "boss_payment:reversal"
+      ],
+      "priority": 1,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "GM Fleet — annulation comptable de versement.\nClient : {{1}}. Contrat : {{2}}.\nMontant annulé : {{3}} {{4}}, dont GML {{5}} {{4}} et LOLC {{6}} {{4}}.\nRéférence initiale : {{7}}. Référence d’annulation : {{8}}.\nDate : {{9}}. Contactez GM Fleet pour toute question sur cette correction.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Client",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Contrat",
+          "example": "GMF-CTR-2026-000099"
+        },
+        {
+          "position": 3,
+          "meaning": "Montant",
+          "example": "177,00"
+        },
+        {
+          "position": 4,
+          "meaning": "Devise",
+          "example": "USD"
+        },
+        {
+          "position": 5,
+          "meaning": "Part GML annulée",
+          "example": "15,00"
+        },
+        {
+          "position": 6,
+          "meaning": "Part LOLC annulée",
+          "example": "162,00"
+        },
+        {
+          "position": 7,
+          "meaning": "Reçu initial",
+          "example": "RECU-EXEMPLE"
+        },
+        {
+          "position": 8,
+          "meaning": "Contre-écriture",
+          "example": "ANNULATION-EXEMPLE"
+        },
+        {
+          "position": 9,
+          "meaning": "Date",
+          "example": "09/11/2026"
+        }
+      ],
+      "example": "GM Fleet — annulation comptable de versement.\nClient : Jean Exemple. Contrat : GMF-CTR-2026-000099.\nMontant annulé : 177,00 USD, dont GML 15,00 USD et LOLC 162,00 USD.\nRéférence initiale : RECU-EXEMPLE. Référence d’annulation : ANNULATION-EXEMPLE.\nDate : 09/11/2026. Contactez GM Fleet pour toute question sur cette correction.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_depot_lolc_confirme_fr",
+      "title": "Reçu de dépôt LOLC · client",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Client Car na ngai",
+      "events": [
+        "lolc_deposit_receipt"
+      ],
+      "priority": 1,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, votre dépôt client LOLC de {{2}} USD a été enregistré le {{3}}.\nDossier : {{4}}. Référence : {{5}}.\nCet avis confirme l’enregistrement du dépôt ; la suite du financement dépend de la décision LOLC.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Client",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Dépôt",
+          "example": "1400,00"
+        },
+        {
+          "position": 3,
+          "meaning": "Date",
+          "example": "04/11/2026"
+        },
+        {
+          "position": 4,
+          "meaning": "Dossier",
+          "example": "CNG-2026-000099"
+        },
+        {
+          "position": 5,
+          "meaning": "Référence",
+          "example": "DEPOT-EXEMPLE"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, votre dépôt client LOLC de 1400,00 USD a été enregistré le 04/11/2026.\nDossier : CNG-2026-000099. Référence : DEPOT-EXEMPLE.\nCet avis confirme l’enregistrement du dépôt ; la suite du financement dépend de la décision LOLC.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_proprietaire_mise_exploitation_fr",
+      "title": "Démarrage du véhicule et prochaine retenue",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Propriétaire externe",
+      "events": [
+        "owner_assignment"
+      ],
+      "priority": 1,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, votre véhicule {{2}}, plaque {{3}}, est confié au chauffeur {{11}} à partir du {{4}}.\nMandat : {{5}}.\nDette restante : {{6}} USD. Prochaine retenue prévue : {{7}} USD pour la période {{8}}.\nMontant propriétaire cible : {{9}} USD. Net prévisionnel : {{10}} USD.\nCette prévision dépend des encaissements et des ajustements convenus. Le paiement mensuel sera confirmé séparément.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Propriétaire",
+          "example": "Marie Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Modèle",
+          "example": "Toyota Vitz"
+        },
+        {
+          "position": 3,
+          "meaning": "Plaque",
+          "example": "TEST-099"
+        },
+        {
+          "position": 4,
+          "meaning": "Début réel",
+          "example": "04/11/2026"
+        },
+        {
+          "position": 5,
+          "meaning": "Mandat propriétaire",
+          "example": "GMF-MAN-2026-000099"
+        },
+        {
+          "position": 6,
+          "meaning": "Solde des avances",
+          "example": "280,50"
+        },
+        {
+          "position": 7,
+          "meaning": "Retenue plafonnée au brut prévu",
+          "example": "165,50"
+        },
+        {
+          "position": 8,
+          "meaning": "Période",
+          "example": "novembre 2026"
+        },
+        {
+          "position": 9,
+          "meaning": "Montant brut cible convenu",
+          "example": "500,00"
+        },
+        {
+          "position": 10,
+          "meaning": "Net prévisionnel",
+          "example": "334,50"
+        },
+        {
+          "position": 11,
+          "meaning": "Nom du chauffeur affecté",
+          "example": "Daniel Exemple"
+        }
+      ],
+      "example": "Bonjour Marie Exemple, votre véhicule Toyota Vitz, plaque TEST-099, est confié au chauffeur Daniel Exemple à partir du 04/11/2026.\nMandat : GMF-MAN-2026-000099.\nDette restante : 280,50 USD. Prochaine retenue prévue : 165,50 USD pour la période novembre 2026.\nMontant propriétaire cible : 500,00 USD. Net prévisionnel : 334,50 USD.\nCette prévision dépend des encaissements et des ajustements convenus. Le paiement mensuel sera confirmé séparément.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": "Messages liés aux avances ou au financement : faire confirmer leur admissibilité et leur qualification par Meta avant usage WhatsApp ; conserver les SMS en attendant."
+    },
+    {
+      "name": "gml_proprietaire_recap_avance_fr",
+      "title": "Détail d’une avance approuvée",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Propriétaire externe",
+      "events": [
+        "owner_debt_recap"
+      ],
+      "priority": 1,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "GM Fleet — récapitulatif de votre avance approuvée.\nPrestation : {{1}}.\nCoût initial : {{2}} USD. Frais uniques de 15 % : {{3}} USD. Total : {{4}} USD.\nSolde restant : {{5}} USD. Durée convenue : {{6}} mois.\nFin du remboursement : {{7}}. Accord : {{8}}.\nLes retenues suivent l’échéancier enregistré avec votre accord.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Prestation",
+          "example": "Réparation moteur"
+        },
+        {
+          "position": 2,
+          "meaning": "Principal",
+          "example": "200,00"
+        },
+        {
+          "position": 3,
+          "meaning": "Frais une seule fois",
+          "example": "30,00"
+        },
+        {
+          "position": 4,
+          "meaning": "Total",
+          "example": "230,00"
+        },
+        {
+          "position": 5,
+          "meaning": "Solde après récupérations",
+          "example": "230,00"
+        },
+        {
+          "position": 6,
+          "meaning": "Durée de 1 à 6 mois",
+          "example": "2"
+        },
+        {
+          "position": 7,
+          "meaning": "Échéance finale",
+          "example": "31/12/2026"
+        },
+        {
+          "position": 8,
+          "meaning": "Accord enregistré",
+          "example": "ACCORD-REPARATION-EXEMPLE"
+        }
+      ],
+      "example": "GM Fleet — récapitulatif de votre avance approuvée.\nPrestation : Réparation moteur.\nCoût initial : 200,00 USD. Frais uniques de 15 % : 30,00 USD. Total : 230,00 USD.\nSolde restant : 230,00 USD. Durée convenue : 2 mois.\nFin du remboursement : 31/12/2026. Accord : ACCORD-REPARATION-EXEMPLE.\nLes retenues suivent l’échéancier enregistré avec votre accord.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": "Messages liés aux avances ou au financement : faire confirmer leur admissibilité et leur qualification par Meta avant usage WhatsApp ; conserver les SMS en attendant."
+    },
+    {
+      "name": "gml_proprietaire_paiement_mensuel_fr",
+      "title": "Payout effectivement payé · propriétaire",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Propriétaire externe",
+      "events": [
+        "owner_settlement"
+      ],
+      "priority": 1,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, votre règlement propriétaire GM Fleet a été enregistré comme payé.\nVéhicule : {{2}}, plaque {{3}}. Période : {{4}}.\nMontant propriétaire avant retenues : {{5}} USD. Remboursement des avances : {{6}} USD.\nNet payé : {{7}} USD le {{8}}.\nRéférence : {{9}}. Cet avis correspond au paiement confirmé par notre caisse.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Propriétaire",
+          "example": "Marie Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Véhicule",
+          "example": "Toyota Vitz"
+        },
+        {
+          "position": 3,
+          "meaning": "Plaque",
+          "example": "TEST-099"
+        },
+        {
+          "position": 4,
+          "meaning": "Période",
+          "example": "01/11/2026 au 30/11/2026"
+        },
+        {
+          "position": 5,
+          "meaning": "Brut propriétaire",
+          "example": "500,00"
+        },
+        {
+          "position": 6,
+          "meaning": "Retenue réelle",
+          "example": "165,50"
+        },
+        {
+          "position": 7,
+          "meaning": "Net réellement payé",
+          "example": "334,50"
+        },
+        {
+          "position": 8,
+          "meaning": "Date réelle",
+          "example": "30/11/2026"
+        },
+        {
+          "position": 9,
+          "meaning": "Référence réelle",
+          "example": "PROPRIETAIRE-EXEMPLE"
+        }
+      ],
+      "example": "Bonjour Marie Exemple, votre règlement propriétaire GM Fleet a été enregistré comme payé.\nVéhicule : Toyota Vitz, plaque TEST-099. Période : 01/11/2026 au 30/11/2026.\nMontant propriétaire avant retenues : 500,00 USD. Remboursement des avances : 165,50 USD.\nNet payé : 334,50 USD le 30/11/2026.\nRéférence : PROPRIETAIRE-EXEMPLE. Cet avis correspond au paiement confirmé par notre caisse.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_copie_contrat_fr",
+      "title": "Copie de contrat à signer",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Propriétaire / chauffeur partenaire",
+      "events": [
+        "contract_copy"
+      ],
+      "priority": 1,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, votre copie du contrat GM Fleet {{2}} est disponible.\nTéléchargement privé : {{3}}\nLe lien est valable 7 jours. Vérifiez vos informations, signez le document puis remettez la copie signée à votre agent GM Fleet. Le téléchargement ne constitue pas une signature.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Marie Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Référence",
+          "example": "GMF-MAN-2026-000099"
+        },
+        {
+          "position": 3,
+          "meaning": "Lien privé généré par le backend",
+          "example": "https://gmfleet.georgemichaellogistics.cd/contrat.html#token=EXEMPLE_FICTIF"
+        }
+      ],
+      "example": "Bonjour Marie Exemple, votre copie du contrat GM Fleet GMF-MAN-2026-000099 est disponible.\nTéléchargement privé : https://gmfleet.georgemichaellogistics.cd/contrat.html#token=EXEMPLE_FICTIF\nLe lien est valable 7 jours. Vérifiez vos informations, signez le document puis remettez la copie signée à votre agent GM Fleet. Le téléchargement ne constitue pas une signature.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_contrat_active_fr",
+      "title": "Contrat chauffeur activé",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Chauffeur",
+      "events": [
+        "contract_activated"
+      ],
+      "priority": 1,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, votre contrat GM Fleet {{2}} est activé.\nVéhicule : {{3}}, plaque {{4}}. Début : {{5}}.\nPremier règlement : {{6}}. Rythme convenu : {{7}}. Montant habituel par règlement : {{8}} {{9}}.\nLes dates et montants enregistrés au contrat font référence.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Chauffeur",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Contrat",
+          "example": "GMF-CTR-2026-000099"
+        },
+        {
+          "position": 3,
+          "meaning": "Véhicule",
+          "example": "Toyota Vitz"
+        },
+        {
+          "position": 4,
+          "meaning": "Plaque",
+          "example": "TEST-099"
+        },
+        {
+          "position": 5,
+          "meaning": "Début",
+          "example": "04/11/2026"
+        },
+        {
+          "position": 6,
+          "meaning": "Première date de règlement exigible, après calendrier hebdomadaire si applicable",
+          "example": "05/11/2026"
+        },
+        {
+          "position": 7,
+          "meaning": "Rythme",
+          "example": "lundi à vendredi"
+        },
+        {
+          "position": 8,
+          "meaning": "Montant correspondant au rythme, pas systématiquement le taux quotidien",
+          "example": "31,00"
+        },
+        {
+          "position": 9,
+          "meaning": "Devise",
+          "example": "USD"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, votre contrat GM Fleet GMF-CTR-2026-000099 est activé.\nVéhicule : Toyota Vitz, plaque TEST-099. Début : 04/11/2026.\nPremier règlement : 05/11/2026. Rythme convenu : lundi à vendredi. Montant habituel par règlement : 31,00 USD.\nLes dates et montants enregistrés au contrat font référence.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_rendez_vous_confirmation_fr",
+      "title": "Rendez-vous confirmé ou reprogrammé",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Client / chauffeur / propriétaire",
+      "events": [
+        "appointment"
+      ],
+      "priority": 1,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, votre rendez-vous GM Fleet est confirmé.\nObjet : {{2}}.\nDate : {{3}} à {{4}}, heure de Kinshasa.\nLieu : {{5}}. Dossier : {{6}}.\nPour une modification, contactez votre agent GM Fleet.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Objet",
+          "example": "Entretien et test de conduite"
+        },
+        {
+          "position": 3,
+          "meaning": "Date",
+          "example": "09/11/2026"
+        },
+        {
+          "position": 4,
+          "meaning": "Heure locale Kinshasa",
+          "example": "10:30"
+        },
+        {
+          "position": 5,
+          "meaning": "Lieu réel du rendez-vous",
+          "example": "Bureau GM Fleet, Gombe"
+        },
+        {
+          "position": 6,
+          "meaning": "Dossier",
+          "example": "CHP-2026-000099"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, votre rendez-vous GM Fleet est confirmé.\nObjet : Entretien et test de conduite.\nDate : 09/11/2026 à 10:30, heure de Kinshasa.\nLieu : Bureau GM Fleet, Gombe. Dossier : CHP-2026-000099.\nPour une modification, contactez votre agent GM Fleet.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_rendez_vous_annule_fr",
+      "title": "Annulation du rendez-vous",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Client",
+      "events": [
+        "appointment_cancelled"
+      ],
+      "priority": 1,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, votre rendez-vous GM Fleet pour {{2}}, prévu le {{3}} à {{4}} heure de Kinshasa, est annulé.\nDossier : {{5}}. Contactez votre agent pour convenir d’une nouvelle date.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Objet",
+          "example": "Entretien et test de conduite"
+        },
+        {
+          "position": 3,
+          "meaning": "Date",
+          "example": "09/11/2026"
+        },
+        {
+          "position": 4,
+          "meaning": "Heure",
+          "example": "10:30"
+        },
+        {
+          "position": 5,
+          "meaning": "Dossier",
+          "example": "CHP-2026-000099"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, votre rendez-vous GM Fleet pour Entretien et test de conduite, prévu le 09/11/2026 à 10:30 heure de Kinshasa, est annulé.\nDossier : CHP-2026-000099. Contactez votre agent pour convenir d’une nouvelle date.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_candidature_recue_fr",
+      "title": "Accusé de réception candidature",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Client",
+      "events": [
+        "application_received"
+      ],
+      "priority": 1,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, GM Fleet a reçu votre candidature au programme {{2}}.\nRéférence du dossier : {{3}}.\nNotre équipe examine les informations transmises et vous contactera pour la suite. Conservez cette référence.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Programme",
+          "example": "Car na ngai · LOLC"
+        },
+        {
+          "position": 3,
+          "meaning": "Dossier",
+          "example": "CNG-2026-000099"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, GM Fleet a reçu votre candidature au programme Car na ngai · LOLC.\nRéférence du dossier : CNG-2026-000099.\nNotre équipe examine les informations transmises et vous contactera pour la suite. Conservez cette référence.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_candidature_admin_fr",
+      "title": "Nouvelle candidature · équipe",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Administrateurs déjà désignés pour les candidatures",
+      "events": [
+        "admin_intake:application"
+      ],
+      "priority": 2,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "GM Fleet — nouvelle candidature reçue.\nDossier : {{1}}. Nom : {{2}}.\nProgramme : {{3}}. Véhicule ou besoin déclaré : {{4}}.\nOuvrez l’espace opérations pour examiner les informations et les documents.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Dossier",
+          "example": "CNG-2026-000099"
+        },
+        {
+          "position": 2,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 3,
+          "meaning": "Programme",
+          "example": "Car na ngai · LOLC"
+        },
+        {
+          "position": 4,
+          "meaning": "Véhicule / besoin",
+          "example": "Suzuki Swift"
+        }
+      ],
+      "example": "GM Fleet — nouvelle candidature reçue.\nDossier : CNG-2026-000099. Nom : Jean Exemple.\nProgramme : Car na ngai · LOLC. Véhicule ou besoin déclaré : Suzuki Swift.\nOuvrez l’espace opérations pour examiner les informations et les documents.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_dossier_retenu_fr",
+      "title": "Candidature retenue",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Client",
+      "events": [
+        "accepted"
+      ],
+      "priority": 2,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, votre candidature GM Fleet {{2}} au programme {{3}} a été retenue pour poursuivre les étapes de traitement.\nVotre agent vous indiquera la prochaine étape. Cette décision ne crée pas encore de contrat actif.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Dossier",
+          "example": "CNG-2026-000099"
+        },
+        {
+          "position": 3,
+          "meaning": "Programme",
+          "example": "Car na ngai · LOLC"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, votre candidature GM Fleet CNG-2026-000099 au programme Car na ngai · LOLC a été retenue pour poursuivre les étapes de traitement.\nVotre agent vous indiquera la prochaine étape. Cette décision ne crée pas encore de contrat actif.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_dossier_refuse_fr",
+      "title": "Candidature refusée",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Client",
+      "events": [
+        "rejected"
+      ],
+      "priority": 2,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, l’examen de votre candidature GM Fleet {{2}} est terminé. Le dossier n’a pas été retenu.\nObservation communiquée : {{3}}.\nVous pouvez contacter votre agent pour obtenir des précisions.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Dossier",
+          "example": "CHP-2026-000099"
+        },
+        {
+          "position": 3,
+          "meaning": "Motif validé pour communication au client",
+          "example": "Pièces requises non fournies après relance"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, l’examen de votre candidature GM Fleet CHP-2026-000099 est terminé. Le dossier n’a pas été retenu.\nObservation communiquée : Pièces requises non fournies après relance.\nVous pouvez contacter votre agent pour obtenir des précisions.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_lolc_accord_fr",
+      "title": "Accord LOLC confirmé",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Client Car na ngai",
+      "events": [
+        "case_milestone:lolc_approved"
+      ],
+      "priority": 2,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, l’accord LOLC a été enregistré pour votre dossier GM Fleet {{2}}.\nGML poursuit la sélection et les contrôles du véhicule. Votre agent vous informera des prochaines étapes de votre financement.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Dossier",
+          "example": "CNG-2026-000099"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, l’accord LOLC a été enregistré pour votre dossier GM Fleet CNG-2026-000099.\nGML poursuit la sélection et les contrôles du véhicule. Votre agent vous informera des prochaines étapes de votre financement.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_lolc_complement_fr",
+      "title": "Complément demandé par LOLC",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Client Car na ngai",
+      "events": [
+        "case_milestone:information_required"
+      ],
+      "priority": 2,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, LOLC demande un complément pour votre dossier GM Fleet {{2}}.\nÉléments demandés : {{3}}.\nContactez votre agent pour transmettre ces éléments et poursuivre le traitement.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Dossier",
+          "example": "CNG-2026-000099"
+        },
+        {
+          "position": 3,
+          "meaning": "Pièces / précisions réellement demandées",
+          "example": "Justificatif de domicile actualisé"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, LOLC demande un complément pour votre dossier GM Fleet CNG-2026-000099.\nÉléments demandés : Justificatif de domicile actualisé.\nContactez votre agent pour transmettre ces éléments et poursuivre le traitement.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_lolc_refus_fr",
+      "title": "Refus LOLC",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Client Car na ngai",
+      "events": [
+        "case_milestone:lolc_rejected"
+      ],
+      "priority": 2,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, LOLC n’a pas approuvé le financement de votre dossier GM Fleet {{2}}.\nContactez votre agent GM Fleet pour les explications et les suites possibles concernant votre dossier.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Dossier",
+          "example": "CNG-2026-000099"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, LOLC n’a pas approuvé le financement de votre dossier GM Fleet CNG-2026-000099.\nContactez votre agent GM Fleet pour les explications et les suites possibles concernant votre dossier.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_equipements_installes_fr",
+      "title": "Installation terminée",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Client Car na ngai",
+      "events": [
+        "case_milestone:equipment_completed"
+      ],
+      "priority": 2,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, l’installation des équipements {{2}} est terminée pour le véhicule de votre dossier GM Fleet {{3}}.\nNotre équipe prépare les documents et la remise du véhicule. Votre agent vous communiquera les modalités.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Équipements réellement installés",
+          "example": "tracker et caméra"
+        },
+        {
+          "position": 3,
+          "meaning": "Dossier",
+          "example": "CNG-2026-000099"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, l’installation des équipements tracker et caméra est terminée pour le véhicule de votre dossier GM Fleet CNG-2026-000099.\nNotre équipe prépare les documents et la remise du véhicule. Votre agent vous communiquera les modalités.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_vehicule_remis_fr",
+      "title": "Remise du véhicule enregistrée",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Client Car na ngai",
+      "events": [
+        "case_milestone:handover"
+      ],
+      "priority": 2,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, la remise de votre véhicule {{2}}, plaque {{3}}, a été enregistrée le {{4}} pour le dossier {{5}}.\nLes photos de l’état initial et le kilométrage sont conservés dans votre dossier. Les versements suivent les dates de votre contrat activé.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Véhicule",
+          "example": "Suzuki Swift"
+        },
+        {
+          "position": 3,
+          "meaning": "Plaque",
+          "example": "TEST-099"
+        },
+        {
+          "position": 4,
+          "meaning": "Date de remise",
+          "example": "04/11/2026"
+        },
+        {
+          "position": 5,
+          "meaning": "Dossier",
+          "example": "CNG-2026-000099"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, la remise de votre véhicule Suzuki Swift, plaque TEST-099, a été enregistrée le 04/11/2026 pour le dossier CNG-2026-000099.\nLes photos de l’état initial et le kilométrage sont conservés dans votre dossier. Les versements suivent les dates de votre contrat activé.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_chauffeur_pret_affectation_fr",
+      "title": "Intégration chauffeur terminée",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Chauffeur partenaire",
+      "events": [
+        "case_milestone:allocation"
+      ],
+      "priority": 2,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, votre intégration chauffeur GM Fleet est terminée pour le dossier {{2}}.\nVotre affectation sera confirmée selon les véhicules disponibles. Aucun versement ne commence avant l’activation de votre contrat et la date convenue.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Dossier",
+          "example": "CHP-2026-000099"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, votre intégration chauffeur GM Fleet est terminée pour le dossier CHP-2026-000099.\nVotre affectation sera confirmée selon les véhicules disponibles. Aucun versement ne commence avant l’activation de votre contrat et la date convenue.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_yango_rattachement_fr",
+      "title": "Rattachement Yango confirmé",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Partenaire Yango",
+      "events": [
+        "case_milestone:yango_joined"
+      ],
+      "priority": 2,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, votre rattachement à GM Fleet sur Yango a été confirmé pour le dossier {{2}}.\nVotre agent reste votre contact pour le suivi de ce partenariat.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Dossier",
+          "example": "YAN-2026-000099"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, votre rattachement à GM Fleet sur Yango a été confirmé pour le dossier YAN-2026-000099.\nVotre agent reste votre contact pour le suivi de ce partenariat.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_devis_recu_fr",
+      "title": "Demande de devis équipements reçue",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Demandeur équipements",
+      "events": [
+        "equipment_received"
+      ],
+      "priority": 2,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, GM Fleet a reçu votre demande de devis pour {{2}}.\nRéférence : {{3}}.\nNotre équipe vous contactera pour confirmer le besoin, le prix et la planification de l’installation.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Besoin",
+          "example": "tracker et caméra"
+        },
+        {
+          "position": 3,
+          "meaning": "Référence de la demande",
+          "example": "DEVIS-EXEMPLE"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, GM Fleet a reçu votre demande de devis pour tracker et caméra.\nRéférence : DEVIS-EXEMPLE.\nNotre équipe vous contactera pour confirmer le besoin, le prix et la planification de l’installation.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_devis_admin_fr",
+      "title": "Nouvelle demande de devis · équipe",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Administrateurs candidatures",
+      "events": [
+        "admin_intake:equipment_quote"
+      ],
+      "priority": 2,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "GM Fleet — nouvelle demande de devis équipements.\nRéférence : {{1}}. Client : {{2}}.\nBesoin : {{3}}.\nOuvrez l’espace opérations pour examiner la demande et préparer la réponse.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Référence",
+          "example": "DEVIS-EXEMPLE"
+        },
+        {
+          "position": 2,
+          "meaning": "Client",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 3,
+          "meaning": "Besoin",
+          "example": "tracker et caméra"
+        }
+      ],
+      "example": "GM Fleet — nouvelle demande de devis équipements.\nRéférence : DEVIS-EXEMPLE. Client : Jean Exemple.\nBesoin : tracker et caméra.\nOuvrez l’espace opérations pour examiner la demande et préparer la réponse.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_compte_equipe_invitation_fr",
+      "title": "Création du compte personnel",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Membre de l’équipe invité",
+      "events": [
+        "staff_invitation"
+      ],
+      "priority": 2,
+      "status": "Événement existant · raccordement WhatsApp à faire",
+      "body": "Bonjour {{1}}, votre compte équipe GM Fleet a été créé avec le rôle {{2}}.\nPour terminer la configuration de votre accès, utilisez le lien personnel suivant : {{3}}\nNe partagez pas ce lien. Contactez votre administrateur s’il est expiré.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Agent Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Rôle",
+          "example": "Agent opérations"
+        },
+        {
+          "position": 3,
+          "meaning": "Lien personnel généré par le serveur",
+          "example": "https://gmfleet.georgemichaellogistics.cd/set-password.html#token_hash=EXEMPLE_FICTIF"
+        }
+      ],
+      "example": "Bonjour Agent Exemple, votre compte équipe GM Fleet a été créé avec le rôle Agent opérations.\nPour terminer la configuration de votre accès, utilisez le lien personnel suivant : https://gmfleet.georgemichaellogistics.cd/set-password.html#token_hash=EXEMPLE_FICTIF\nNe partagez pas ce lien. Contactez votre administrateur s’il est expiré.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_documents_a_completer_fr",
+      "title": "Pièces à compléter",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Client",
+      "events": [
+        "proposed:documents_required"
+      ],
+      "priority": 3,
+      "status": "Proposition · déclenchement absent ou à ajouter, ne pas activer automatiquement",
+      "body": "Bonjour {{1}}, votre dossier GM Fleet {{2}} nécessite les pièces suivantes : {{3}}.\nMerci de les transmettre à votre agent avant le {{4}} pour poursuivre le traitement.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Dossier",
+          "example": "CNG-2026-000099"
+        },
+        {
+          "position": 3,
+          "meaning": "Pièces à fournir",
+          "example": "Permis valide et justificatif de domicile"
+        },
+        {
+          "position": 4,
+          "meaning": "Date convenue",
+          "example": "10/11/2026"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, votre dossier GM Fleet CNG-2026-000099 nécessite les pièces suivantes : Permis valide et justificatif de domicile.\nMerci de les transmettre à votre agent avant le 10/11/2026 pour poursuivre le traitement.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_rappel_rendez_vous_fr",
+      "title": "Rappel de rendez-vous",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Client",
+      "events": [
+        "proposed:appointment_reminder"
+      ],
+      "priority": 3,
+      "status": "Proposition · déclenchement absent ou à ajouter, ne pas activer automatiquement",
+      "body": "Bonjour {{1}}, rappel de votre rendez-vous GM Fleet : {{2}}, le {{3}} à {{4}}, heure de Kinshasa.\nLieu : {{5}}. Dossier : {{6}}.\nContactez votre agent si vous devez modifier ce rendez-vous.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Objet",
+          "example": "Entretien et conduite"
+        },
+        {
+          "position": 3,
+          "meaning": "Date",
+          "example": "09/11/2026"
+        },
+        {
+          "position": 4,
+          "meaning": "Heure",
+          "example": "10:30"
+        },
+        {
+          "position": 5,
+          "meaning": "Lieu",
+          "example": "Bureau GM Fleet, Gombe"
+        },
+        {
+          "position": 6,
+          "meaning": "Dossier",
+          "example": "CHP-2026-000099"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, rappel de votre rendez-vous GM Fleet : Entretien et conduite, le 09/11/2026 à 10:30, heure de Kinshasa.\nLieu : Bureau GM Fleet, Gombe. Dossier : CHP-2026-000099.\nContactez votre agent si vous devez modifier ce rendez-vous.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_rappel_versement_fr",
+      "title": "Échéance quotidienne ou hebdomadaire",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Chauffeur",
+      "events": [
+        "proposed:payment_due"
+      ],
+      "priority": 3,
+      "status": "Proposition · déclenchement absent ou à ajouter, ne pas activer automatiquement",
+      "body": "Bonjour {{1}}, votre règlement GM Fleet du {{2}} arrive à échéance.\nContrat : {{3}}. Montant à régler : {{4}} {{5}}, dont échéances antérieures {{6}} {{5}}.\nCet avis suit votre calendrier contractuel. Si vous avez déjà payé, contactez la caisse avec votre reçu.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Date réelle de règlement, dimanche si hebdomadaire",
+          "example": "08/11/2026"
+        },
+        {
+          "position": 3,
+          "meaning": "Contrat",
+          "example": "GMF-CTR-2026-000099"
+        },
+        {
+          "position": 4,
+          "meaning": "Total dû",
+          "example": "177,00"
+        },
+        {
+          "position": 5,
+          "meaning": "Devise",
+          "example": "USD"
+        },
+        {
+          "position": 6,
+          "meaning": "Arriéré antérieur seulement",
+          "example": "0,00"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, votre règlement GM Fleet du 08/11/2026 arrive à échéance.\nContrat : GMF-CTR-2026-000099. Montant à régler : 177,00 USD, dont échéances antérieures 0,00 USD.\nCet avis suit votre calendrier contractuel. Si vous avez déjà payé, contactez la caisse avec votre reçu.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": "Messages liés aux avances ou au financement : faire confirmer leur admissibilité et leur qualification par Meta avant usage WhatsApp ; conserver les SMS en attendant."
+    },
+    {
+      "name": "gml_retard_versement_fr",
+      "title": "Retard selon le calendrier réel",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": null,
+      "recipient": "Chauffeur",
+      "events": [
+        "proposed:payment_overdue"
+      ],
+      "priority": 3,
+      "status": "SMS seulement · ne pas soumettre à WhatsApp comme modèle de recouvrement",
+      "body": "Bonjour {{1}}, au {{2}}, un solde de {{3}} {{4}} reste en retard sur votre contrat GM Fleet {{5}}.\nPremière échéance dépassée : {{6}}.\nMerci de contacter la caisse pour vérifier la situation et convenir du règlement.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Date du constat, après échéance",
+          "example": "09/11/2026"
+        },
+        {
+          "position": 3,
+          "meaning": "Arriéré réellement calculé",
+          "example": "177,00"
+        },
+        {
+          "position": 4,
+          "meaning": "Devise",
+          "example": "USD"
+        },
+        {
+          "position": 5,
+          "meaning": "Contrat",
+          "example": "GMF-CTR-2026-000099"
+        },
+        {
+          "position": 6,
+          "meaning": "Échéance de règlement dépassée",
+          "example": "08/11/2026"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, au 09/11/2026, un solde de 177,00 USD reste en retard sur votre contrat GM Fleet GMF-CTR-2026-000099.\nPremière échéance dépassée : 08/11/2026.\nMerci de contacter la caisse pour vérifier la situation et convenir du règlement.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "SMS_ONLY_DO_NOT_SUBMIT",
+      "meta_review_note": "La politique WhatsApp interdit les usages de recouvrement de dettes. Ce brouillon reste une proposition SMS et ne doit pas être renommé ou déguisé en Utility."
+    },
+    {
+      "name": "gml_controle_dimanche_fr",
+      "title": "Contrôle du dimanche",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Chauffeur affecté",
+      "events": [
+        "proposed:sunday_inspection_reminder"
+      ],
+      "priority": 3,
+      "status": "Proposition · déclenchement absent ou à ajouter, ne pas activer automatiquement",
+      "body": "Bonjour {{1}}, le contrôle GM Fleet de votre véhicule {{2}}, plaque {{3}}, est prévu le dimanche {{4}} à {{5}}, heure de Kinshasa.\nLieu : {{6}}.\nPrésentez le véhicule pour les vérifications, les photos et le relevé du kilométrage.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Jean Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Véhicule",
+          "example": "Toyota Vitz"
+        },
+        {
+          "position": 3,
+          "meaning": "Plaque",
+          "example": "TEST-099"
+        },
+        {
+          "position": 4,
+          "meaning": "Dimanche",
+          "example": "08/11/2026"
+        },
+        {
+          "position": 5,
+          "meaning": "Heure",
+          "example": "09:00"
+        },
+        {
+          "position": 6,
+          "meaning": "Lieu",
+          "example": "Centre de contrôle GM Fleet"
+        }
+      ],
+      "example": "Bonjour Jean Exemple, le contrôle GM Fleet de votre véhicule Toyota Vitz, plaque TEST-099, est prévu le dimanche 08/11/2026 à 09:00, heure de Kinshasa.\nLieu : Centre de contrôle GM Fleet.\nPrésentez le véhicule pour les vérifications, les photos et le relevé du kilométrage.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_reparation_accord_fr",
+      "title": "Demande d’accord avant préfinancement",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Propriétaire externe",
+      "events": [
+        "proposed:repair_approval_request"
+      ],
+      "priority": 3,
+      "status": "Proposition · déclenchement absent ou à ajouter, ne pas activer automatiquement",
+      "body": "Bonjour {{1}}, pour votre véhicule {{2}}, plaque {{3}}, une réparation est proposée : {{4}}.\nCoût : {{5}} USD. Si GML préfinance, frais uniques de 15 % : {{6}} USD, total {{7}} USD, sur {{8}} mois.\nAucune avance n’est confirmée par cet avis. Contactez votre agent pour valider ou refuser ces conditions.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Marie Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Véhicule",
+          "example": "Toyota Vitz"
+        },
+        {
+          "position": 3,
+          "meaning": "Plaque",
+          "example": "TEST-099"
+        },
+        {
+          "position": 4,
+          "meaning": "Diagnostic / prestation",
+          "example": "Remplacement de la pompe à eau"
+        },
+        {
+          "position": 5,
+          "meaning": "Coût",
+          "example": "200,00"
+        },
+        {
+          "position": 6,
+          "meaning": "15 % uniques",
+          "example": "30,00"
+        },
+        {
+          "position": 7,
+          "meaning": "Total",
+          "example": "230,00"
+        },
+        {
+          "position": 8,
+          "meaning": "Durée maximale 6 mois",
+          "example": "2"
+        }
+      ],
+      "example": "Bonjour Marie Exemple, pour votre véhicule Toyota Vitz, plaque TEST-099, une réparation est proposée : Remplacement de la pompe à eau.\nCoût : 200,00 USD. Si GML préfinance, frais uniques de 15 % : 30,00 USD, total 230,00 USD, sur 2 mois.\nAucune avance n’est confirmée par cet avis. Contactez votre agent pour valider ou refuser ces conditions.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": "Messages liés aux avances ou au financement : faire confirmer leur admissibilité et leur qualification par Meta avant usage WhatsApp ; conserver les SMS en attendant."
+    },
+    {
+      "name": "gml_signature_recue_fr",
+      "title": "Copie signée vérifiée",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Propriétaire / chauffeur",
+      "events": [
+        "proposed:signed_copy_verified"
+      ],
+      "priority": 3,
+      "status": "Proposition · déclenchement absent ou à ajouter, ne pas activer automatiquement",
+      "body": "Bonjour {{1}}, GM Fleet a reçu et vérifié la copie signée de votre contrat {{2}} le {{3}}.\nLe document est conservé dans votre dossier. Votre agent vous informera de toute prochaine étape nécessaire.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Marie Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Contrat",
+          "example": "GMF-MAN-2026-000099"
+        },
+        {
+          "position": 3,
+          "meaning": "Date de vérification réelle",
+          "example": "05/11/2026"
+        }
+      ],
+      "example": "Bonjour Marie Exemple, GM Fleet a reçu et vérifié la copie signée de votre contrat GMF-MAN-2026-000099 le 05/11/2026.\nLe document est conservé dans votre dossier. Votre agent vous informera de toute prochaine étape nécessaire.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_service_indisponible_direction_fr",
+      "title": "Incident opérationnel à vérifier",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Direction",
+      "events": [
+        "proposed:operational_incident"
+      ],
+      "priority": 3,
+      "status": "Proposition · déclenchement absent ou à ajouter, ne pas activer automatiquement",
+      "body": "GM Fleet — incident à vérifier.\nService concerné : {{1}}. Référence : {{2}}.\nConstat : {{3}}. Date : {{4}}.\nOuvrez le journal des opérations avant de relancer une action susceptible de créer un doublon.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Service",
+          "example": "Paiement digital"
+        },
+        {
+          "position": 2,
+          "meaning": "Référence",
+          "example": "TRANSACTION-EXEMPLE"
+        },
+        {
+          "position": 3,
+          "meaning": "Erreur vérifiée",
+          "example": "Statut fournisseur non confirmé"
+        },
+        {
+          "position": 4,
+          "meaning": "Date et heure",
+          "example": "04/11/2026 à 14:30, Kinshasa"
+        }
+      ],
+      "example": "GM Fleet — incident à vérifier.\nService concerné : Paiement digital. Référence : TRANSACTION-EXEMPLE.\nConstat : Statut fournisseur non confirmé. Date : 04/11/2026 à 14:30, Kinshasa.\nOuvrez le journal des opérations avant de relancer une action susceptible de créer un doublon.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_affectation_chauffeur_fr",
+      "title": "Affectation du chauffeur",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Chauffeur",
+      "events": [
+        "proposed:driver_assignment_template"
+      ],
+      "priority": 1,
+      "status": "Affectation existante · modèle WhatsApp spécialisé à raccorder",
+      "body": "Bonjour {{1}}, vous êtes affecté au véhicule {{2}}, plaque {{3}}, du propriétaire {{4}}. Début du service : {{5}}. Premier versement : {{6}}. Montant habituel : {{7}} USD. Votre contrat GM Fleet fait référence.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Chauffeur",
+          "example": "Daniel Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Véhicule",
+          "example": "Toyota Vitz"
+        },
+        {
+          "position": 3,
+          "meaning": "Plaque",
+          "example": "TEST-099"
+        },
+        {
+          "position": 4,
+          "meaning": "Propriétaire",
+          "example": "Marie Exemple"
+        },
+        {
+          "position": 5,
+          "meaning": "Début",
+          "example": "09/11/2026"
+        },
+        {
+          "position": 6,
+          "meaning": "Premier versement",
+          "example": "10/11/2026"
+        },
+        {
+          "position": 7,
+          "meaning": "Montant",
+          "example": "31,00"
+        }
+      ],
+      "example": "Bonjour Daniel Exemple, vous êtes affecté au véhicule Toyota Vitz, plaque TEST-099, du propriétaire Marie Exemple. Début du service : 09/11/2026. Premier versement : 10/11/2026. Montant habituel : 31,00 USD. Votre contrat GM Fleet fait référence.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_mobile_invitation_fr",
+      "title": "Invitation GML Mobile",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Propriétaire",
+      "events": [
+        "proposed:owner_mobile_invitation"
+      ],
+      "priority": 3,
+      "status": "Proposition · déclenchement absent ou à ajouter, ne pas activer automatiquement",
+      "body": "Bonjour {{1}}, votre accès GML Mobile est prêt pour votre véhicule {{2}}, plaque {{3}}. Téléchargez l’application ici : {{4}}. Activez votre compte avec ce lien personnel : {{5}}. Ne partagez pas ce lien.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Propriétaire",
+          "example": "Marie Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Véhicule",
+          "example": "Toyota Vitz"
+        },
+        {
+          "position": 3,
+          "meaning": "Plaque",
+          "example": "TEST-099"
+        },
+        {
+          "position": 4,
+          "meaning": "Lien officiel de téléchargement",
+          "example": "https://example.com/gml-mobile"
+        },
+        {
+          "position": 5,
+          "meaning": "Invitation privée",
+          "example": "https://example.com/activation/EXEMPLE"
+        }
+      ],
+      "example": "Bonjour Marie Exemple, votre accès GML Mobile est prêt pour votre véhicule Toyota Vitz, plaque TEST-099. Téléchargez l’application ici : https://example.com/gml-mobile. Activez votre compte avec ce lien personnel : https://example.com/activation/EXEMPLE. Ne partagez pas ce lien.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_service_suspendu_fr",
+      "title": "Service suspendu",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Propriétaire / chauffeur, envois distincts",
+      "events": [
+        "proposed:service_paused"
+      ],
+      "priority": 3,
+      "status": "Proposition · déclenchement absent ou à ajouter, ne pas activer automatiquement",
+      "body": "Bonjour {{1}}, le service du véhicule {{2}}, plaque {{3}}, est suspendu à partir du {{4}}. Motif : {{5}}. Votre agent GM Fleet vous informera de la reprise.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Marie Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Véhicule",
+          "example": "Toyota Vitz"
+        },
+        {
+          "position": 3,
+          "meaning": "Plaque",
+          "example": "TEST-099"
+        },
+        {
+          "position": 4,
+          "meaning": "Date",
+          "example": "12/11/2026"
+        },
+        {
+          "position": 5,
+          "meaning": "Motif communiqué",
+          "example": "Réparation en atelier"
+        }
+      ],
+      "example": "Bonjour Marie Exemple, le service du véhicule Toyota Vitz, plaque TEST-099, est suspendu à partir du 12/11/2026. Motif : Réparation en atelier. Votre agent GM Fleet vous informera de la reprise.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_service_repris_fr",
+      "title": "Reprise du service",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Propriétaire / chauffeur, envois distincts",
+      "events": [
+        "proposed:service_resumed"
+      ],
+      "priority": 3,
+      "status": "Proposition · déclenchement absent ou à ajouter, ne pas activer automatiquement",
+      "body": "Bonjour {{1}}, le service du véhicule {{2}}, plaque {{3}}, reprend le {{4}} avec le chauffeur {{5}}. Les dates de versement suivent le calendrier enregistré par GM Fleet.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Marie Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Véhicule",
+          "example": "Toyota Vitz"
+        },
+        {
+          "position": 3,
+          "meaning": "Plaque",
+          "example": "TEST-099"
+        },
+        {
+          "position": 4,
+          "meaning": "Date",
+          "example": "16/11/2026"
+        },
+        {
+          "position": 5,
+          "meaning": "Chauffeur",
+          "example": "Daniel Exemple"
+        }
+      ],
+      "example": "Bonjour Marie Exemple, le service du véhicule Toyota Vitz, plaque TEST-099, reprend le 16/11/2026 avec le chauffeur Daniel Exemple. Les dates de versement suivent le calendrier enregistré par GM Fleet.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_fin_service_fr",
+      "title": "Fin du service ou de l’affectation",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Propriétaire / chauffeur, envois distincts",
+      "events": [
+        "proposed:service_ended"
+      ],
+      "priority": 3,
+      "status": "Proposition · déclenchement absent ou à ajouter, ne pas activer automatiquement",
+      "body": "Bonjour {{1}}, la fin du service ou de l’affectation du véhicule {{2}}, plaque {{3}}, est enregistrée au {{4}}. Référence : {{5}}. Contactez votre agent GM Fleet pour les modalités de restitution et le bilan final.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Marie Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Véhicule",
+          "example": "Toyota Vitz"
+        },
+        {
+          "position": 3,
+          "meaning": "Plaque",
+          "example": "TEST-099"
+        },
+        {
+          "position": 4,
+          "meaning": "Date",
+          "example": "30/11/2026"
+        },
+        {
+          "position": 5,
+          "meaning": "Référence",
+          "example": "FIN-EXEMPLE"
+        }
+      ],
+      "example": "Bonjour Marie Exemple, la fin du service ou de l’affectation du véhicule Toyota Vitz, plaque TEST-099, est enregistrée au 30/11/2026. Référence : FIN-EXEMPLE. Contactez votre agent GM Fleet pour les modalités de restitution et le bilan final.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_inspection_resultat_fr",
+      "title": "Résultat de l’inspection",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Propriétaire / chauffeur, selon le dossier",
+      "events": [
+        "proposed:inspection_completed"
+      ],
+      "priority": 3,
+      "status": "Proposition · déclenchement absent ou à ajouter, ne pas activer automatiquement",
+      "body": "Bonjour {{1}}, le contrôle du véhicule {{2}}, plaque {{3}}, a été effectué le {{4}}. Résultat : {{5}}. Prochaine action : {{6}}. Les photos et le kilométrage sont conservés par GM Fleet.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Marie Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Véhicule",
+          "example": "Toyota Vitz"
+        },
+        {
+          "position": 3,
+          "meaning": "Plaque",
+          "example": "TEST-099"
+        },
+        {
+          "position": 4,
+          "meaning": "Date",
+          "example": "08/11/2026"
+        },
+        {
+          "position": 5,
+          "meaning": "Résultat",
+          "example": "Contrôle conforme"
+        },
+        {
+          "position": 6,
+          "meaning": "Action",
+          "example": "Prochain contrôle dimanche"
+        }
+      ],
+      "example": "Bonjour Marie Exemple, le contrôle du véhicule Toyota Vitz, plaque TEST-099, a été effectué le 08/11/2026. Résultat : Contrôle conforme. Prochaine action : Prochain contrôle dimanche. Les photos et le kilométrage sont conservés par GM Fleet.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_incident_vehicule_fr",
+      "title": "Incident signalé sur le véhicule",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Propriétaire / direction, selon le dossier",
+      "events": [
+        "proposed:vehicle_incident"
+      ],
+      "priority": 3,
+      "status": "Proposition · déclenchement absent ou à ajouter, ne pas activer automatiquement",
+      "body": "Bonjour {{1}}, un incident a été signalé pour le véhicule {{2}}, plaque {{3}}, le {{4}}. Constat : {{5}}. Référence : {{6}}. GM Fleet vous contactera pour la suite. Aucun coût n’est approuvé par ce message.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Marie Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Véhicule",
+          "example": "Toyota Vitz"
+        },
+        {
+          "position": 3,
+          "meaning": "Plaque",
+          "example": "TEST-099"
+        },
+        {
+          "position": 4,
+          "meaning": "Date",
+          "example": "12/11/2026"
+        },
+        {
+          "position": 5,
+          "meaning": "Constat",
+          "example": "Bruit moteur à vérifier"
+        },
+        {
+          "position": 6,
+          "meaning": "Référence",
+          "example": "INCIDENT-EXEMPLE"
+        }
+      ],
+      "example": "Bonjour Marie Exemple, un incident a été signalé pour le véhicule Toyota Vitz, plaque TEST-099, le 12/11/2026. Constat : Bruit moteur à vérifier. Référence : INCIDENT-EXEMPLE. GM Fleet vous contactera pour la suite. Aucun coût n’est approuvé par ce message.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_suivi_indisponible_fr",
+      "title": "GPS ou caméra indisponible",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Propriétaire / équipe technique",
+      "events": [
+        "proposed:monitoring_offline"
+      ],
+      "priority": 3,
+      "status": "Proposition · déclenchement absent ou à ajouter, ne pas activer automatiquement",
+      "body": "Bonjour {{1}}, les données {{2}} du véhicule {{3}}, plaque {{4}}, ne sont plus actualisées depuis le {{5}}. La dernière position connue ne confirme pas sa position actuelle. GM Fleet vérifie la connexion.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Marie Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Service",
+          "example": "GPS"
+        },
+        {
+          "position": 3,
+          "meaning": "Véhicule",
+          "example": "Toyota Vitz"
+        },
+        {
+          "position": 4,
+          "meaning": "Plaque",
+          "example": "TEST-099"
+        },
+        {
+          "position": 5,
+          "meaning": "Dernière communication",
+          "example": "12/11/2026 à 10:30, Kinshasa"
+        }
+      ],
+      "example": "Bonjour Marie Exemple, les données GPS du véhicule Toyota Vitz, plaque TEST-099, ne sont plus actualisées depuis le 12/11/2026 à 10:30, Kinshasa. La dernière position connue ne confirme pas sa position actuelle. GM Fleet vérifie la connexion.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_alerte_vehicule_fr",
+      "title": "Alerte de surveillance configurée",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Propriétaire / équipe autorisée",
+      "events": [
+        "proposed:monitoring_alert"
+      ],
+      "priority": 3,
+      "status": "Proposition · déclenchement absent ou à ajouter, ne pas activer automatiquement",
+      "body": "Bonjour {{1}}, une alerte {{2}} a été détectée pour le véhicule {{3}}, plaque {{4}}, le {{5}}. Consultez GML Mobile pour vérifier les informations et contactez GM Fleet si nécessaire.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Marie Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Type d’alerte",
+          "example": "Sortie de la zone autorisée"
+        },
+        {
+          "position": 3,
+          "meaning": "Véhicule",
+          "example": "Toyota Vitz"
+        },
+        {
+          "position": 4,
+          "meaning": "Plaque",
+          "example": "TEST-099"
+        },
+        {
+          "position": 5,
+          "meaning": "Date",
+          "example": "12/11/2026 à 10:40, Kinshasa"
+        }
+      ],
+      "example": "Bonjour Marie Exemple, une alerte Sortie de la zone autorisée a été détectée pour le véhicule Toyota Vitz, plaque TEST-099, le 12/11/2026 à 10:40, Kinshasa. Consultez GML Mobile pour vérifier les informations et contactez GM Fleet si nécessaire.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    },
+    {
+      "name": "gml_paiement_digital_statut_fr",
+      "title": "Paiement digital non confirmé",
+      "language": "fr",
+      "language_label": "French / Français",
+      "category": "UTILITY",
+      "recipient": "Client",
+      "events": [
+        "proposed:digital_payment_status"
+      ],
+      "priority": 3,
+      "status": "Proposition · déclenchement absent ou à ajouter, ne pas activer automatiquement",
+      "body": "Bonjour {{1}}, votre tentative de paiement GM Fleet de {{2}} USD, référence {{3}}, a le statut suivant : {{4}}. Ce message ne confirme aucun encaissement. Si votre compte a été débité, contactez la caisse avec cette référence avant une nouvelle tentative.",
+      "parameters": [
+        {
+          "position": 1,
+          "meaning": "Nom",
+          "example": "Daniel Exemple"
+        },
+        {
+          "position": 2,
+          "meaning": "Montant",
+          "example": "31,00"
+        },
+        {
+          "position": 3,
+          "meaning": "Référence",
+          "example": "PAIEMENT-EXEMPLE"
+        },
+        {
+          "position": 4,
+          "meaning": "Statut vérifié",
+          "example": "En attente de confirmation du fournisseur"
+        }
+      ],
+      "example": "Bonjour Daniel Exemple, votre tentative de paiement GM Fleet de 31,00 USD, référence PAIEMENT-EXEMPLE, a le statut suivant : En attente de confirmation du fournisseur. Ce message ne confirme aucun encaissement. Si votre compte a été débité, contactez la caisse avec cette référence avant une nouvelle tentative.",
+      "header": null,
+      "footer": "GM Fleet · Suivi de votre dossier",
+      "buttons": [],
+      "submission_status": "DRAFT_NOT_SUBMITTED",
+      "meta_review_note": null
+    }
+  ],
+  "sources": [
+    {
+      "title": "Meta — gestion des modèles",
+      "url": "https://whatsappbusiness.com/blog/manage-message-templates-whatsapp-business-api/"
+    },
+    {
+      "title": "Meta — documentation des modèles",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/overview"
+    },
+    {
+      "title": "Meta — politique de messagerie",
+      "url": "https://business.whatsapp.com/policy"
+    }
+  ]
+}
