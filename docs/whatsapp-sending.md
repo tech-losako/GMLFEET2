@@ -72,7 +72,7 @@ Body:
 ## Done when
 
 - Test to one authorised number: template delivered, receipt relayed by GML marks it
-  delivered, then read; a forced failure (invalid number) produces exactly one SMS.
+  delivered (read is optional); a forced failure (invalid number) produces exactly one SMS.
 - No GM Fleet message ever appears twice; unknown receipts are ignored.
 - Then set `WHATSAPP_ENABLED=true`.
 
@@ -91,7 +91,7 @@ The database and Edge functions are deployed. Website controls live in the messa
 
 Validation: `tests/whatsapp-dispatch-database.cjs`, `tests/whatsapp-sending-edge.cjs`, `tests/gml-mobile-bridge-edge.cjs`, `tests/sms-delivery-edge.cjs`, `tests/appointment-sms-function.cjs`, `tests/driver-payment-reminders-edge.cjs`, `tests/sms-admin-browser.cjs`. Tests mock provider calls; no live messages are sent by them.
 
-Live verification remains pending: `WHATSAPP_GRAPH_VERSION` is invalid/missing in GM Fleet's saved configuration. French language is set and `WHATSAPP_ENABLED=false`. The authorized recipient is +243837959472; no test has yet been sent. A real read receipt relayed by GML and one accepted SMS fallback are required before normal WhatsApp traffic is enabled. The database enforces this gate as well as the environment flag.
+Live verification remains pending: `WHATSAPP_GRAPH_VERSION` is invalid/missing in GM Fleet's saved configuration. French language is set and `WHATSAPP_ENABLED=false`. The authorized recipient is +243837959472; no test has yet been sent. A real delivery receipt relayed by GML and one accepted SMS fallback are required before normal WhatsApp traffic is enabled. The database enforces this gate as well as the environment flag.
 
 
 ### Live check — 7 November 2026
@@ -101,3 +101,8 @@ All required secrets are configured; Meta approved bodies match for 25 templates
 The authorized recipient +243837959472 confirmed receiving and opening the WhatsApp test. GM Fleet still has no delivered/read receipt for that WAMID through GML, so general WhatsApp sending remains disabled. The forced invalid-template send returned Meta code 132001 and created exactly one SMS fallback. A test-only validation bug cancelled that child before submission; it was corrected and only the same never-submitted child was resumed. Tests now assert fallback children bypass WhatsApp template validation. Test dispatch is ID-scoped (`whatsapp-test-send`) and cannot sweep unrelated pending messages.
 
 Remaining integration check on GML: its existing WhatsApp webhook must forward this message's status using the signed `whatsapp_status` action described above. Do not manually mark messages read in GM Fleet, and do not register another Meta webhook.
+
+
+### Delivery acceptance — 7 November 2026
+
+The new technical test `TEST-WA-acdf29e7` was delivered at 01:56:28 UTC, with two valid signed receipt calls updating the message. The SMS fallback test previously created one child accepted once by Africa’s Talking. The readiness check now uses delivered status; read receipts are optional information and never gate sending. The admin status uses the delivered test time as well. General WhatsApp is enabled after this migration, retaining explicit recipient permission, approved matching templates, global pause and exactly one SMS fallback on confirmed failure. Unknown send outcomes remain held for review. Driver payment reminders retain SMS.

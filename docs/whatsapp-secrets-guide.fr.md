@@ -20,7 +20,7 @@ Exemple :
 
 Le jeton, le Phone Number ID et le WABA ID viennent de Meta et concernent le même numéro que GML. Aucun Verify Token ni App Secret supplémentaire n’est nécessaire : le webhook appartient à GML. La version, la langue et le bouton d’activation sont des paramètres de configuration, même si Supabase les conserve dans Secrets.
 
-Ces variables sont lues par le backend. **Conserver `WHATSAPP_ENABLED=false` jusqu’au test lu et au test de repli SMS.** Aucun secret réel n’est présent dans ces documents. Ne pas coller les clés dans le chat ou dans Git.
+Ces variables sont lues par le backend. **Conserver `WHATSAPP_ENABLED=false` jusqu’au test livré et au test de repli SMS.** Aucun secret réel n’est présent dans ces documents. Ne pas coller les clés dans le chat ou dans Git.
 
 Pour créer les modèles : ouvrir [le catalogue simple](whatsapp-template-pack.fr.html).
 
