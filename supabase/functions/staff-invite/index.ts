@@ -37,7 +37,8 @@ Deno.serve(async req => {
    const {error:saveError}=await caller.rpc('manage_staff',{p:{user_id:data.user.id,display_name:name,phone,role:p.role,active:true,revision:p.revision||0}});
    if(saveError)throw Error(saveError.message);
    link=origin+'/set-password.html#token_hash='+encodeURIComponent(data.properties.hashed_token)+'&type='+type;
-   return 'GM Fleet : '+(type==='recovery'?'choisissez un nouveau mot de passe':'activez votre accès personnel')+'.\n'+link+'\nLien personnel à usage unique. Ne le partagez pas.';
+   // 157 ASCII characters for an invite with the current 64-character hash; one SMS segment.
+   return 'GM Fleet: '+link;
   });
   return reply(200,{link,email,phone,sms_status:result.status,sms_error:result.error||null,sms_id:result.id,replayed:!!result.replayed});
  }catch{return reply(500,{error:'Invitation indisponible. Actualisez et réessayez.'});}
