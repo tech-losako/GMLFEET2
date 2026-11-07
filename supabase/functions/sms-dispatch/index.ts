@@ -17,6 +17,14 @@ Deno.serve(async req=>{
    if(!staff?.active||staff.deleted_at||!['admin','super_admin'].includes(staff.role))return reply(403,{error:'Accès administrateur requis'});
   }
   const p=await req.json();
+  if(p.action==='whatsapp-test-send'){
+   if(!/^[0-9a-f-]{36}$/i.test(String(p.id||'')))return reply(400,{error:'Identifiant du test requis'});
+   const {data:n,error}=await service.from('sms_dispatches').select('*').eq('id',p.id).eq('kind','whatsapp_test').maybeSingle();
+   if(error||!n)return reply(404,{error:'Test introuvable'});
+   if(!worker&&n.actor_id!==actor)return reply(403,{error:'Ce test appartient à un autre compte'});
+   if(!config.enabled)return reply(200,{success:true,paused:true});
+   const result=await sendReservedSMS(service,n);return reply(200,{success:true,id:n.id,status:result.status});
+  }
   if(p.action==='whatsapp-health'){const config=await whatsappOptions(true),state=await smsRpc(service,'whatsapp_health');return reply(200,{enabled:config.enabled,configured:config.configured,missing:config.missing,approved:config.approved,mismatched:config.mismatched,meta_error_code:config.meta_error_code||null,meta_http_status:config.meta_http_status||null,...state});}
   if(!worker&&p.action==='configuration')return reply(200,{configured:!!(Deno.env.get('AFRICASTALKING_USERNAME')&&Deno.env.get('AFRICASTALKING_API_KEY')),mode:Deno.env.get('AFRICASTALKING_USERNAME')==='sandbox'?'sandbox':'production',sender:Deno.env.get('AFRICASTALKING_SENDER_ID')||'Expéditeur par défaut du fournisseur',enabled:config.enabled,delivery_health:config.delivery_health,callback_url:staff.role==='super_admin'?url+'/functions/v1/africastalking-delivery?key='+config.callback_token:undefined});
   if(!worker&&p.action==='driver-reminder-test'){

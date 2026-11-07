@@ -4,6 +4,7 @@ const fs=require('fs'),assert=require('assert/strict'),{randomUUID}=require('cry
  await db.exec('alter table appointments add column if not exists sms_requested boolean not null default true');
  await db.exec(fs.readFileSync('supabase/migrations/20261106121743_whatsapp_channel_dispatch_and_bridge_receipts.sql','utf8'));
  await db.exec(fs.readFileSync('supabase/migrations/20261106125355_whatsapp_test_limits_and_health.sql','utf8'));
+ await db.exec(fs.readFileSync('supabase/migrations/20261107005451_whatsapp_approved_technical_test_template.sql','utf8'));
  const admin='11111111-1111-1111-1111-111111111111',root=async(sql,p=[])=>{await db.exec('reset role');return db.query(sql,p);},staff=async(name,p)=>{await db.exec('reset role');await db.query("select set_config('request.jwt.claim.sub',$1,false)",[admin]);await db.exec('set role authenticated');return (await db.query('select '+name+'($1::jsonb) j',[p])).rows[0].j;},service=async(name,p)=>{await db.exec('reset role;set role service_role');return (await db.query('select '+name+'($1::jsonb) j',[p])).rows[0].j;};
  const a=(await root("insert into applications(name,phone,vehicle,source) values('Recorded Client','+243810000001','Swift','office') returning *")).rows[0];
  async function queued(key,kind='application_received',extra={}){await root("select private.queue_sms($1,$2,'+243810000001','RECORDED SMS',$3)",[key,kind,a.id]);const row=(await root('select * from sms_dispatches where event_key=$1',[key])).rows[0];return row;}

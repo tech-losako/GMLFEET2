@@ -23,7 +23,7 @@ export async function sendTrackedSMS(db:any,p:any,message:string|(()=>Promise<st
  return sendReservedSMS(db,saved,message,!!p.retry);
 }
 export async function sendReservedSMS(db:any,saved:any,message?:string|(()=>Promise<string|null>),retry=false){
- const isTest=saved.kind==='whatsapp_test',options=saved.whatsapp_template?await whatsappOptions(isTest):null;
+ const isTest=saved.kind==='whatsapp_test'&&!saved.fallback_of,options=saved.whatsapp_template?await whatsappOptions(isTest):null;
  if(isTest&&(!options?.configured||(saved.whatsapp_template!=='GMFLEET_INVALID_TEMPLATE_TEST'&&!options.approved.includes(saved.whatsapp_template)))){await smsRpc(db,'cancel_whatsapp_notification',{id:saved.id,reason:'Configuration ou modèle WhatsApp non vérifié'});return {id:saved.id,status:'not_configured',error:'Configuration ou modèle WhatsApp non vérifié'};}
  const claimed=await smsRpc(db,'claim_sms_dispatch',{id:saved.id,retry,whatsapp_enabled:!!options?.enabled,approved_templates:options?.approved||[],whatsapp_test:isTest&&!!options?.configured});
  if(!claimed)return {id:saved.id,status:saved.status,error:saved.error,replayed:true};
