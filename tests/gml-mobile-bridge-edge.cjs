@@ -13,6 +13,8 @@ async function call(p={},options={}){const raw=options.raw||JSON.stringify({acti
  assert.ok(!JSON.stringify(logs).includes('12345678'));
  const receipt={action:'whatsapp_status',statuses:[{wamid:'wamid.TEST_RECEIPT',status:'read',at:new Date().toISOString(),recipient:'243837959472',error_title:'must not enter database'}]};
  const result=await call({}, {raw:JSON.stringify(receipt)});assert.equal(result.status,200);assert.equal(result.body.updated,1);assert.equal(commands.at(-1).statuses[0].error_title,undefined);assert.equal((await call({}, {raw:JSON.stringify(receipt),bad:true})).status,401);
+ assert.equal((await call({}, {raw:JSON.stringify({...receipt,statuses:[{...receipt.statuses[0],error_code:null,error_title:null}]})})).status,200);
+ assert.equal((await call({}, {raw:JSON.stringify({...receipt,statuses:[{...receipt.statuses[0],error_code:'not-a-number'}]})})).status,400);
  assert.equal((await call({}, {raw:JSON.stringify({...receipt,statuses:[{...receipt.statuses[0],status:'invented'}]})})).status,400);
  assert.equal((await call({}, {raw:JSON.stringify({...receipt,statuses:[{...receipt.statuses[0],recipient:'invalid'}]})})).status,400);
  console.log('PASS case 7: real WebCrypto HMAC verification, timestamps/version, malformed body/action checks, five-action allowlist, redacted auth logs; provider/database mocked.');
