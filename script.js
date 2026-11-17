@@ -449,13 +449,13 @@ document.addEventListener('change',event=>{if(event.target.form)delete event.tar
 function applicationFiles(service){
  if(service==='Gestion de flotte'){
   const ordered=[['flotteCarteRose','01-carte-rose'],['flotteAutorisationTransport','02-autorisation-transport'],['flotteVignette','03-vignette'],['flotteAssurance','04-assurance'],['flotteControleTechnique','05-controle-technique'],['flottePhotoAvant','06-photo-avant'],['flottePhotoArriere','07-photo-arriere'],['flottePhotoGauche','08-photo-gauche'],['flottePhotoDroite','09-photo-droite'],['flottePhotoInterieur','10-photo-interieur']];
-  return ordered.flatMap(([id,prefix])=>Array.from(document.getElementById(id)?.files||[]).map(file=>new File([file],prefix+'-'+file.name.replace(/[^a-zA-Z0-9._-]+/g,'-'),{type:file.type,lastModified:file.lastModified})));
+  return ordered.flatMap(([id,prefix])=>Array.from(window.GMFleetImages?.files(document.getElementById(id))||document.getElementById(id)?.files||[]).map(file=>new File([file],prefix+'-'+file.name.replace(/[^a-zA-Z0-9._-]+/g,'-'),{type:file.type,lastModified:file.lastModified})));
  }
  const ordered=service==='Chauffeur Yango'
   ?[['yangoPermisRecto','01-permis-recto'],['yangoPermisVerso','02-permis-verso'],['yangoCarteRose','03-carte-rose']]
   :service?[['recrutementPermisRecto','01-permis-recto'],['recrutementPermisVerso','02-permis-verso'],['recrutementCV','03-cv'],['applicantDocument','03-document']]
   :[['clientPermisRecto','01-permis-recto'],['clientPermisVerso','02-permis-verso']];
- return ordered.flatMap(([id,prefix])=>Array.from(document.getElementById(id)?.files||[]).map(file=>new File([file],prefix+'-'+file.name.replace(/[^a-zA-Z0-9._-]+/g,'-'),{type:file.type,lastModified:file.lastModified})));
+ return ordered.flatMap(([id,prefix])=>Array.from(window.GMFleetImages?.files(document.getElementById(id))||document.getElementById(id)?.files||[]).map(file=>new File([file],prefix+'-'+file.name.replace(/[^a-zA-Z0-9._-]+/g,'-'),{type:file.type,lastModified:file.lastModified})));
 }
 async function sendPublicApplication(app,form){
  if(!window.GMFleetBackend?.isConfigured())throw new Error('Le service est indisponible. Réessayez plus tard.');
@@ -463,6 +463,7 @@ async function sendPublicApplication(app,form){
   if(!form.querySelector('#yangoConditionsConsent')?.checked)throw new Error('Lisez et acceptez les conditions Partenaire Yango avant l’envoi.');
   app.yangoConditionsAccepted='true';app.yangoConditionsVersion=window.GMFleetContracts.VERSION;
  }
+ await window.GMFleetImages?.ready(form);
  const id=form.dataset.submissionId||(form.dataset.submissionId=crypto.randomUUID());
  const confirmation=await window.GMFleetBackend.createApplication(app,applicationFiles(app.service),id);
  delete form.dataset.submissionId;
