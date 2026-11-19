@@ -16,7 +16,7 @@
   PARTNER_DRIVER:[...commonStages,'approved','available','on_hold','rejected','withdrawn']
  };
  const lolc = {not_submitted:'Non soumis',pending:'En attente de décision',information_required:'Complément demandé',approved:'Approuvé par LOLC',rejected:'Refusé par LOLC'};
- const sources = {website:'Site web',office:'Accueil au bureau',agent:'Agent',referral:'Recommandation'};
+ const sources = {website:'Site web',office:'Accueil au bureau',agent:'Agent',referral:'Recommandation',lolc:'LOLC'};
  const appointmentStates = {scheduled:'Programmé',confirmed:'Confirmé',completed:'Effectué',missed:'Manqué',cancelled:'Annulé',rescheduled:'Reprogrammé'};
  const OFFICE_ADDRESS='Bureau GM Fleet, 01 Ngongo Lutete, Kinshasa, Gombe';
  const detailLabels = {birthPlace:'Lieu de naissance',birthDate:'Date de naissance',nationality:'Nationalité',licenseCategory:'Catégorie du permis',addressNumber:'Numéro de résidence',addressAvenue:'Avenue / rue',addressQuarter:'Quartier',addressCommune:'Commune',initialDeposit:'Apport / dépôt initial déclaré',email:'E-mail',idNumber:'Pièce d’identité',carBrand:'Marque',carModel:'Modèle',carPlate:'Plaque',carYear:'Année',carChassis:'Châssis',permisFileName:'Permis (nom déclaré)',carteRoseFileName:'Carte rose (nom déclaré)',photosCount:'Photos déclarées',cvFileName:'CV (nom déclaré)',licenseNumber:'Numéro de permis',yangoStatus:'Statut Yango'};
