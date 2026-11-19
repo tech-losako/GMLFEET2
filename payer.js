@@ -124,7 +124,7 @@
  }
  async function downloadReceipt(id,button){
   button.disabled=true;const access=token;
-  try{const receipt=await call('receipt',{receipt_id:id});if(token!==access)return;if(receipt.status!=='confirmed')throw new Error('Le reçu sera disponible après confirmation du paiement.');window.GMFleetReceipt.download(receipt);}
+  try{const receipt=await call('receipt',{receipt_id:id});if(token!==access)return;if(receipt.status!=='confirmed')throw new Error('Le reçu sera disponible après confirmation du paiement.');await window.GMFleetReceipt.download(receipt);}
   catch(error){const panel=$('panel-receipts');if(panel){let notice=panel.querySelector('.form-error');if(!notice){notice=document.createElement('p');notice.className='form-error';notice.setAttribute('role','alert');panel.append(notice);}notice.textContent=error.message;}}finally{button.disabled=false;}
  }
  let refreshing=false;

@@ -1,0 +1,23 @@
+const fs=require('fs'),assert=require('assert/strict'),{randomUUID}=require('crypto'),{PGlite}=require('../work/dbtest/node_modules/@electric-sql/pglite');const AsyncFunction=Object.getPrototypeOf(async function(){}).constructor;
+(async()=>{const db=new PGlite();try{
+ const src=fs.readFileSync('tests/whatsapp-dispatch-database.cjs','utf8'),boot=src.slice(src.indexOf(' const source='),src.indexOf('\n const admin='));await new AsyncFunction('db','fs','process','AsyncFunction',boot)(db,fs,process,AsyncFunction);
+ await db.exec("alter table staff_members add column receives_finance_sms boolean not null default true;update staff_members set phone='+243810000099';");
+ const boss=fs.readFileSync('supabase/migrations/20261104113801_designated_boss_payment_sms_alerts.sql','utf8');await db.exec(boss.slice(boss.indexOf('create function private.queue_boss_finance_sms'),boss.indexOf('create or replace function private.queue_payment_sms')));
+ await db.exec(fs.readFileSync('supabase/migrations/20261119084112_payment_gml_share_notifications.sql','utf8'));
+ const admin='11111111-1111-1111-1111-111111111111',a=(await db.query("insert into applications(name,phone,vehicle,source) values('Client Fixture','+243 906 500 702','Vitz','office') returning id")).rows[0].id;
+ const driver=(await db.query("insert into drivers(application_id,full_name,phone,status) values($1,'Client Fixture','+243906500702','active') returning id",[a])).rows[0].id;
+ const v=(await db.query("insert into vehicles(model,plate) values('Vitz','GML-TEST') returning id")).rows[0].id;
+ const c=(await db.query("insert into contracts(request_id,command_payload,application_id,driver_id,vehicle_id,contract_type,currency,start_date,end_date,first_payment_date,daily_lolc,daily_gml,operating_days,excluded_dates,signed_reference,created_by) values($1,'{}',$2,$3,$4,'DRIVE_TO_OWN','USD','2026-11-01','2027-11-01','2026-11-02',27,2.5,array[1,2,3,4,5,6],'{}','GML-CTR-TEST',$5) returning id",[randomUUID(),a,driver,v,admin])).rows[0].id;
+ // Isolate notification triggers; allocations are owned by existing cashier RPC tests.
+ await db.exec('alter table payments disable trigger user;alter table payments enable trigger z_queue_payment_sms');
+ async function pay(amount,lolc,method='Espèces',extra={}){return (await db.query("insert into payments(contract_id,driver_name,amount,lolc_amount,paid_on,method,reference,recorded_by,entry_kind,reverses_payment_id) values($1,'Client Fixture',$2,$3,'2026-11-19',$4,$5,$6,$7,$8) returning *",[c,amount,lolc,method,'TEST-'+randomUUID(),admin,extra.kind||'payment',extra.original||null])).rows[0];}
+ async function receipt(p){return (await db.query('select * from sms_dispatches where event_key=$1',['payment:'+p.id])).rows[0];}
+ const day=await pay(29.5,27);let msg=await receipt(day);assert.match(msg.body,/recu 2.50 USD pour la part GML/);assert.ok(!msg.body.includes('LOLC'));assert.equal(msg.recipient,'+243906500702');
+ const snapshot=(await db.query('select private.whatsapp_snapshot(s) j from sms_dispatches s where id=$1',[msg.id])).rows[0].j;assert.equal(snapshot.template,'gml_versement_confirme_fr');assert.equal(Number(snapshot.parameters[1]),2.5);
+ const week=await pay(177,162,'Araka Mobile Money');msg=await receipt(week);assert.match(msg.body,/recu 15.00 USD/);assert.ok(!msg.body.includes('162'));assert.equal(Number((await db.query('select private.whatsapp_snapshot(s) j from sms_dispatches s where id=$1',[msg.id])).rows[0].j.parameters[1]),15);
+ const internal=(await db.query("select body from sms_dispatches where kind='boss_payment' and event_key like $1",['payment:'+week.id+':boss:%'])).rows[0].body;assert.match(internal,/GML : 15.00 USD. LOLC : 162.00 USD/);
+ const zero=await pay(27,27);assert.equal(await receipt(zero),undefined);
+ const reversal=await pay(29.5,27,'Espèces',{kind:'reversal',original:day.id});msg=await receipt(reversal);assert.match(msg.body,/annulation de la part GML de 2.50 USD/);assert.ok(!msg.body.includes('LOLC'));assert.equal((await db.query('select private.whatsapp_snapshot(s) j from sms_dispatches s where id=$1',[msg.id])).rows[0].j,null);
+ const recorded=(await db.query('select amount,lolc_amount from payments where id=$1',[week.id])).rows[0];assert.equal(Number(recorded.amount),177);assert.equal(Number(recorded.lolc_amount),162);
+ console.log('PASS cash/digital client confirmations use actual GML share (daily 2.50, weekly 15.00), no LOLC wording, normalized phone, approved WhatsApp parameters, internal full split, zero-GML skip, GML-only reversal and unchanged recorded amounts. No messages sent.');
+}finally{await db.close();}})().catch(e=>{console.error(e.message,e.stack);process.exitCode=1;});

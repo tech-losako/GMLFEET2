@@ -1,190 +1,42 @@
-/* PDF receipts use server-confirmed payment data. jsPDF is pinned and served locally. */
-window.GMFleetReceipt = (() => {
- const COMPANY = {
-  name: 'George Michael Logistics',
-  rccm: 'KNG/RCCM/24-B-03334',
-  idnat: '01-F4300-N61874P',
-  address: '1 Ngongo-Lutete, Kinshasa'
- };
- const COLORS = {
-  ink: [20, 40, 56],
-  muted: [103, 122, 139],
-  line: [214, 222, 229],
-  soft: [247, 249, 251],
-  red: [211, 61, 54]
- };
-
- function create(receipt){
-  if(receipt.status!=='confirmed')throw new Error('Paiement non confirmé.');
-  if(!window.jspdf?.jsPDF)throw new Error('Téléchargement indisponible. Actualisez la page.');
-
-  const doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
-  const clean=value=>String(value??'').normalize('NFC').replace(/[\u0000-\u001f]/g,' ').replace(/[\u202f\u00a0]/g,' ').trim();
-  const money=value=>new Intl.NumberFormat('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(value)||0).replace(/[\u202f\u00a0]/g,' ')+' '+clean(receipt.currency);
-  const paymentDate=parseDate(receipt.paid_on);
-  const confirmedDate=parseDate(receipt.confirmed_at,true);
-  const receiptCode=number(receipt);
-  const left=18;
-  const right=192;
-
-  function parseDate(value,withTime=false){
-   if(!value)return '—';
-   const bare=/^\d{4}-\d{2}-\d{2}$/.test(value);
-   const parsed=new Date(bare?value+'T12:00:00Z':value);
-   if(Number.isNaN(parsed.getTime()))return clean(value);
-   const options=withTime
-    ?{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Africa/Kinshasa'}
-    :{day:'2-digit',month:'long',year:'numeric',timeZone:'Africa/Kinshasa'};
-   return new Intl.DateTimeFormat('fr-FR',options).format(parsed).replace(/[\u202f\u00a0]/g,' ');
-  }
-  function text(value,x,y,options={}){
-   const content=Array.isArray(value)?value.map(clean):clean(value);
-   doc.text(content,x,y,options);
-  }
-  function addLogo(){
-   const image=document.querySelector('.brand img');
-   if(image?.complete&&image.naturalWidth){
-    try{
-     const canvas=document.createElement('canvas');canvas.width=240;canvas.height=240;
-     const context=canvas.getContext('2d');context.fillStyle='#fff';context.fillRect(0,0,240,240);context.drawImage(image,0,0,240,240);
-     doc.addImage(canvas.toDataURL('image/jpeg',.9),'JPEG',left,15,25,25,undefined,'FAST');return;
-    }catch{}
-   }
-   doc.setDrawColor(...COLORS.red);doc.setLineWidth(1);doc.circle(left+12.5,27.5,11.5);
-   doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...COLORS.red);text('GML',left+12.5,30,{align:'center'});
-  }
-  function drawHeader(){
-   addLogo();
-   doc.setTextColor(...COLORS.ink);doc.setFont('helvetica','bold');doc.setFontSize(14);text(COMPANY.name,48,20.5);
-   doc.setFont('helvetica','normal');doc.setFontSize(8.5);
-   text('RCCM: '+COMPANY.rccm,48,27);
-   text('IDNAT: '+COMPANY.idnat,48,32.5);
-   text(COMPANY.address,48,38);
-
-   doc.setFont('helvetica','bold');doc.setFontSize(16);text('REÇU',right,20.5,{align:'right'});
-   doc.setFontSize(10);text('DE PAIEMENT',right,26,{align:'right'});
-   doc.setFontSize(9.5);text(receiptCode,right,32.5,{align:'right'});
-   doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(...COLORS.muted);
-   text('Date : '+paymentDate,right,38,{align:'right'});
-   doc.setTextColor(...COLORS.ink);doc.setFont('helvetica','bold');text('Confirmé le : '+confirmedDate,right,44,{align:'right'});
-
-   doc.setDrawColor(...COLORS.ink);doc.setLineWidth(.55);doc.line(left,51,right,51);
-   doc.setDrawColor(...COLORS.red);doc.setLineWidth(1.4);doc.line(left,51,left+21,51);
-  }
-  function drawCustomer(){
-   doc.setDrawColor(...COLORS.line);doc.setLineWidth(.25);doc.roundedRect(left,60,174,37,2,2);
-   doc.setTextColor(...COLORS.muted);doc.setFont('helvetica','bold');doc.setFontSize(8.5);text('CHAUFFEUR',left+5,68);
-   doc.setTextColor(...COLORS.ink);doc.setFontSize(12);text(receipt.driver_name||'—',left+5,76);
-   doc.setFont('helvetica','normal');doc.setFontSize(8.8);
-   doc.setTextColor(...COLORS.muted);text('Véhicule :',left+5,84);doc.setTextColor(...COLORS.ink);text(receipt.vehicle?.model||'—',left+23,84);
-   doc.setTextColor(...COLORS.muted);text('Contrat :',112,68);doc.setTextColor(...COLORS.ink);text(receipt.contract_reference||'—',128,68);
-   doc.setTextColor(...COLORS.muted);text('Plaque :',112,76);doc.setTextColor(...COLORS.ink);text(receipt.vehicle?.plate||'—',128,76);
-   doc.setTextColor(...COLORS.muted);text('Méthode :',112,84);doc.setTextColor(...COLORS.ink);text(clean(receipt.method||'').replace(/Araka/gi,'Mobile Money')||'—',132,84);
-   doc.setTextColor(...COLORS.muted);text('Référence :',left+5,92);doc.setTextColor(...COLORS.ink);doc.setFont('courier','normal');doc.setFontSize(8);text(receipt.reference||'—',left+26,92);
-  }
-  function drawPaymentTable(){
-   const top=108;
-   const columns=[left,left+9,left+70,left+123,left+148,right];
-   doc.setFillColor(...COLORS.soft);doc.rect(left,top,174,14,'F');
-   doc.setDrawColor(...COLORS.line);doc.setLineWidth(.3);doc.line(left,top,right,top);doc.line(left,top+14,right,top+14);
-   doc.setTextColor(...COLORS.ink);doc.setFont('helvetica','bold');doc.setFontSize(8.5);
-   text('#',left+3,top+8.5);text('Description',columns[1]+2,top+8.5);text('Référence',columns[2]+2,top+8.5);text('Plaque',columns[3]+2,top+8.5);text('Montant',right-2,top+8.5,{align:'right'});
-
-   const description=['Versement au contrat',paymentDate];
-   doc.setFont('courier','normal');doc.setFontSize(7.2);
-   const reference=doc.splitTextToSize(clean(receipt.reference||'—'),49);
-   const rowHeight=Math.max(22,Math.max(description.length,reference.length)*5+7);
-   doc.setFont('helvetica','normal');doc.setFontSize(8.7);doc.setTextColor(...COLORS.ink);
-   text('1',left+3,top+21);
-   text(description,columns[1]+2,top+21);
-   doc.setFont('courier','normal');doc.setFontSize(7.2);text(reference,columns[2]+2,top+21);
-   doc.setFont('helvetica','normal');doc.setFontSize(8.5);text(receipt.vehicle?.plate||'—',columns[3]+2,top+21);
-   doc.setFont('helvetica','bold');doc.setFontSize(9);text(money(receipt.total_charged??receipt.amount),right-2,top+21,{align:'right'});
-   doc.setDrawColor(...COLORS.line);doc.setLineWidth(.2);doc.line(left,top+14+rowHeight,right,top+14+rowHeight);
-   return top+14+rowHeight;
-  }
-  function drawTotal(y){
-   y+=10;
-   doc.setTextColor(...COLORS.ink);doc.setFont('helvetica','bold');doc.setFontSize(11.5);text('TOTAL REÇU',left,y+7);
-   doc.setFontSize(12);text(money(receipt.total_charged??receipt.amount),right,y+7,{align:'right'});
-   doc.setDrawColor(...COLORS.ink);doc.setLineWidth(.55);doc.line(left,y-3,right,y-3);
-   doc.setDrawColor(...COLORS.red);doc.setLineWidth(1.4);doc.line(right-30,y+11,right,y+11);
-   return y+20;
-  }
-  function drawBreakdown(y){
-   const items=[
-    ['Versement au contrat',money(receipt.amount)],
-    ['Frais de transaction',money(receipt.transaction_fee)],
-    ['Part LOLC',receipt.lolc_amount===undefined?'—':money(receipt.lolc_amount)],
-    ['Part GML',receipt.gml_amount===undefined?'—':money(receipt.gml_amount)]
-   ];
-   doc.setFillColor(...COLORS.soft);doc.roundedRect(left,y,174,28,1.5,1.5,'F');
-   doc.setTextColor(...COLORS.muted);doc.setFont('helvetica','bold');doc.setFontSize(7.5);text('DÉTAIL DU VERSEMENT',left+5,y+7);
-   items.forEach(([label,value],index)=>{
-    const x=left+5+index*42.25;
-    doc.setFont('helvetica','normal');doc.setFontSize(7.2);doc.setTextColor(...COLORS.muted);text(label,x,y+15);
-    doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...COLORS.ink);text(value,x,y+22);
-   });
-   return y+36;
-  }
-  function continuationPage(){
-   doc.addPage();
-   doc.setTextColor(...COLORS.ink);doc.setFont('helvetica','bold');doc.setFontSize(11);text('REÇU '+receiptCode,left,20);
-   doc.setDrawColor(...COLORS.ink);doc.setLineWidth(.4);doc.line(left,25,right,25);
-   return 35;
-  }
-  function drawCoveredDates(y){
-   const dates=Array.isArray(receipt.covered_dates)?receipt.covered_dates:[];
-   if(!dates.length)return y;
-   if(y+23>244)y=continuationPage();
-   doc.setTextColor(...COLORS.muted);doc.setFont('helvetica','bold');doc.setFontSize(8);text('ÉCHÉANCES COUVERTES ('+dates.length+')',left,y);
-   y+=8;
-   for(let index=0;index<dates.length;index+=3){
-    if(y+8>244){y=continuationPage();doc.setTextColor(...COLORS.muted);doc.setFont('helvetica','bold');doc.setFontSize(8);text('ÉCHÉANCES COUVERTES - SUITE',left,y);y+=8;}
-    dates.slice(index,index+3).forEach((item,column)=>{
-     const x=left+column*58;
-     doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(...COLORS.ink);text(parseDate(item.date),x,y);
-     doc.setFont('helvetica','bold');text(money(item.amount),x+54,y,{align:'right'});
-    });
-    y+=8;
-   }
-   return y+3;
-  }
-  function drawSignatures(y){
-   if(y+25>270)y=continuationPage();
-   y=Math.max(y+8,232);
-   doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(...COLORS.muted);text('Signature & cachet GML',left,y);text('Signature chauffeur',113,y);
-   doc.setDrawColor(...COLORS.line);doc.setLineWidth(.25);doc.line(left,y+15,89,y+15);doc.line(113,y+15,right,y+15);
-  }
-  function drawFooters(){
-   const pages=doc.getNumberOfPages();
-   for(let page=1;page<=pages;page++){
-    doc.setPage(page);doc.setDrawColor(...COLORS.line);doc.setLineWidth(.2);doc.line(left,278,right,278);
-    doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(...COLORS.muted);
-    text('GM Fleet · Une marque de George Michael Logistics',left,284);
-    text('gmfleet.georgemichaellogistics.cd',105,284,{align:'center'});
-    text('Page '+page+' / '+pages,right,284,{align:'right'});
-   }
-  }
-
-  drawHeader();
-  drawCustomer();
-  let y=drawPaymentTable();
-  y=drawTotal(y);
-  y=drawBreakdown(y);
-  y=drawCoveredDates(y);
-  drawSignatures(y);
-  drawFooters();
-  doc.setProperties({title:receiptCode+' - Reçu de paiement',author:'George Michael Logistics',subject:'Versement GM Fleet confirmé'});
-  return doc;
+/* Shared cashier/driver PDF. Amounts come from recorded payments. */
+window.GMFleetReceipt=(()=>{
+ const COMPANY={name:'George Michael Logistics',rccm:'KNG/RCCM/24-B-03334',idnat:'01-F4300-N61874P',address:'1, avenue Ngongo-Lutete, Gombe, Kinshasa',phone:'+243 851 686 846',website:'gmfleet.georgemichaellogistics.cd'};
+ const C={ink:[20,40,56],muted:[100,117,130],line:[219,227,232],soft:[245,248,250],red:[211,61,54]};
+ let logoPromise,logo;
+ function ready(){if(!logoPromise)logoPromise=new Promise((resolve,reject)=>{const img=new Image(),timer=setTimeout(()=>{logoPromise=null;reject(Error('Logo indisponible. Réessayez le téléchargement.'));},15000);img.onload=()=>{clearTimeout(timer);logo=img;resolve();};img.onerror=()=>{clearTimeout(timer);logoPromise=null;reject(Error('Logo indisponible. Réessayez le téléchargement.'));};img.src='/img/logogml-Photoroom.png';});return logoPromise;}
+ const clean=v=>String(v??'').normalize('NFC').replace(/[\u0000-\u001f]/g,' ').replace(/[\u202f\u00a0]/g,' ').replace(/[\u2011\u2013\u2014]/g,'-').trim();
+ function number(r){const year=String(r.paid_on||r.confirmed_at||new Date().toISOString()).slice(0,4),id=r.kind==='equipment'?String(r.id).replace(/[^a-z0-9]/gi,'').slice(0,10).toUpperCase():String(r.id??'0').replace(/[^0-9]/g,'').padStart(5,'0');return 'GML-'+(r.kind==='equipment'?'EQP':'PAY')+'-'+year+'-'+id;}
+ function create(r){
+  if(r.status!=='confirmed')throw Error('Paiement non confirmé.');
+  if(!window.jspdf?.jsPDF)throw Error('Téléchargement indisponible. Actualisez la page.');
+  const doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),L=18,R=192,W=174,code=number(r),cancelled=r.entry_kind==='reversal'||r.reversed;
+  const money=v=>Number(v||0).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2}).replace(/[\u202f\u00a0]/g,' ')+' '+clean(r.currency||'USD');
+  const date=(v,time=false)=>{if(!v)return '-';const d=new Date(/^\d{4}-\d{2}-\d{2}$/.test(v)?v+'T12:00:00Z':v);return Number.isNaN(d.getTime())?clean(v):clean(new Intl.DateTimeFormat('fr-FR',time?{dateStyle:'medium',timeStyle:'short',timeZone:'Africa/Kinshasa'}:{dateStyle:'long',timeZone:'Africa/Kinshasa'}).format(d));};
+  const text=(v,x,y,o={})=>doc.text(Array.isArray(v)?v.map(clean):clean(v),x,y,o);
+  const font=(size,bold=false,color=C.ink)=>{doc.setFont('helvetica',bold?'bold':'normal');doc.setFontSize(size);doc.setTextColor(...color);};
+  function addLogo(){const img=logo||document.querySelector('.brand img');if(img?.complete&&img.naturalWidth){doc.addImage(img,'PNG',L,15,27,27,undefined,'FAST');return;}font(22,true);text('GM',L,27);font(10,true,C.red);text('FLEET',L,35);}
+  function page(){doc.addPage();font(11,true);text(code,L,20);font(8,false,C.muted);text('Détail du versement - suite',R,20,{align:'right'});doc.setDrawColor(...C.line);doc.line(L,26,R,26);return 36;}
+  function space(y,h){return y+h>258?page():y;}
+  doc.setFillColor(...C.ink);doc.rect(0,0,210,4,'F');doc.setFillColor(...C.red);doc.rect(L,0,25,4,'F');
+  addLogo();font(13,true);text(COMPANY.name,51,21);font(9,true,C.red);text('GM FLEET',51,28);font(8,false,C.muted);text(COMPANY.address,51,34);text(COMPANY.phone,51,39);font(7,false,C.muted);text('RCCM : '+COMPANY.rccm+'     IDNAT : '+COMPANY.idnat,L,49);
+  font(17,true);text(r.entry_kind==='reversal'?'ANNULATION':'REÇU',R,20,{align:'right'});font(8,true,C.muted);text(r.kind==='equipment'?'RÈGLEMENT ÉQUIPEMENTS':'DE VERSEMENT',R,27,{align:'right'});font(9,true);text(code,R,35,{align:'right'});font(7,false,C.muted);text('Émis le '+date(r.confirmed_at,true),R,42,{align:'right'});
+  doc.setDrawColor(...C.line);doc.line(L,55,R,55);
+  doc.setFillColor(...(cancelled?C.red:C.ink));doc.roundedRect(L,65,W,32,2,2,'F');font(8,true,[220,230,235]);text(r.entry_kind==='reversal'?'MONTANT ANNULÉ':'MONTANT ENCAISSÉ',L+6,75);font(23,true,[255,255,255]);text(money(r.total_charged??r.amount),L+6,89);font(9,true,[255,255,255]);text(cancelled?'ANNULÉ':'PAIEMENT CONFIRMÉ',R-6,76,{align:'right'});font(8,false,[235,241,244]);text(date(r.paid_on),R-6,89,{align:'right'});
+  let y=105;
+  const rows=[[[r.kind==='equipment'?'DOSSIER CLIENT':'CHAUFFEUR',r.driver_name],['CONTRAT / DOSSIER',r.contract_reference]],[['VÉHICULE',clean(r.vehicle?.model)+' · '+clean(r.vehicle?.plate)],['MODE DE PAIEMENT',clean(r.method).replace(/Araka/gi,'Mobile Money')]],[['RÉFÉRENCE DU VERSEMENT',r.reference],['ENCAISSEMENT CONFIRMÉ PAR',r.confirmed_by||'GM Fleet']]];
+  for(const row of rows){font(9);const values=row.map(([,v])=>doc.splitTextToSize(clean(v)||'-',80)),height=Math.max(...values.map(a=>a.length))*4.5+9.5;y=space(y,height);row.forEach(([label],i)=>{const x=L+i*90;font(7,true,C.muted);text(label,x,y);font(9);text(values[i],x,y+6);});y+=height;}
+  y+=3;y=space(y,65);font(8,true,C.muted);text('DÉTAIL DU PAIEMENT',L,y);y+=6;
+  const items=r.kind==='equipment'?[['Règlement équipements GML',r.amount]]:[['Part GM Fleet',r.gml_amount??Number(r.amount)-Number(r.lolc_amount||0)],['Part LOLC encaissée pour son compte',r.lolc_amount||0],['Frais de transaction',r.transaction_fee||0]];
+  for(const [label,amount] of items){doc.setFillColor(...C.soft);doc.rect(L,y,W,10,'F');font(9);text(label,L+4,y+6.5);font(10,true);text(money(amount),R-4,y+6.5,{align:'right'});y+=11;}
+  doc.setDrawColor(...C.ink);doc.line(L,y,R,y);font(10,true);text(r.entry_kind==='reversal'?'TOTAL ANNULÉ':'TOTAL ENCAISSÉ',L+4,y+8);font(12,true);text(money(r.total_charged??r.amount),R-4,y+8,{align:'right'});y+=20;
+  if(r.kind==='equipment'){y=space(y,16);font(8,false,C.muted);text(doc.splitTextToSize('Forfait de référence : tracker 130 USD + installation 20 USD + services 7,50 USD x 12 = 90 USD. Le total encaissé ci-dessus correspond au règlement effectivement reçu.',W),L,y);y+=15;}
+  if(r.reversed){y=space(y,12);font(9,true,C.red);text('Ce versement a été annulé par une contre-écriture.',L,y);y+=10;}
+  if(r.covered_dates?.length){y=space(y,18);font(8,true,C.muted);text('ÉCHÉANCES COUVERTES',L,y);y+=8;for(let i=0;i<r.covered_dates.length;i+=2){y=space(y,8);r.covered_dates.slice(i,i+2).forEach((d,n)=>{font(8);text(date(d.date),L+n*90,y);font(8,true);text(money(d.amount),L+n*90+81,y,{align:'right'});});y+=7;}y+=5;}
+  y=space(y,12);font(8,false,C.muted);text(doc.splitTextToSize('Reçu émis électroniquement à partir d’un paiement enregistré et confirmé. Conservez sa référence pour toute demande auprès de GM Fleet.',W),L,y);y+=16;
+  if(y<239){font(8,false,C.muted);text('Visa / cachet en cas de remise papier',L,247);doc.setDrawColor(...C.line);doc.line(L,264,L+72,264);}
+  for(let p=1;p<=doc.getNumberOfPages();p++){doc.setPage(p);doc.setDrawColor(...C.line);doc.line(L,278,R,278);font(7,false,C.muted);text('GM Fleet · Une marque de George Michael Logistics',L,284);text(COMPANY.website,L,289);text('Page '+p+' / '+doc.getNumberOfPages(),R,284,{align:'right'});}
+  doc.setProperties({title:code+' - Reçu GM Fleet',author:COMPANY.name,subject:'Paiement GM Fleet enregistré'});return doc;
  }
-
- function number(receipt){
-  const value=String(receipt.id??'').replace(/[^0-9]/g,'')||'0';
-  const source=receipt.paid_on||receipt.confirmed_at||new Date().toISOString();
-  const year=String(source).slice(0,4).replace(/[^0-9]/g,'')||String(new Date().getFullYear());
-  return 'GML-PAY-'+year+'-'+value.padStart(3,'0');
- }
-
- return {create,number,download:receipt=>create(receipt).save(number(receipt)+'.pdf')};
+ async function createAsync(r){await ready();return create(r);}
+ return {COMPANY,create,createAsync,number,ready,download:async r=>(await createAsync(r)).save(number(r)+'.pdf')};
 })();

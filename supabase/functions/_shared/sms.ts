@@ -6,7 +6,7 @@ export async function providerSMS(to:string,message:string){
  const username=Deno.env.get('AFRICASTALKING_USERNAME'),apiKey=Deno.env.get('AFRICASTALKING_API_KEY'),sender=Deno.env.get('AFRICASTALKING_SENDER_ID'),sandbox=username==='sandbox';
  if(!username||!apiKey)return {status:'not_configured',error:'Service SMS non configuré',sandbox};
  if(!smsPhone(to))return {status:'failed',error:'Numéro invalide : +243 suivi de 9 chiffres',sandbox};
- const body=new URLSearchParams({username,to,message,enqueue:'true'});if(sender)body.set('from',sender);
+ const body=new URLSearchParams({username,to:smsPhone(to),message,enqueue:'true'});if(sender)body.set('from',sender);
  try{
   const r=await fetch('https://api.'+(sandbox?'sandbox.':'')+'africastalking.com/version1/messaging',{method:'POST',headers:{apiKey,'Content-Type':'application/x-www-form-urlencoded',Accept:'application/json'},body,signal:AbortSignal.timeout(15000)});
   if(!r.ok)return {status:r.status>=500||r.status===408?'unknown':'failed',error:'Service SMS HTTP '+r.status,sandbox};
