@@ -18,6 +18,6 @@ function fixture(){
  await page.evaluate(()=>{weekData.as_of='2026-09-23';weekData.due=78.5;document.dispatchEvent(new Event('visibilitychange'));});await page.waitForFunction(()=>document.querySelector('.week-summary').textContent.includes('3 jour'));assert.match(await page.locator('.week-summary').innerText(),/78,50/);
  await page.screenshot({path:path.join(root,'tests/artifacts/weekly-payments-mobile.png'),fullPage:true});
  // Render the actual confirmed cash receipt as well, without exposing driver access tokens.
- const livePath=path.join(root,'tests/artifacts/aziz-cash-receipt.json');if(fs.existsSync(livePath)){const receipt=JSON.parse(fs.readFileSync(livePath,'utf8'));const pdf=await page.evaluate(r=>Array.from(new Uint8Array(window.GMFleetReceipt.create(r).output('arraybuffer'))),receipt);fs.writeFileSync(path.join(root,'tests/artifacts/GMFleet-recu-4.pdf'),Buffer.from(pdf));}
+ const livePath=path.join(root,'tests/artifacts/aziz-cash-receipt.json');if(fs.existsSync(livePath)){const receipt=JSON.parse(fs.readFileSync(livePath,'utf8'));const pdf=await page.evaluate(async r=>Array.from(new Uint8Array((await window.GMFleetReceipt.createAsync(r)).output('arraybuffer'))),receipt);fs.writeFileSync(path.join(root,'tests/artifacts/GMFleet-recu-4.pdf'),Buffer.from(pdf));}
  console.log('PASS: settled week, daily accrual, 1/2/3 days, custom amounts, partial-day remainder, cash PDF and cashier refresh with preserved edits.');
  }finally{await browser.close();server.close();}})().catch(e=>{console.error(e);process.exit(1)});

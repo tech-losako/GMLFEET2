@@ -2,13 +2,15 @@
 window.GMFleetReceipt=(()=>{
  const COMPANY={name:'George Michael Logistics',rccm:'KNG/RCCM/24-B-03334',idnat:'01-F4300-N61874P',address:'1, avenue Ngongo-Lutete, Gombe, Kinshasa',phone:'+243 851 686 846',website:'gmfleet.georgemichaellogistics.cd'};
  const C={ink:[20,40,56],muted:[100,117,130],line:[219,227,232],soft:[245,248,250],red:[211,61,54]};
- let logoPromise,logo;
- function ready(){if(!logoPromise)logoPromise=new Promise((resolve,reject)=>{const img=new Image(),timer=setTimeout(()=>{logoPromise=null;reject(Error('Logo indisponible. Réessayez le téléchargement.'));},15000);img.onload=()=>{clearTimeout(timer);logo=img;resolve();};img.onerror=()=>{clearTimeout(timer);logoPromise=null;reject(Error('Logo indisponible. Réessayez le téléchargement.'));};img.src='/img/logogml-Photoroom.png';});return logoPromise;}
+ let assetsPromise,logo,stamp;
+ function asset(src,label){return new Promise((resolve,reject)=>{const img=new Image(),timer=setTimeout(()=>{img.onload=img.onerror=null;reject(Error(label+' indisponible. Réessayez le téléchargement.'));},15000);img.onload=()=>{clearTimeout(timer);resolve(img);};img.onerror=()=>{clearTimeout(timer);reject(Error(label+' indisponible. Réessayez le téléchargement.'));};img.src=src;});}
+ function ready(){if(!assetsPromise)assetsPromise=Promise.all([asset('/img/logogml-Photoroom.png','Logo'),asset('/img/gml-receipt-stamp.png','Cachet')]).then(([l,s])=>{logo=l;stamp=s;}).catch(error=>{assetsPromise=null;throw error;});return assetsPromise;}
  const clean=v=>String(v??'').normalize('NFC').replace(/[\u0000-\u001f]/g,' ').replace(/[\u202f\u00a0]/g,' ').replace(/[\u2011\u2013\u2014]/g,'-').trim();
  function number(r){const year=String(r.paid_on||r.confirmed_at||new Date().toISOString()).slice(0,4),id=r.kind==='equipment'?String(r.id).replace(/[^a-z0-9]/gi,'').slice(0,10).toUpperCase():String(r.id??'0').replace(/[^0-9]/g,'').padStart(5,'0');return 'GML-'+(r.kind==='equipment'?'EQP':'PAY')+'-'+year+'-'+id;}
  function create(r){
   if(r.status!=='confirmed')throw Error('Paiement non confirmé.');
   if(!window.jspdf?.jsPDF)throw Error('Téléchargement indisponible. Actualisez la page.');
+  if(!stamp?.complete||!stamp.naturalWidth)throw Error('Le cachet GML doit être chargé avant de créer le reçu. Réessayez le téléchargement.');
   const doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),L=18,R=192,W=174,code=number(r),cancelled=r.entry_kind==='reversal'||r.reversed;
   const money=v=>Number(v||0).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2}).replace(/[\u202f\u00a0]/g,' ')+' '+clean(r.currency||'USD');
   const date=(v,time=false)=>{if(!v)return '-';const d=new Date(/^\d{4}-\d{2}-\d{2}$/.test(v)?v+'T12:00:00Z':v);return Number.isNaN(d.getTime())?clean(v):clean(new Intl.DateTimeFormat('fr-FR',time?{dateStyle:'medium',timeStyle:'short',timeZone:'Africa/Kinshasa'}:{dateStyle:'long',timeZone:'Africa/Kinshasa'}).format(d));};
@@ -32,8 +34,10 @@ window.GMFleetReceipt=(()=>{
   if(r.kind==='equipment'){y=space(y,16);font(8,false,C.muted);text(doc.splitTextToSize('Forfait de référence : tracker 130 USD + installation 20 USD + services 7,50 USD x 12 = 90 USD. Le total encaissé ci-dessus correspond au règlement effectivement reçu.',W),L,y);y+=15;}
   if(r.reversed){y=space(y,12);font(9,true,C.red);text('Ce versement a été annulé par une contre-écriture.',L,y);y+=10;}
   if(r.covered_dates?.length){y=space(y,18);font(8,true,C.muted);text('ÉCHÉANCES COUVERTES',L,y);y+=8;for(let i=0;i<r.covered_dates.length;i+=2){y=space(y,8);r.covered_dates.slice(i,i+2).forEach((d,n)=>{font(8);text(date(d.date),L+n*90,y);font(8,true);text(money(d.amount),L+n*90+81,y,{align:'right'});});y+=7;}y+=5;}
-  y=space(y,12);font(8,false,C.muted);text(doc.splitTextToSize('Reçu émis électroniquement à partir d’un paiement enregistré et confirmé. Conservez sa référence pour toute demande auprès de GM Fleet.',W),L,y);y+=16;
-  if(y<239){font(8,false,C.muted);text('Visa / cachet en cas de remise papier',L,247);doc.setDrawColor(...C.line);doc.line(L,264,L+72,264);}
+  if(y+32>275)y=page();
+  font(8,false,C.muted);text(doc.splitTextToSize('Reçu émis électroniquement à partir d’un paiement enregistré et confirmé. Conservez sa référence pour toute demande auprès de GM Fleet.',125),L,y+5);
+  font(7,false,C.muted);text('Cachet GML reproduit électroniquement.',L,y+22);
+  if(stamp?.complete&&stamp.naturalWidth){font(7,true,C.muted);text('CACHET GML',R-32,y-2);doc.addImage(stamp,'PNG',R-32,y,32,32,undefined,'FAST');}
   for(let p=1;p<=doc.getNumberOfPages();p++){doc.setPage(p);doc.setDrawColor(...C.line);doc.line(L,278,R,278);font(7,false,C.muted);text('GM Fleet · Une marque de George Michael Logistics',L,284);text(COMPANY.website,L,289);text('Page '+p+' / '+doc.getNumberOfPages(),R,284,{align:'right'});}
   doc.setProperties({title:code+' - Reçu GM Fleet',author:COMPANY.name,subject:'Paiement GM Fleet enregistré'});return doc;
  }

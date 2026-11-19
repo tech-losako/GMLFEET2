@@ -45,3 +45,7 @@ Validation: `payment-gml-notifications-database.cjs`, `sms-delivery-edge.cjs`,
 SMS admin browser test. The demonstration PDF is `output/pdf/exemple-recu-gml.pdf`;
 its pages were rendered and visually reviewed. Tests use fictional data and do not
 send payment messages.
+
+The supplied company stamp is embedded unchanged in cashier, driver and equipment
+receipt PDFs, beneath the payment details. It is labelled as an electronic
+reproduction. Both logo and stamp must load before a PDF can be generated.
