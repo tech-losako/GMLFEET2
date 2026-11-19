@@ -47,5 +47,6 @@ its pages were rendered and visually reviewed. Tests use fictional data and do n
 send payment messages.
 
 The supplied company stamp is embedded unchanged in cashier, driver and equipment
-receipt PDFs, beneath the payment details. It is labelled as an electronic
-reproduction. Both logo and stamp must load before a PDF can be generated.
+receipt PDFs, aligned left beneath the payment details. The explanatory receipt
+and electronic-reproduction sentences are omitted. Both logo and stamp must load
+before a PDF can be generated.

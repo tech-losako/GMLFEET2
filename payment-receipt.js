@@ -35,9 +35,7 @@ window.GMFleetReceipt=(()=>{
   if(r.reversed){y=space(y,12);font(9,true,C.red);text('Ce versement a été annulé par une contre-écriture.',L,y);y+=10;}
   if(r.covered_dates?.length){y=space(y,18);font(8,true,C.muted);text('ÉCHÉANCES COUVERTES',L,y);y+=8;for(let i=0;i<r.covered_dates.length;i+=2){y=space(y,8);r.covered_dates.slice(i,i+2).forEach((d,n)=>{font(8);text(date(d.date),L+n*90,y);font(8,true);text(money(d.amount),L+n*90+81,y,{align:'right'});});y+=7;}y+=5;}
   if(y+32>275)y=page();
-  font(8,false,C.muted);text(doc.splitTextToSize('Reçu émis électroniquement à partir d’un paiement enregistré et confirmé. Conservez sa référence pour toute demande auprès de GM Fleet.',125),L,y+5);
-  font(7,false,C.muted);text('Cachet GML reproduit électroniquement.',L,y+22);
-  if(stamp?.complete&&stamp.naturalWidth){font(7,true,C.muted);text('CACHET GML',R-32,y-2);doc.addImage(stamp,'PNG',R-32,y,32,32,undefined,'FAST');}
+  doc.addImage(stamp,'PNG',L,y,32,32,undefined,'FAST');
   for(let p=1;p<=doc.getNumberOfPages();p++){doc.setPage(p);doc.setDrawColor(...C.line);doc.line(L,278,R,278);font(7,false,C.muted);text('GM Fleet · Une marque de George Michael Logistics',L,284);text(COMPANY.website,L,289);text('Page '+p+' / '+doc.getNumberOfPages(),R,284,{align:'right'});}
   doc.setProperties({title:code+' - Reçu GM Fleet',author:COMPANY.name,subject:'Paiement GM Fleet enregistré'});return doc;
  }
