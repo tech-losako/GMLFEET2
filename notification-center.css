@@ -1,0 +1,29 @@
+.notification-workspace{max-width:1120px;margin:auto}
+.notification-workspace [hidden]{display:none!important}
+.notification-tabs{display:flex;flex-wrap:wrap;gap:6px;padding:6px;background:#e9eff2;border-radius:14px;margin-bottom:22px}
+.notification-tabs button{flex:1;padding:11px 16px;border:0;border-radius:10px;background:transparent;color:#506674;font:inherit;font-weight:650;cursor:pointer}
+.notification-tabs button[aria-pressed=true]{background:#172e3c;color:white;box-shadow:0 2px 6px #172e3c18}
+.notification-summary{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.notification-workspace .card{padding:24px;margin-bottom:18px;min-width:0}
+.notification-workspace h3{margin:0 0 12px}
+.notification-workspace p{margin:10px 0;line-height:1.55}
+.notification-workspace .card-heading{gap:12px;flex-wrap:wrap}
+.notification-workspace .card-heading h3{margin:0}
+.notification-filters{display:grid;grid-template-columns:2fr 1fr 1.4fr;gap:12px;margin:20px 0 8px}
+.notification-workspace label{display:block;min-width:0}
+.notification-workspace input:not([type=checkbox]),.notification-workspace select{width:100%;min-width:0;margin-top:7px}
+.notification-message{border-top:1px solid #e2e9ed;padding:14px 0}
+.notification-message summary{display:flex;align-items:center;justify-content:space-between;gap:14px;cursor:pointer;list-style:none}
+.notification-message summary>span:first-child{min-width:0}
+.notification-message summary strong{display:block;font-size:15px}
+.notification-message small{display:block;margin-top:6px;color:#617583;font-size:13px}
+.notification-message .tag{font-size:12px;white-space:normal;text-align:center;max-width:210px}
+.notification-message-details{padding:12px 0 0;overflow-wrap:anywhere;font-size:14px}
+.notification-pagination{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #e2e9ed;padding-top:18px;font-size:14px}
+.notification-test{border-top:1px solid #e2e9ed;margin-top:24px;padding-top:22px}
+.notification-workspace form{display:grid;gap:16px;max-width:600px;margin-top:18px}
+.notification-workspace form button{justify-self:start}
+.notification-workspace .check{display:flex;gap:10px;align-items:flex-start}
+.notification-workspace summary:focus-visible,.notification-tabs button:focus-visible{outline:3px solid #277c87;outline-offset:3px}
+.notification-workspace details>summary{cursor:pointer}
+@media(max-width:650px){.notification-summary,.notification-filters{grid-template-columns:1fr}.notification-tabs{gap:4px}.notification-tabs button{flex:1 1 28%;padding:10px 6px;font-size:14px}.notification-workspace .card{padding:18px}.notification-message summary{align-items:flex-start;flex-direction:column;gap:9px}.notification-pagination{flex-wrap:wrap}.notification-pagination button{padding:9px 12px}.notification-message .tag{max-width:100%;text-align:left}}
